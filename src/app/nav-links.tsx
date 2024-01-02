@@ -21,7 +21,7 @@ const NavLinks = () => {
 			{links.map((link) => {
 				const LinkIcon = link.icon;
 				return (
-					<li className="cursor-pointer">
+					<li key={`li-${link.name}`} className="cursor-pointer">
 						<Link key={link.name} href={link.href} className={clsx({'text-black': pathname === link.href})}>
 							<LinkIcon className="w-7" />
 						</Link>
