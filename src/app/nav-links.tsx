@@ -24,7 +24,6 @@ const NavLinks = () => {
 					<li className="cursor-pointer">
 						<Link key={link.name} href={link.href} className={clsx({'text-black': pathname === link.href})}>
 							<LinkIcon className="w-7" />
-							<p className="hidden md:block">{link.name}</p>
 						</Link>
 					</li>
 				);
