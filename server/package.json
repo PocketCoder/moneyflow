@@ -1,0 +1,24 @@
+{
+	"name": "moneyflow-server",
+	"version": "0.0.0-alpha",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Jake Williams",
+	"license": "ISC",
+	"dependencies": {
+		"@prisma/client": "^5.8.0",
+		"cors": "^2.8.5",
+		"dotenv": "^16.3.1",
+		"express": "^4.18.2",
+		"express-oauth2-jwt-bearer": "^1.6.0",
+		"helmet": "^7.1.0",
+		"morgan": "^1.10.0"
+	},
+	"devDependencies": {
+		"@types/node": "^20.11.0",
+		"prisma": "^5.8.0"
+	}
+}
