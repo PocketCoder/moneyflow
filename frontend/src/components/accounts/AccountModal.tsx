@@ -1,3 +1,4 @@
+import {useContext} from 'react';
 import {
 	Dialog,
 	DialogPanel,
@@ -18,12 +19,22 @@ import {
 	TableCell
 } from '@tremor/react';
 import {XMarkIcon} from '@heroicons/react/24/outline';
+import PrefContext from '../../lib/PrefContext';
 
 export default function AccountModal({isOpen, setIsOpen, account}) {
-	const chartData = account.balanceHistory;
+	const {preferences} = useContext(PrefContext);
+	const year = preferences.year;
+	const chartData = account.years[year];
 	chartData.sort((a, b) => new Date(a.date) - new Date(b.date));
 	const valueFormatter = (number: number) =>
 		`${new Intl.NumberFormat('en-GB', {style: 'currency', currency: 'GBP'}).format(number).toString()}`;
+	const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = date.getDate();
+        const month = date.getMonth() + 1; // Month is zero-based
+        const year = date.getFullYear();
+        return `${day}/${month < 10 ? '0' : ''}${month}/${year}`;
+    };
 	return (
 		<Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
 			<DialogPanel>
@@ -56,7 +67,7 @@ export default function AccountModal({isOpen, setIsOpen, account}) {
 							<LineChart
 								className=""
 								data={chartData}
-								index="strBal" // FIXME: Date is going backwards in graph.
+								index={"date"} // FIXME: Format Date
 								categories={['amount']}
 								colors={['emerald']}
 								valueFormatter={valueFormatter}
@@ -74,7 +85,7 @@ export default function AccountModal({isOpen, setIsOpen, account}) {
 								<TableBody>
 									{chartData.map((item, index) => (
 										<TableRow key={`${index}_${item.name}`}>
-											<TableCell>{item.strBal}</TableCell>
+											<TableCell>{item.date}</TableCell>
 											<TableCell>£{item.amount}</TableCell>
 										</TableRow>
 									))}

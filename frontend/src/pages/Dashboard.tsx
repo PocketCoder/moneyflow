@@ -30,7 +30,6 @@ export default function Dashboard() {
 				<Card className="w-fit">
 					<Title>TO DO:</Title>
 					- Add in Line Chart for Net Worth History. <br />
-					- Add in breakdown by category. <br />- Filters for years (eventually.)
 				</Card>
 				{/*netWorthAcc ? <LineChart data={netWorthAcc.balanceHistory.reverse()} valueFormatter={valueFormatter} index={'date'} categories={['balance']} colors={['emerald']} /> : <p>Loading...</p>*/}
 			</div>

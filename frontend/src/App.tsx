@@ -17,9 +17,13 @@ import AddMenu from './components/AddMenu';
 import AddNewAccountModal from './components/AddNewAccountModal';
 import UpdateAllModal from './components/UpdateAllModal';
 import UserContext from './lib/UserContext';
+import PrefContext from './lib/PrefContext';
 
 function App() {
+	const currYear = new Date().getFullYear();
+
 	const [displayErrors, setDisplayErrors] = useState<ReactNode[] | null>(null);
+
 	function handleError(error, title: string) {
 		const errorMessage = error instanceof Error ? error.message : error;
 		const newError = (
@@ -33,7 +37,9 @@ function App() {
 		);
 		setDisplayErrors((prev) => [...(prev || []), newError]);
 	}
+
 	const {isLoading, isAuthenticated, error, user, getAccessTokenSilently, loginWithRedirect} = useAuth0();
+
 	const [userData, setUserData] = useState<UserDataType>({
 		id: '',
 		authID: '',
@@ -42,8 +48,11 @@ function App() {
 		netWorth: 0,
 		banks: []
 	});
-	const currYear = new Date().getFullYear();
-	const [year, setYear] = useState(currYear);
+
+	const [preferences, setPreferences] = useState({
+		year: currYear
+	});
+	
 	const [years, setYears] = useState([]);
 
 	if (error) handleError(error, 'Auth0 Error');
@@ -118,46 +127,49 @@ function App() {
 	};
 
 	console.log(userData);
+	
 	return (
-		<UserContext.Provider value={{userData, setUserData}}>
-			<main className="px-5 overflow-y-hidden">
-				{isLoading ? <span>Auth0 Loading...</span> : <></>}
-				{displayErrors}
-				<Routes>
-					<Route path="/" element={<Home />} />
-					<Route path="/dashboard" element={<Dashboard />} />
-					<Route path="/accounts" element={<Accounts />} />
-					<Route path="/profile" element={<Profile />} />
-					<Route path="/callback" element={<Callback />} />
-					<Route path="*" element={<NotFound />} />
-				</Routes>
-			</main>
-			{isMenuOpen && (
-				<AddMenu
-					updateAllModal={toggleUpdateAllModal}
-					addNewAccountModal={toggleAddNewAccountModal}
-					toggleMenu={toggleMenu}
-					menuState={isMenuOpen}
-				/>
-			)}
-			{isUpdateAllModalOpen && (
-				<UpdateAllModal usrData={userData} isOpen={isUpdateAllModalOpen} toggle={toggleUpdateAllModal} />
-			)}
-			{isAddNewAccountModalOpen && <AddNewAccountModal closeModal={toggleAddNewAccountModal} />}
-			<Card className="h-fit max-h-fit py-4 px-1 min-w-fit max-w-max fixed bottom-20 left-1/2 transform -translate-x-1/2 flex justify-evenly items-center">
-				{years.map((y, i) => (
-					<Button
-						size="xs"
-						key={y}
-						variant={year == y ? 'primary' : 'secondary'}
-						className="mx-5"
-						onClick={() => setYear(y)}>
-						{y}
-					</Button>
-				))}
-			</Card>
-			<NavBar toggleMenu={toggleMenu} />
-		</UserContext.Provider>
+		<PrefContext.Provider value={{preferences, setPreferences}}>
+			<UserContext.Provider value={{userData, setUserData}}>
+				<main className="px-5 overflow-y-hidden">
+					{isLoading ? <span>Auth0 Loading...</span> : <></>}
+					{displayErrors}
+					<Routes>
+						<Route path="/" element={<Home />} />
+						<Route path="/dashboard" element={<Dashboard />} />
+						<Route path="/accounts" element={<Accounts />} />
+						<Route path="/profile" element={<Profile />} />
+						<Route path="/callback" element={<Callback />} />
+						<Route path="*" element={<NotFound />} />
+					</Routes>
+				</main>
+				{isMenuOpen && (
+					<AddMenu
+						updateAllModal={toggleUpdateAllModal}
+						addNewAccountModal={toggleAddNewAccountModal}
+						toggleMenu={toggleMenu}
+						menuState={isMenuOpen}
+					/>
+				)}
+				{isUpdateAllModalOpen && (
+					<UpdateAllModal usrData={userData} isOpen={isUpdateAllModalOpen} toggle={toggleUpdateAllModal} />
+				)}
+				{isAddNewAccountModalOpen && <AddNewAccountModal closeModal={toggleAddNewAccountModal} />}
+				<Card className="h-fit max-h-fit py-4 px-1 min-w-fit max-w-max fixed bottom-20 left-1/2 transform -translate-x-1/2 flex justify-evenly items-center">
+					{years.map((y, i) => (
+						<Button
+							size="xs"
+							key={y}
+							variant={preferences.year == y ? 'primary' : 'secondary'}
+							className="mx-5"
+							onClick={() => setPreferences({year: y})}>
+							{y}
+						</Button>
+					))}
+				</Card>
+				<NavBar toggleMenu={toggleMenu} />
+			</UserContext.Provider>
+		</PrefContext.Provider>
 	);
 }
 

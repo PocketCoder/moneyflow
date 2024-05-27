@@ -11,7 +11,6 @@ import {recalculateNetWorth} from '../lib/functions';
 export default function Profile() {
 	const {user} = useAuth0();
 	const {userData, setUserData} = useContext(UserContext);
-	console.log({userData});
 	return (
 		<main className="p-6 h-full w-full mb-16">
 			<h1 className="text-2xl">Profile</h1>
