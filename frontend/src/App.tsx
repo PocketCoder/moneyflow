@@ -4,7 +4,6 @@ import {Routes, Route} from 'react-router-dom';
 import {Callout, Card, Button} from '@tremor/react';
 import {ExclamationTriangleIcon} from '@heroicons/react/24/outline';
 import {getAccountsAndBalances, getUniqueBanks, sumNetWorth} from './lib/functions';
-import {getUserID} from './lib/data';
 import {UserDataType} from './lib/definitions';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
@@ -45,7 +44,7 @@ function App() {
 		authID: '',
 		email: '',
 		accounts: [],
-		netWorth: 0,
+		netWorth: {},
 		banks: []
 	});
 

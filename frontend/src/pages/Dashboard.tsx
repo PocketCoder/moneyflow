@@ -3,7 +3,6 @@ import UserContext from '../lib/UserContext';
 import {valueFormatter} from '../lib/functions';
 import ProgressBar from '../components/dashboard/ProgressBar';
 import {Title, Metric, LineChart, Card} from '@tremor/react';
-import {formatDate} from '../lib/functions';
 import PrefContext from '../lib/PrefContext';
 
 export default function Dashboard() {
