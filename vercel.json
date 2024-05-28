@@ -1,0 +1,13 @@
+{
+    "projects": [
+      {
+        "src": "server/",
+        "use": "@vercel/node"
+      },
+      {
+        "src": "frontend/",
+        "use": "@vercel/static-build",
+        "config": { "distDir": "dist" }
+      }
+    ]
+  }  
