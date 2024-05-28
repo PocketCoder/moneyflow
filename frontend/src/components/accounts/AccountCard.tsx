@@ -16,7 +16,7 @@ export default function AccountCard({account}) {
 			console.warn({account, e});
 		}
 	}, [account]);
-	const balance = account.years[year] ?  account.years[year][0].amount : 0;
+	const balance = account.years[year] ? account.years[year][0].amount : 0;
 	return (
 		<Card
 			className="border-x-1 border-b-2 border-b-gray-200 border-x-gray-200 hover:border-gray-200 transition-all ease-in-out cursor-pointer"

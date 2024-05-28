@@ -29,12 +29,12 @@ export default function AccountModal({isOpen, setIsOpen, account}) {
 	const valueFormatter = (number: number) =>
 		`${new Intl.NumberFormat('en-GB', {style: 'currency', currency: 'GBP'}).format(number).toString()}`;
 	const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        const day = date.getDate();
-        const month = date.getMonth() + 1; // Month is zero-based
-        const year = date.getFullYear();
-        return `${day}/${month < 10 ? '0' : ''}${month}/${year}`;
-    };
+		const date = new Date(dateString);
+		const day = date.getDate();
+		const month = date.getMonth() + 1; // Month is zero-based
+		const year = date.getFullYear();
+		return `${day}/${month < 10 ? '0' : ''}${month}/${year}`;
+	};
 	return (
 		<Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
 			<DialogPanel>
@@ -67,7 +67,7 @@ export default function AccountModal({isOpen, setIsOpen, account}) {
 							<LineChart
 								className=""
 								data={chartData}
-								index={"date"} // FIXME: Format Date
+								index={'date'} // FIXME: Format Date
 								categories={['amount']}
 								colors={['emerald']}
 								valueFormatter={valueFormatter}

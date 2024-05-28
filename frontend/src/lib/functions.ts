@@ -4,7 +4,21 @@ export function valueFormatter(number: number) {
 	return `${new Intl.NumberFormat('en-GB', {style: 'currency', currency: 'GBP'}).format(number).toString()}`;
 }
 
-export function recalculateNetWorth() {}
+export function sumNetWorth(userData) {
+	let years = {};
+	for (const a of userData.accounts) {
+		for (const y in a['years']) {
+			if (years[y] === undefined) {
+				years[y] = 0;
+			}
+			const val = parseFloat(a['years'][y][0].amount);
+			if (a.name === 'Net Worth') continue;
+			a.type === 'Debt' ? (years[y] -= val) : (years[y] += val);
+		}
+	}
+	console.log({years});
+	return years;
+}
 
 export async function getAccounts() {}
 
@@ -20,15 +34,7 @@ export async function getAccountsAndBalances(auth0id: string, token: string) {
 		console.error('Error fetching accounts:', error);
 	}
 	let allYears: string[] = [];
-	let nw: number;
 	for (const account of accounts) {
-		if (account.name === 'Net Worth') {
-			const sortedArray = account.balances.sort(
-				(a: {date: string}, b: {date: string}) => new Date(b.date) - new Date(a.date)
-			);
-			const mostRecentAmount = sortedArray[0].amount;
-			nw = parseFloat(mostRecentAmount);
-		}
 		const balances = account.balances;
 		const years = {};
 		for (const balance of balances) {
@@ -52,7 +58,7 @@ export async function getAccountsAndBalances(auth0id: string, token: string) {
 		};
 		accountArr.push(item);
 	}
-	return {accountArr, allYears, nw};
+	return {accountArr, allYears};
 }
 
 export function getUniqueBanks(accounts) {
@@ -63,16 +69,6 @@ export function getUniqueBanks(accounts) {
 		}
 	}
 	return banks;
-}
-
-export function sumNetWorth(accounts) {
-	let netWorth = 0;
-	for (const account of accounts) {
-		if (account.type === 'Net Worth') continue;
-		account.type === 'Debt' ? (netWorth -= parseFloat(account.balance)) : (netWorth += parseFloat(account.balance));
-	}
-	netWorth = parseFloat(netWorth.toFixed(2));
-	return netWorth;
 }
 
 export function formatDate(dateString) {

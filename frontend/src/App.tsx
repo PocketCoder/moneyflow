@@ -52,7 +52,7 @@ function App() {
 	const [preferences, setPreferences] = useState({
 		year: currYear
 	});
-	
+
 	const [years, setYears] = useState([]);
 
 	if (error) handleError(error, 'Auth0 Error');
@@ -79,16 +79,17 @@ function App() {
 						}
 					});
 				}
-				const {accountArr, allYears, nw} = await getAccountsAndBalances(auth0id, token);
+				const {accountArr, allYears} = await getAccountsAndBalances(auth0id, token);
 				setYears([...allYears]);
 				const uniqueBanks = getUniqueBanks(accountArr);
-				//const nw = accountArr.find((obj) => obj.name === 'Net Worth').balance;
-				//const z = sumNetWorth(accountArr);
-				//console.log({nw, z});
 				setUserData((prevObj) => ({
 					...prevObj,
 					banks: uniqueBanks,
-					accounts: accountArr,
+					accounts: accountArr
+				}));
+				const nw = sumNetWorth(userData);
+				setUserData((prevObj) => ({
+					...prevObj,
 					netWorth: nw
 				}));
 			} catch (error) {
@@ -127,7 +128,7 @@ function App() {
 	};
 
 	console.log(userData);
-	
+
 	return (
 		<PrefContext.Provider value={{preferences, setPreferences}}>
 			<UserContext.Provider value={{userData, setUserData}}>

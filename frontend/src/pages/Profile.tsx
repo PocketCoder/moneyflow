@@ -6,7 +6,7 @@ import {LoginButton} from '../components/buttons/LoginButton';
 import {LogoutButton} from '../components/buttons/LogoutButton';
 import {TextInput, Button} from '@tremor/react';
 import {TrophyIcon, ChevronRightIcon} from '@heroicons/react/24/outline';
-import {recalculateNetWorth} from '../lib/functions';
+import {sumNetWorth} from '../lib/functions';
 
 export default function Profile() {
 	const {user} = useAuth0();
@@ -50,7 +50,7 @@ export default function Profile() {
 						<div className="mt-6 w-full">
 							<div className="w-full flex justify-between items-center py-2 px-4 my-2 border-solid border-gray-300 border rounded-md">
 								<span>Recalculate Net Worth</span>
-								<Button onClick={() => recalculateNetWorth(userData)}>Recaculate</Button>
+								<Button onClick={() => sumNetWorth(userData)}>Recaculate</Button>
 							</div>
 							<div className="w-full flex justify-between items-center py-2 px-4 my-2 border-solid border-gray-300 border rounded-md">
 								<span>Export My Data</span>
