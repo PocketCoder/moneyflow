@@ -7,6 +7,7 @@ import {LogoutButton} from '../components/buttons/LogoutButton';
 import {TextInput, Button} from '@tremor/react';
 import {TrophyIcon, ChevronRightIcon} from '@heroicons/react/24/outline';
 import {sumNetWorth} from '../lib/functions';
+import Accounts from '../components/profile/Accounts.tsx';
 
 export default function Profile() {
 	const {user} = useAuth0();
@@ -46,6 +47,9 @@ export default function Profile() {
 								<span>End of year goal</span>
 								<TextInput className="w-1/3" type="text" icon={TrophyIcon} />
 							</div>
+						</div>
+						<div className="mt-6 w-full flex flex-wrap flex-row justify-between items-start">
+							<Accounts />
 						</div>
 						<div className="mt-6 w-full">
 							<div className="w-full flex justify-between items-center py-2 px-4 my-2 border-solid border-gray-300 border rounded-md">

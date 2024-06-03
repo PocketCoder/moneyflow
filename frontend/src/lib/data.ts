@@ -90,3 +90,25 @@ export async function pushNewAccounts(data: object, token: string) {
 		throw new Error(error);
 	}
 }
+
+export async function pushNewTags(data: {id: string, accountID: string, tags: Array<string>}, token: string) {
+	try {
+		const res = await fetch(`${import.meta.env.VITE_SERVER}/tags/${data.id}`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				authorization: `Bearer ${token}`
+			},
+			body: JSON.stringify(data)
+		});
+		const result = await res.json();
+		if (!result.success) {
+			throw new Error(result.error);
+		} else {
+			return {success: true};
+		}
+	} catch (error) {
+		console.error('Error:', error);
+		throw new Error(error);
+	}
+}

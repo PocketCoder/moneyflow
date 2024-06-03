@@ -33,5 +33,5 @@ export type UserDataType = {
 	email: string;
 	banks: string[]; // SELECT (parent) FROM accounts ; then .filter();
 	accounts: object[];
-	netWorth: { [year: string]: number };
+	netWorth: {[year: string]: number};
 };

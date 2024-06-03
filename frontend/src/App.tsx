@@ -4,6 +4,7 @@ import {Routes, Route} from 'react-router-dom';
 import {Callout, Card, Button} from '@tremor/react';
 import {ExclamationTriangleIcon} from '@heroicons/react/24/outline';
 import {getAccountsAndBalances, getUniqueBanks, sumNetWorth} from './lib/functions';
+import {getUserID} from './lib/data'
 import {UserDataType} from './lib/definitions';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
@@ -23,11 +24,11 @@ function App() {
 
 	const [displayErrors, setDisplayErrors] = useState<ReactNode[] | null>(null);
 
-	function handleError(error, title: string) {
+	function handleError(error: any, title: string) {
 		const errorMessage = error instanceof Error ? error.message : error;
 		const newError = (
 			<Callout
-				className="min-h-12 max-h-fit min-w-fit max-w-screen max-w-3/5 fixed bottom-20 left-2 z-50"
+				className="min-h-12 h-auto max-h-fit min-w-fit max-w-11/12 fixed bottom-20 left-2 z-50"
 				title={title}
 				icon={ExclamationTriangleIcon}
 				color="rose">
@@ -86,10 +87,12 @@ function App() {
 					banks: uniqueBanks,
 					accounts: accountArr
 				}));
-				const nw = sumNetWorth(userData);
+				const nw = sumNetWorth(userData); // FIXME: Isn't working
+				const dbID = await getUserID(auth0id, token);
 				setUserData((prevObj) => ({
 					...prevObj,
-					netWorth: nw
+					netWorth: nw,
+					id: dbID
 				}));
 			} catch (error) {
 				handleError(error, 'useEffect() Error');
@@ -132,7 +135,7 @@ function App() {
 		<PrefContext.Provider value={{preferences, setPreferences}}>
 			<UserContext.Provider value={{userData, setUserData}}>
 				<main className="px-5 overflow-y-hidden">
-					{isLoading ? <span>Auth0 Loading...</span> : <></>}
+					{isLoading && <span>Auth0 Loading...</span>}
 					{displayErrors}
 					<Routes>
 						<Route path="/" element={<Home />} />

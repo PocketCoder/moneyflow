@@ -51,9 +51,11 @@ export async function getAccountsAndBalances(auth0id: string, token: string) {
 			years[year].push(balance);
 		}
 		const item = {
+			id: account.id,
 			name: account.name,
 			type: account.type,
 			parent: account.parent,
+			tags: account.tags,
 			years: years
 		};
 		accountArr.push(item);
