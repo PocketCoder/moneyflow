@@ -3,7 +3,7 @@ import {useAuth0} from '@auth0/auth0-react';
 import UserContext from '../../lib/UserContext';
 import {Card, Title, Subtitle, Text, Badge, Button, TextInput} from '@tremor/react';
 import {MinusCircleIcon, PlusCircleIcon} from '@heroicons/react/24/outline';
-import { pushNewTags } from '../../lib/data';
+import {pushNewTags} from '../../lib/data';
 
 export default function Accounts() {
 	const {getAccessTokenSilently} = useAuth0();
@@ -18,7 +18,10 @@ export default function Accounts() {
 			setUserData({...userData, accounts: updatedAccounts});
 			try {
 				const token = await getAccessTokenSilently();
-				await pushNewTags({id: userData.id, accountID: userData.accounts[accountIndex].id, tags: userData.accounts[accountIndex].tags}, token);
+				await pushNewTags(
+					{id: userData.id, accountID: userData.accounts[accountIndex].id, tags: userData.accounts[accountIndex].tags},
+					token
+				);
 			} catch (err) {
 				console.error('Error', err);
 				throw new Error(err);
@@ -32,7 +35,10 @@ export default function Accounts() {
 		setUserData({...userData, accounts: updatedAccounts});
 		try {
 			const token = await getAccessTokenSilently();
-			await pushNewTags({id: userData.id, accountID: userData.accounts[accountIndex].id, tags: updatedAccounts[accountIndex].tags}, token);
+			await pushNewTags(
+				{id: userData.id, accountID: userData.accounts[accountIndex].id, tags: updatedAccounts[accountIndex].tags},
+				token
+			);
 		} catch (err) {
 			console.error('Error', err);
 			throw new Error(err);

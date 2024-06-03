@@ -4,9 +4,10 @@ export function valueFormatter(number: number) {
 	return `${new Intl.NumberFormat('en-GB', {style: 'currency', currency: 'GBP'}).format(number).toString()}`;
 }
 
-export function sumNetWorth(userData) {
+export function sumNetWorth(accountsArr) {
+	console.log(accountsArr);
 	let years = {};
-	for (const a of userData.accounts) {
+	for (const a of accountsArr) {
 		for (const y in a['years']) {
 			if (years[y] === undefined) {
 				years[y] = 0;
@@ -16,7 +17,6 @@ export function sumNetWorth(userData) {
 			a.type === 'Debt' ? (years[y] -= val) : (years[y] += val);
 		}
 	}
-	console.log({years});
 	return years;
 }
 

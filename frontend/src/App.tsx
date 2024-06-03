@@ -4,7 +4,7 @@ import {Routes, Route} from 'react-router-dom';
 import {Callout, Card, Button} from '@tremor/react';
 import {ExclamationTriangleIcon} from '@heroicons/react/24/outline';
 import {getAccountsAndBalances, getUniqueBanks, sumNetWorth} from './lib/functions';
-import {getUserID} from './lib/data'
+import {getUserID} from './lib/data';
 import {UserDataType} from './lib/definitions';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
@@ -55,51 +55,50 @@ function App() {
 
 	const [years, setYears] = useState([]);
 
-	if (error) handleError(error, 'Auth0 Error');
+	useEffect(() => {
+		if (error) handleError(error, 'Auth0 Error');
+	}, [error]);
+
+	function authenticateUser() {
+		if (!isLoading && !isAuthenticated) {
+			loginWithRedirect({appState: {returnTo: '/dashboard'}});
+		}
+	}
+
+	async function fetchData(auth0id: string) {
+		try {
+			let token;
+			try {
+				token = await getAccessTokenSilently();
+			} catch (e) {
+				console.error(`Token Failed: ${e}`);
+				await loginWithRedirect({
+					appState: {
+						returnTo: '/dashboard'
+					}
+				});
+			}
+			const {accountArr, allYears} = await getAccountsAndBalances(auth0id, token);
+			const nw = sumNetWorth(accountArr);
+			setYears([...allYears]);
+			const uniqueBanks = getUniqueBanks(accountArr);
+			const dbID = await getUserID(auth0id, token);
+			setUserData((prevObj) => ({
+				...prevObj,
+				banks: uniqueBanks,
+				accounts: accountArr,
+				netWorth: nw,
+				id: dbID
+			}));
+		} catch (error) {
+			handleError(error, 'useEffect() Error');
+		}
+	}
 
 	useEffect(() => {
-		if (!isLoading && !isAuthenticated) {
-			loginWithRedirect({
-				appState: {
-					returnTo: '/dashboard'
-				}
-			});
-		}
-
-		async function fetchData(auth0id: string) {
-			try {
-				let token;
-				try {
-					token = await getAccessTokenSilently();
-				} catch (e) {
-					console.error(`Token Failed: ${e}`);
-					await loginWithRedirect({
-						appState: {
-							returnTo: '/dashboard'
-						}
-					});
-				}
-				const {accountArr, allYears} = await getAccountsAndBalances(auth0id, token);
-				setYears([...allYears]);
-				const uniqueBanks = getUniqueBanks(accountArr);
-				setUserData((prevObj) => ({
-					...prevObj,
-					banks: uniqueBanks,
-					accounts: accountArr
-				}));
-				const nw = sumNetWorth(userData); // FIXME: Isn't working
-				const dbID = await getUserID(auth0id, token);
-				setUserData((prevObj) => ({
-					...prevObj,
-					netWorth: nw,
-					id: dbID
-				}));
-			} catch (error) {
-				handleError(error, 'useEffect() Error');
-			}
-		}
-
-		if (isAuthenticated) {
+		if (!isAuthenticated) {
+			authenticateUser();
+		} else {
 			if (user) {
 				const auth0id = user ? user.sub?.split('|')[1] : '';
 				const usrEmail = user.email ? user.email : '';
@@ -111,7 +110,7 @@ function App() {
 				fetchData(auth0id);
 			}
 		}
-	}, [isAuthenticated, user, getAccessTokenSilently]);
+	}, [isAuthenticated, user]);
 
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isUpdateAllModalOpen, setIsUpdateAllModalOpen] = useState(false);

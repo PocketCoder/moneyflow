@@ -91,7 +91,7 @@ export async function pushNewAccounts(data: object, token: string) {
 	}
 }
 
-export async function pushNewTags(data: {id: string, accountID: string, tags: Array<string>}, token: string) {
+export async function pushNewTags(data: {id: string; accountID: string; tags: Array<string>}, token: string) {
 	try {
 		const res = await fetch(`${import.meta.env.VITE_SERVER}/tags/${data.id}`, {
 			method: 'POST',
