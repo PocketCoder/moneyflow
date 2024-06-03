@@ -37,10 +37,41 @@ export default function NetWorthDonut({data, year}) {
 	}
 
 	const chartData = transformData(data, year);
-	// TODO: Add legend
+	const colours = [
+		'rose',
+		'pink',
+		'fuchsia',
+		'purple',
+		'violet',
+		'indigo',
+		'blue',
+		'sky',
+		'cyan',
+		'teal',
+		'emerald',
+		'green',
+		'lime',
+		'yellow',
+		'amber',
+		'orange',
+		'red',
+		'stone',
+		'neutral',
+		'zinc',
+		'gray',
+		'slate'
+	];
+	const chartcolours = colours.slice(0, chartData.unique.length);
 	return (
 		<div className="flex flex-row justify-evenly items-center w-1/2">
-			<DonutChart data={chartData.formattedResult} variant="pie" valueFormatter={valueFormatter} />
+			<DonutChart
+				data={chartData.formattedResult}
+				variant="pie"
+				showAnimation={true}
+				colors={chartcolours}
+				valueFormatter={valueFormatter}
+			/>
+			<Legend categories={chartData.unique} colors={chartcolours} className="max-w-xs" />
 		</div>
 	);
 }
