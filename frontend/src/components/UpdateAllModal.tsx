@@ -1,4 +1,4 @@
-import {useState, useEffect, useContext} from 'react';
+import {useState, useContext} from 'react';
 import UserContext from '../lib/UserContext';
 import {pushUpdates} from '../lib/functions';
 import UpdateCard from './UpdateCard';
@@ -6,10 +6,10 @@ import {DatePicker, Dialog, DialogPanel, Title, Subtitle, Button, Text} from '@t
 import {XMarkIcon, DocumentPlusIcon} from '@heroicons/react/24/outline';
 import {useAuth0} from '@auth0/auth0-react';
 
-export default function UpdateAllModal({usrData, isOpen, toggle}) {
+export default function UpdateAllModal({isOpen, toggle}) {
 	const {getAccessTokenSilently, loginWithRedirect} = useAuth0();
 	const {userData} = useContext(UserContext);
-	const [data, setData] = useState(usrData.accounts);
+	const [data, setData] = useState(userData.accounts);
 	const [date, setDate] = useState(new Date());
 	const [newData, setNewData] = useState([]);
 	const updateAccount = (accountObj, value) => {
@@ -22,9 +22,6 @@ export default function UpdateAllModal({usrData, isOpen, toggle}) {
 		let token;
 		try {
 			token = await getAccessTokenSilently();
-			const result = await pushUpdates(newData, userData, token);
-			if (result?.success) {
-			}
 		} catch (e) {
 			console.error(`Token Failed: ${e}`);
 			await loginWithRedirect({
@@ -32,6 +29,13 @@ export default function UpdateAllModal({usrData, isOpen, toggle}) {
 					returnTo: '/dashboard'
 				}
 			});
+		}
+		try {
+			const result = await pushUpdates(newData, userData, token);
+			if (result?.success) {
+			}
+		} catch (e) {
+			console.error(`Token Failed: ${e}`);
 		}
 	}
 

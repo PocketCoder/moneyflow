@@ -3,20 +3,29 @@ import {CurrencyPoundIcon} from '@heroicons/react/24/outline';
 import {calcPercDiff} from '../lib/functions';
 
 export default function UpdateCard({account, newData, setNewData}) {
+	const currYear = new Date().getFullYear();
 	if (account.name === 'Net Worth') {
 		return <></>;
 	}
-	const sortedBals = account.balanceHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
-	const date = new Date(sortedBals[0].date);
-	const lastUpdate = {
-		amount: sortedBals[0].amount,
-		date: `${date.toLocaleDateString(undefined, {
-			weekday: 'short',
-			year: '2-digit',
-			month: 'short',
-			day: '2-digit'
-		})}`
-	};
+	console.log(account);
+	let lastUpdate: object;
+	if (account.years[currYear]) {
+		const latestBal: object = account.years[currYear][account.years[currYear].length - 1];
+		lastUpdate = {
+			amount: latestBal.amount,
+			date: `${new Date(latestBal.date).toLocaleDateString(undefined, {
+				weekday: 'short',
+				year: '2-digit',
+				month: 'short',
+				day: '2-digit'
+			})}`
+		};
+	} else {
+		lastUpdate = {
+			amount: '?',
+			date: 'Not updated this year'
+		};
+	}
 	const percDiff: number = newData[account.name] ? calcPercDiff(lastUpdate.amount, newData[account.name].amount) : 0;
 	const updateFunc = (accountName, value) => {
 		setNewData({account: accountName, parent: account.parent}, value);
