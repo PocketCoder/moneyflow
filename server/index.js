@@ -94,13 +94,15 @@ app.post('/accounts/add/:id', checkJwt, async (req, res) => {
             });
             const date = new Date();
             const bal = parseFloat(accounts[a].balance);
-            const newBalance = await prisma.balances.create({
-                data: {
-                    account: account.id,
-                    date: date,
-                    amount: bal
-                }
-            });
+            if (bal) {
+                const newBalance = await prisma.balances.create({
+                    data: {
+                        account: account.id,
+                        date: date,
+                        amount: bal
+                    }
+                });
+            }
         }
         catch (e) {
             error = e;
