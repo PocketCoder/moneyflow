@@ -1,5 +1,5 @@
 import {useState, useContext} from 'react';
-import {TextInput, Title, Subtitle, Button, Card, Select, SelectItem} from '@tremor/react';
+import {TextInput, Title, Subtitle, Button, Card, Select, SelectItem, Divider} from '@tremor/react';
 import {
 	PlusIcon,
 	XMarkIcon,
@@ -11,6 +11,7 @@ import {
 import {addNewAccounts} from '../lib/functions';
 import {useAuth0} from '@auth0/auth0-react';
 import UserContext from '../lib/UserContext';
+import {toast} from 'react-toastify';
 
 export default function AddNewAccountModal({closeModal}) {
 	const {userData} = useContext(UserContext);
@@ -34,11 +35,26 @@ export default function AddNewAccountModal({closeModal}) {
 	};
 
 	const saveAccounts = async () => {
+		for (const a of accounts) {
+			if (a.balance == '') {
+				a.balance = '0';
+			} else if (Number.isNaN(parseFloat(a.balance))) {
+				toast.warn(`${a.balance} is not a number(Bank: ${a.parent}; Account: ${a.name})`);
+				return;
+			}
+			if (a.parent == '' || a.name == '' || a.type == '') {
+				toast.warn(`Blank fields.`);
+				return;
+			}
+		}
 		let token;
 		try {
+			toast('Creating...');
 			token = await getAccessTokenSilently();
 			const result = await addNewAccounts(accounts, userData, token);
 			if (result?.success) {
+				toast.success('Account Added');
+				closeModal();
 			}
 		} catch (e) {
 			console.error(`Token Failed: ${e}`);
@@ -56,45 +72,57 @@ export default function AddNewAccountModal({closeModal}) {
 				<Title>Add New Account</Title>
 				<Subtitle>Add a new bank and any accounts you hold with them, and their balances.</Subtitle>
 				{accounts.map((account, index) => (
-					<div key={index} className="flex justify-between items-start my-2">
-						<TextInput
-							type="text"
-							placeholder="Bank Name..."
-							className=""
-							value={account.parent}
-							icon={BuildingLibraryIcon}
-							onChange={(e) => updateAccount(index, 'parent', e.target.value)}
-						/>
-						<TextInput
-							type="text"
-							placeholder="Account Name..."
-							className=""
-							value={account.name}
-							icon={WalletIcon}
-							onChange={(e) => updateAccount(index, 'name', e.target.value)}
-						/>
-						<Select onValueChange={(e) => updateAccount(index, 'type', e)}>
-							<SelectItem value="Current Account">Current Account</SelectItem>
-							<SelectItem value="Savings Account">Savings Account</SelectItem>
-							<SelectItem value="S&S ISA">S&S ISA</SelectItem>
-							<SelectItem value="Cash Lifetime ISA">Cash Lifetime ISA</SelectItem>
-							<SelectItem value="S&S Lifetime ISA">S&S Lifetime ISA</SelectItem>
-							<SelectItem value="Cash ISA">Cash ISA</SelectItem>
-							<SelectItem value="Junior ISA">Junior ISA</SelectItem>
-							<SelectItem value="Joint Account">Joint Account</SelectItem>
-							<SelectItem value="Student Account">Student Account</SelectItem>
-							<SelectItem value="Debt">Debt</SelectItem>
-							<SelectItem value="Pension">Pension</SelectItem>
-						</Select>
-						<TextInput
-							type="text"
-							placeholder="Balance..."
-							className=""
-							value={account.balance}
-							icon={CurrencyPoundIcon}
-							onChange={(e) => updateAccount(index, 'balance', e.target.value)}
-						/>
-						<Button icon={XMarkIcon} size="sm" color="red" onClick={() => removeAccount(index)}></Button>
+					<div key={index} className="w-full mt-4 mb-1">
+						<div className="flex justify-between items-start w-full">
+							<div className="w-2/5">
+								<TextInput
+									type="text"
+									placeholder="Bank Name..."
+									className="w-full"
+									value={account.parent}
+									icon={BuildingLibraryIcon}
+									onChange={(e) => updateAccount(index, 'parent', e.target.value)}
+								/>
+								<TextInput
+									type="text"
+									placeholder="Account Name..."
+									className="w-full mt-1"
+									value={account.name}
+									icon={WalletIcon}
+									onChange={(e) => updateAccount(index, 'name', e.target.value)}
+								/>
+							</div>
+							<div className="w-2/5 ml-2">
+								<Select
+									onValueChange={(e) => updateAccount(index, 'type', e)}
+									className="w-full"
+									placeholder="Account type...">
+									<SelectItem value="Current Account">Current Account</SelectItem>
+									<SelectItem value="Savings Account">Savings Account</SelectItem>
+									<SelectItem value="S&S ISA">S&S ISA</SelectItem>
+									<SelectItem value="Cash Lifetime ISA">Cash Lifetime ISA</SelectItem>
+									<SelectItem value="S&S Lifetime ISA">S&S Lifetime ISA</SelectItem>
+									<SelectItem value="Cash ISA">Cash ISA</SelectItem>
+									<SelectItem value="Junior ISA">Junior ISA</SelectItem>
+									<SelectItem value="Joint Account">Joint Account</SelectItem>
+									<SelectItem value="Student Account">Student Account</SelectItem>
+									<SelectItem value="Debt">Debt</SelectItem>
+									<SelectItem value="Pension">Pension</SelectItem>
+								</Select>
+								<TextInput
+									type="text"
+									placeholder="Balance... (default:  £0)"
+									className="w-full mt-1"
+									value={account.balance}
+									icon={CurrencyPoundIcon}
+									onChange={(e) => updateAccount(index, 'balance', e.target.value)}
+								/>
+							</div>
+							<div className="w-1/6">
+								<Button icon={XMarkIcon} size="sm" color="red" onClick={() => removeAccount(index)}></Button>
+							</div>
+						</div>
+						<Divider />
 					</div>
 				))}
 				<Button className="mt-2" icon={PlusIcon} size="sm" onClick={addAccount}>
