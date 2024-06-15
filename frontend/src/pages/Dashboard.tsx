@@ -14,9 +14,9 @@ export default function Dashboard() {
 	const len = userData.netWorth[preferences.year].length;
 	const nw = userData.netWorth[preferences.year][len - 1].amount;
 	return (
-		<main className="p-6 h-full w-full mb-16">
+		<main className="p-6 min-h-full h-full w-full mb-16">
 			<h1 className="text-2xl">Dashboard</h1>
-			<div className="flex flex-wrap justify-start items-center mt-4">
+			<div className="flex flex-wrap justify-start items-center mt-4 mb-20">
 				<div className="flex justify-evenly items-center my-4 w-full">
 					<div>
 						<Metric>{valueFormatter(nw)}</Metric>

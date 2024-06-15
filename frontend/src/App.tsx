@@ -1,9 +1,8 @@
-import {useState, useEffect, ReactNode} from 'react';
+import {useState, useEffect} from 'react';
 import {useAuth0} from '@auth0/auth0-react';
 import {Routes, Route} from 'react-router-dom';
-import {Callout, Card, Button} from '@tremor/react';
-import {ExclamationTriangleIcon} from '@heroicons/react/24/outline';
-import {getAccountsAndBalances, getUniqueBanks, sumNetWorth} from './lib/functions';
+import {Card, Button} from '@tremor/react';
+import {getAccountsAndBalances, getUniqueBanks} from './lib/functions';
 import {getUserID} from './lib/data';
 import {UserDataType} from './lib/definitions';
 import Home from './pages/Home';
@@ -12,6 +11,7 @@ import Accounts from './pages/Accounts';
 import Profile from './pages/Profile';
 import Callback from './pages/Callback';
 import NotFound from './pages/NotFound';
+import Loading from './pages/Loading';
 import NavBar from './components/NavBar';
 import AddMenu from './components/AddMenu';
 import AddNewAccountModal from './components/AddNewAccountModal';
@@ -41,9 +41,10 @@ function App() {
 	});
 
 	const [years, setYears] = useState([]);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		if (error) handleError(error, 'Auth0 Error');
+		if (error) toast.error(`Auth0 Error: ${error}`);
 	}, [error]);
 
 	function authenticateUser() {
@@ -54,6 +55,7 @@ function App() {
 
 	async function fetchData(auth0id: string) {
 		try {
+			setLoading(true);
 			let token;
 			try {
 				token = await getAccessTokenSilently();
@@ -83,6 +85,7 @@ function App() {
 		} catch (error) {
 			toast.error(`fetchData Error: ${error}`);
 		} finally {
+			setLoading(false);
 		}
 	}
 
@@ -124,9 +127,11 @@ function App() {
 	return (
 		<PrefContext.Provider value={{preferences, setPreferences}}>
 			<UserContext.Provider value={{userData, setUserData}}>
-				<main className="px-5 overflow-y-hidden">
-					{isLoading && <span>Auth0 Loading...</span>}
-					{displayErrors}
+				{isLoading || loading ? (
+					<span>
+						<Loading />
+					</span>
+				) : (
 					<Routes>
 						<Route path="/" element={<Home />} />
 						<Route path="/dashboard" element={<Dashboard />} />
@@ -135,7 +140,7 @@ function App() {
 						<Route path="/callback" element={<Callback />} />
 						<Route path="*" element={<NotFound />} />
 					</Routes>
-				</main>
+				)}
 				{isMenuOpen && (
 					<AddMenu
 						updateAllModal={toggleUpdateAllModal}

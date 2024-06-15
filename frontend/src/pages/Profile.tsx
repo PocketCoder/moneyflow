@@ -32,7 +32,7 @@ export default function Profile() {
 						<p>Logged in as: {user.email}</p>
 						<LogoutButton />
 					</div>
-					<div className="w-full flex flex-col items-center justify-evenly">
+					<div className="w-full flex flex-col items-center justify-evenly pb-20">
 						<div className="mt-6 w-full">
 							<div className="w-full flex justify-between items-center py-2 px-4 my-2 border-solid border-gray-300 border rounded-md">
 								<span>Change Email</span>
