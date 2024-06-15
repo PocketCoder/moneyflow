@@ -15,7 +15,7 @@
 		"@auth0/nextjs-auth0": "^3.5.0",
 		"@heroicons/react": "^2.1.1",
 		"@prisma/client": "^5.8.0",
-		"@tremor/react": "^3.13.1",
+		"@tremor/react": "^3.17.2",
 		"clsx": "^2.1.0",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
