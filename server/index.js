@@ -13,7 +13,7 @@ const checkJwt = auth({
     issuerBaseURL: `https://moneyflow-cred.eu.auth0.com/`
 });
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.ORIGIN_URL,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true
 }));

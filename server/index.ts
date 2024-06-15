@@ -18,7 +18,7 @@ const checkJwt = auth({
 
 app.use(
 	cors({
-		origin: 'http://localhost:5173',
+		origin: process.env.ORIGIN_URL,
 		methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 		credentials: true
 	})
