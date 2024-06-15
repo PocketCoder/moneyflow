@@ -1,11 +1,12 @@
 import {useContext} from 'react';
 import UserContext from '../lib/UserContext';
+import PrefContext from '../lib/PrefContext';
+
 import {valueFormatter} from '../lib/functions';
 import ProgressBar from '../components/dashboard/ProgressBar';
 import NetWorthDonut from '../components/dashboard/NetWorthDonut';
 import NetWorthChart from '../components/dashboard/NetWorthChart';
 import {Title, Metric} from '@tremor/react';
-import PrefContext from '../lib/PrefContext';
 
 export default function Dashboard() {
 	const {userData} = useContext(UserContext);
