@@ -1,18 +1,27 @@
+import {useContext} from 'react';
+import PrefContext from '../../lib/PrefContext';
 import {SparkAreaChart} from '@tremor/react';
-import {formatDate} from '../../lib/functions';
+import {dateFormatter} from '../../lib/functions';
 
 export default function AccountSpark({account}) {
-	for (const obj of account.balanceHistory) {
-		obj.date = formatDate(obj.date);
+	const {preferences} = useContext(PrefContext);
+	const year = preferences.year;
+	const chartData = account.years[year];
+	if (chartData == undefined) {
+		return <></>;
 	}
-
+	chartData.sort((a, b) => new Date(a.date) - new Date(b.date));
+	const formattedData = chartData.map((item) => ({
+		...item,
+		date: dateFormatter(item.date)
+	}));
 	return (
 		<SparkAreaChart
-			data={account.balanceHistory.reverse()}
-			categories={['balance']}
+			data={formattedData}
+			categories={['amount']}
 			index={'date'}
 			colors={['emerald']}
-			className="h-12 w-full"
+			className="h-8 w-full pt-2"
 		/>
 	);
 }

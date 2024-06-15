@@ -11,6 +11,11 @@ export function sumNetWorth(accountsArr) {
 		for (const y in a['years']) {
 			if (years[y] === undefined) {
 				years[y] = 0;
+export function dateFormatter(dateString: string) {
+	const date = new Date(dateString);
+	const options = {year: 'numeric', month: 'short'};
+	return date.toLocaleDateString('en-GB', options);
+}
 			}
 			const val = parseFloat(a['years'][y][0].amount);
 			if (a.name === 'Net Worth') continue;

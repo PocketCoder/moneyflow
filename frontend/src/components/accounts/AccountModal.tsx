@@ -1,4 +1,5 @@
 import {useContext} from 'react';
+import PrefContext from '../../lib/PrefContext';
 import {
 	Dialog,
 	DialogPanel,
@@ -19,22 +20,17 @@ import {
 	TableCell
 } from '@tremor/react';
 import {XMarkIcon} from '@heroicons/react/24/outline';
-import PrefContext from '../../lib/PrefContext';
+import {valueFormatter, dateFormatter} from '../../lib/functions';
 
 export default function AccountModal({isOpen, setIsOpen, account}) {
 	const {preferences} = useContext(PrefContext);
 	const year = preferences.year;
 	const chartData = account.years[year];
 	chartData.sort((a, b) => new Date(a.date) - new Date(b.date));
-	const valueFormatter = (number: number) =>
-		`${new Intl.NumberFormat('en-GB', {style: 'currency', currency: 'GBP'}).format(number).toString()}`;
-	const formatDate = (dateString) => {
-		const date = new Date(dateString);
-		const day = date.getDate();
-		const month = date.getMonth() + 1; // Month is zero-based
-		const year = date.getFullYear();
-		return `${day}/${month < 10 ? '0' : ''}${month}/${year}`;
-	};
+	const formattedData = chartData.map((item) => ({
+		...item,
+		date: dateFormatter(item.date)
+	}));
 	return (
 		<Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
 			<DialogPanel>
@@ -65,13 +61,14 @@ export default function AccountModal({isOpen, setIsOpen, account}) {
 					<TabPanels>
 						<TabPanel>
 							<LineChart
-								className=""
-								data={chartData}
-								index={'date'} // FIXME: Format Date
+								data={formattedData}
+								index={'date'}
 								categories={['amount']}
 								colors={['emerald']}
 								valueFormatter={valueFormatter}
 								showAnimation={true}
+								autoMinValue={true}
+								yAxisWidth={70}
 							/>
 						</TabPanel>
 						<TabPanel>
@@ -83,7 +80,7 @@ export default function AccountModal({isOpen, setIsOpen, account}) {
 									</TableRow>
 								</TableHead>
 								<TableBody>
-									{chartData.map((item, index) => (
+									{formattedData.map((item, index) => (
 										<TableRow key={`${index}_${item.name}`}>
 											<TableCell>{item.date}</TableCell>
 											<TableCell>£{item.amount}</TableCell>

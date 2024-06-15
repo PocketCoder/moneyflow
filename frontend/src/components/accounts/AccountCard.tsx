@@ -1,25 +1,24 @@
-import {useMemo, useContext} from 'react';
+import {useContext} from 'react';
 import PrefContext from '../../lib/PrefContext';
 import {Card, Metric, Text, Title, BadgeDelta} from '@tremor/react';
+import AccountSpark from './AccountSpark';
 import {calcPercDiff} from '../../lib/functions';
 
 export default function AccountCard({account}) {
 	const {preferences} = useContext(PrefContext);
 	const year = preferences.year;
-	const percDiffResult = useMemo(() => {
-		try {
-			const balLen = account.years[year].length;
-			const oldestBal = account.years[year][balLen - 1];
-			const percDiff = calcPercDiff(oldestBal.amount, account.balance);
-			return percDiff;
-		} catch (e) {
-			console.warn({account, e});
-		}
-	}, [account]);
-	const balance = account.years[year] ? account.years[year][0].amount : 0;
+	const balance = account.years[year] ? account.years[year][account.years[year].length - 1].amount : 0;
+	const first = account.years[year] ? account.years[year][0].amount : 0;
+	const last = account.years[year] ? account.years[year][account.years[year].length - 1].amount : 0;
+	let diff;
+	if (first != 0) {
+		diff = calcPercDiff(first, last);
+	} else {
+		diff = 0;
+	}
 	return (
 		<Card
-			className="border-x-1 border-b-2 border-b-gray-200 border-x-gray-200 hover:border-gray-200 transition-all ease-in-out cursor-pointer"
+			className="flex-col justify-between h-60 border-x-1 border-b-2 border-b-gray-200 border-x-gray-200 hover:border-gray-200 transition-all ease-in-out cursor-pointer"
 			decoration="top"
 			decorationColor={account.type === 'Debt' ? 'red' : 'indigo'}>
 			<Title>{account.name}</Title>
@@ -29,15 +28,13 @@ export default function AccountCard({account}) {
 			) : (
 				<Metric className=" mt-2">£{balance}</Metric>
 			)}
-			{!isNaN(percDiffResult) && isFinite(percDiffResult) ? (
-				<BadgeDelta
-					className="mt-3"
-					deltaType={percDiffResult > 0 ? 'moderateIncrease' : percDiffResult < 0 ? 'moderateDecrease' : 'unchanged'}>
-					{percDiffResult}%
-				</BadgeDelta>
-			) : (
-				<></>
-			)}
+			<BadgeDelta
+				deltaType={diff > 0 ? 'moderateIncrease' : diff < 0 ? 'moderateDecrease' : 'unchanged'}
+				isIncreasePositive={true}
+				size="xs">
+				{diff}%
+			</BadgeDelta>
+			<AccountSpark account={account} />
 		</Card>
 	);
 }
