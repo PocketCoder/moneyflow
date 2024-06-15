@@ -34,6 +34,7 @@ app.get('/authID/:id', checkJwt, async (req, res) => {
     }
     catch (e) {
         console.error(`Error in /authID/${req.params.id}`);
+        console.error(e);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
