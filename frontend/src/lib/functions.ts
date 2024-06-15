@@ -146,36 +146,6 @@ function calculateNetWorth(updates, netWorth) {
 	return {account: 'Net Worth', parent: 'Net Worth', date: new Date(), amount: nw};
 }
 
-export function history(accounts) {
-	const netWorth: {date: string; balance: number} = {};
-	for (const a of accounts) {
-		if (a.name === 'Mum ISA') break;
-		if (a.name === 'Deposit (2, 324, W9 3EF)') break;
-		// TODO: Add in constants for these values as they didn't change throughout the year so there's only one entry.
-		for (const b of a.balanceHistory) {
-			if (b.date == undefined) {
-				console.log(b);
-				break;
-			}
-			const month = new Date(b.date).getMonth() + 1;
-			const year = new Date(b.date).getFullYear();
-			const fullDate = `${month}/${year}`;
-			const balance = parseFloat(b.balance);
-			if (isNaN(balance)) {
-				console.error(`Invalid balance for date ${jDate}: ${b.balance}`);
-				return;
-			}
-			if (netWorth[fullDate] === undefined) {
-				netWorth[fullDate] = balance;
-			} else {
-				netWorth[fullDate] += balance;
-			}
-		}
-	}
-	// FIXME: Net Worth isn't correct at the end.
-	console.log(netWorth);
-}
-
 export function calcPercDiff(oldValue, newValue) {
 	if (oldValue === 0) {
 		throw new Error('Cannot divide by zero.');
