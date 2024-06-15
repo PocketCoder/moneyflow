@@ -78,8 +78,8 @@ function App() {
 					}
 				});
 			}
-			const {accountArr, allYears} = await getAccountsAndBalances(auth0id, token);
-			const nw = sumNetWorth(accountArr);
+			const {accountArr, allYears, netWorth} = await getAccountsAndBalances(auth0id, token);
+			const nw = netWorth;
 			setYears([...allYears]);
 			const uniqueBanks = getUniqueBanks(accountArr);
 			const dbID = await getUserID(auth0id, token);

@@ -30,6 +30,7 @@ export async function getAccounts() {}
 export async function getAccountsAndBalances(auth0id: string, token: string) {
 	const usrID = await getUserID(auth0id, token);
 	const accountArr = [];
+	let netWorth;
 	let accounts;
 	try {
 		accounts = await fetchAccounts(usrID, token);
@@ -63,9 +64,12 @@ export async function getAccountsAndBalances(auth0id: string, token: string) {
 			tags: account.tags,
 			years: years
 		};
+		if (item.name === 'Net Worth') {
+			netWorth = item.years;
+		}
 		accountArr.push(item);
 	}
-	return {accountArr, allYears};
+	return {accountArr, allYears, netWorth};
 }
 
 export function getUniqueBanks(accounts) {
