@@ -1,6 +1,6 @@
 export async function fetchAccounts(userID: string, token: string) {
 	try {
-		const response = await fetch(`${import.meta.env.VITE_SERVER}/accounts/${userID}`, {
+		const response = await fetch(`${process.env.VITE_SERVER}/accounts/${userID}`, {
 			method: 'GET',
 			cache: 'default',
 			headers: {
@@ -24,7 +24,7 @@ export async function fetchAccounts(userID: string, token: string) {
 
 export async function getUserID(authID: string, token: string) {
 	try {
-		const res = await fetch(`${import.meta.env.VITE_SERVER}/authID/${authID}`, {
+		const res = await fetch(`${process.env.VITE_SERVER}/authID/${authID}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ export async function getUserID(authID: string, token: string) {
 export async function updateAccounts(data: object, token: string) {
 	console.log(data);
 	try {
-		const res = await fetch(`${import.meta.env.VITE_SERVER}/accounts/${data.id}`, {
+		const res = await fetch(`${process.env.VITE_SERVER}/accounts/${data.id}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ export async function updateAccounts(data: object, token: string) {
 
 export async function pushNewAccounts(data: object, token: string) {
 	try {
-		const res = await fetch(`${import.meta.env.VITE_SERVER}/accounts/add/${data.id}`, {
+		const res = await fetch(`${process.env.VITE_SERVER}/accounts/add/${data.id}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ export async function pushNewAccounts(data: object, token: string) {
 
 export async function pushNewTags(data: {id: string; accountID: string; tags: Array<string>}, token: string) {
 	try {
-		const res = await fetch(`${import.meta.env.VITE_SERVER}/tags/${data.id}`, {
+		const res = await fetch(`${process.env.VITE_SERVER}/tags/${data.id}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
