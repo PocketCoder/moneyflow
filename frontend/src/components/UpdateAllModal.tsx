@@ -9,12 +9,15 @@ import {useAuth0} from '@auth0/auth0-react';
 export default function UpdateAllModal({isOpen, toggle}) {
 	const {getAccessTokenSilently, loginWithRedirect} = useAuth0();
 	const {userData} = useContext(UserContext);
-	const [data, setData] = useState(userData.accounts);
 	const [date, setDate] = useState(new Date());
 	const [newData, setNewData] = useState([]);
+
+	const data = userData.accounts;
+
 	const updateAccount = (accountObj, value) => {
 		if (value === '') return;
-		const newUpdate = {...accountObj, date: new Date(), amount: value};
+		value.replace(/,/g, '');
+		const newUpdate = {...accountObj, date: date, amount: value};
 		setNewData((prevUpdates) => ({...prevUpdates, [accountObj.account]: newUpdate}));
 	};
 
@@ -31,8 +34,10 @@ export default function UpdateAllModal({isOpen, toggle}) {
 			});
 		}
 		try {
+			if (!token) throw new Error('Not authenticated');
 			const result = await pushUpdates(newData, userData, token);
 			if (result?.success) {
+				toggle();
 			}
 		} catch (e) {
 			console.error(`Token Failed: ${e}`);
@@ -45,7 +50,8 @@ export default function UpdateAllModal({isOpen, toggle}) {
 				<div className="flex justify-between items-center">
 					<div>
 						<Title>Update Balances</Title>
-						<Subtitle>Update the balances in your accounts. Leave blank if the balance has remaind the same.</Subtitle>
+						<Subtitle>Update the balances in your accounts.</Subtitle>
+						<Text>Leave blank if the balance has remaind the same.</Text>
 					</div>
 					<div>
 						<Button className="mx-4" icon={XMarkIcon} size="xs" variant="secondary" color="red" onClick={toggle}>
