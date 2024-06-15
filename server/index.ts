@@ -28,6 +28,10 @@ app.use(helmet());
 app.use(morgan('tiny'));
 app.use(express.json());
 
+app.get("/", (req, res) => {
+	res.send("Express on Vercel");
+  });
+
 app.get('/authID/:id', checkJwt, async (req, res) => {
 	try {
 		const id = await prisma.users.findUnique({
