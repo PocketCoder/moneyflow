@@ -4,28 +4,32 @@ export function valueFormatter(number: number) {
 	return `${new Intl.NumberFormat('en-GB', {style: 'currency', currency: 'GBP'}).format(number).toString()}`;
 }
 
-export function sumNetWorth(accountsArr) {
-	console.log(accountsArr);
-	let years = {};
-	for (const a of accountsArr) {
-		for (const y in a['years']) {
-			if (years[y] === undefined) {
-				years[y] = 0;
 export function dateFormatter(dateString: string) {
 	const date = new Date(dateString);
 	const options = {year: 'numeric', month: 'short'};
 	return date.toLocaleDateString('en-GB', options);
 }
+
+export function calcNetWorthHistory(userData) {
+	let historyObj = {};
+	for (const a of userData.accounts) {
+		if (Object.keys(a.years).length === 0) continue;
+		for (const y in a.years) {
+			for (const b in a.years[y]) {
+				console.log(a.years[y][b]);
+				const bal = parseFloat(a.years[y][b]['amount']);
+				const date = new Date(a.years[y][b]['date']);
+				const dateStr = date.toString();
+				if (!Object.hasOwn(historyObj, dateStr)) {
+					historyObj[dateStr] = bal;
+				} else {
+					historyObj[dateStr] += bal;
+				}
 			}
-			const val = parseFloat(a['years'][y][0].amount);
-			if (a.name === 'Net Worth') continue;
-			a.type === 'Debt' ? (years[y] -= val) : (years[y] += val);
 		}
 	}
-	return years;
+	console.log(historyObj);
 }
-
-export async function getAccounts() {}
 
 export async function getAccountsAndBalances(auth0id: string, token: string) {
 	const usrID = await getUserID(auth0id, token);
