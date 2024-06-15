@@ -143,3 +143,4 @@ process.on('SIGINT', async () => {
     await prisma.$disconnect();
     process.exit();
 });
+module.exports = app;
