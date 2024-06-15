@@ -19,24 +19,11 @@ import UpdateAllModal from './components/UpdateAllModal';
 import UserContext from './lib/UserContext';
 import PrefContext from './lib/PrefContext';
 
+import {ToastContainer, toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
+
 function App() {
 	const currYear = new Date().getFullYear();
-
-	const [displayErrors, setDisplayErrors] = useState<ReactNode[] | null>(null);
-
-	function handleError(error: any, title: string) {
-		const errorMessage = error instanceof Error ? error.message : error;
-		const newError = (
-			<Callout
-				className="min-h-12 h-auto max-h-fit min-w-fit max-w-11/12 fixed bottom-20 left-2 z-50"
-				title={title}
-				icon={ExclamationTriangleIcon}
-				color="rose">
-				{errorMessage}
-			</Callout>
-		);
-		setDisplayErrors((prev) => [...(prev || []), newError]);
-	}
 
 	const {isLoading, isAuthenticated, error, user, getAccessTokenSilently, loginWithRedirect} = useAuth0();
 
@@ -90,8 +77,12 @@ function App() {
 				netWorth: nw,
 				id: dbID
 			}));
+			toast.success('Data loaded!', {
+				autoClose: 7000
+			});
 		} catch (error) {
-			handleError(error, 'useEffect() Error');
+			toast.error(`fetchData Error: ${error}`);
+		} finally {
 		}
 	}
 
@@ -170,6 +161,7 @@ function App() {
 					))}
 				</Card>
 				<NavBar toggleMenu={toggleMenu} />
+				<ToastContainer />
 			</UserContext.Provider>
 		</PrefContext.Provider>
 	);

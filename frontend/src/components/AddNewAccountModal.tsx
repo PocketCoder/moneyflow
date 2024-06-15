@@ -39,11 +39,11 @@ export default function AddNewAccountModal({closeModal}) {
 			if (a.balance == '') {
 				a.balance = '0';
 			} else if (Number.isNaN(parseFloat(a.balance))) {
-				toast.warn(`${a.balance} is not a number(Bank: ${a.parent}; Account: ${a.name})`);
+				toast.warn(`${a.balance} is not a number (Bank: ${a.parent}; Account: ${a.name})`);
 				return;
 			}
 			if (a.parent == '' || a.name == '' || a.type == '') {
-				toast.warn(`Blank fields.`);
+				toast.warn(`Please fill in the blank fields.`);
 				return;
 			}
 		}
