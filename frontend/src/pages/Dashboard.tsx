@@ -3,6 +3,7 @@ import UserContext from '../lib/UserContext';
 import {valueFormatter} from '../lib/functions';
 import ProgressBar from '../components/dashboard/ProgressBar';
 import NetWorthDonut from '../components/dashboard/NetWorthDonut';
+import NetWorthChart from '../components/dashboard/NetWorthChart';
 import {Title, Metric} from '@tremor/react';
 import PrefContext from '../lib/PrefContext';
 
@@ -26,6 +27,9 @@ export default function Dashboard() {
 				<div className="flex justify-evenly items-center my-4 w-full">
 					<ProgressBar start={25000} goal={40000} curr={userData.netWorth[preferences.year]} />
 					<NetWorthDonut data={userData.accounts} year={preferences.year} />
+				</div>
+				<div className='flex-col my-4 mx-auto w-10/12 h-auto"'>
+					<NetWorthChart />
 				</div>
 			</div>
 		</main>
