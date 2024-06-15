@@ -108,6 +108,8 @@ export default function AddNewAccountModal({closeModal}) {
 									<SelectItem value="Student Account">Student Account</SelectItem>
 									<SelectItem value="Debt">Debt</SelectItem>
 									<SelectItem value="Pension">Pension</SelectItem>
+									<SelectItem value="Net Worth">Net Worth</SelectItem>
+									<SelectItem value="Other">Other</SelectItem>
 								</Select>
 								<TextInput
 									type="text"
