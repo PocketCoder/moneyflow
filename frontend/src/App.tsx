@@ -6,7 +6,7 @@ import {Card, Button} from '@tremor/react';
 import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-import {fetchUserData} from './lib/functions'
+import {fetchUserData} from './lib/functions';
 import {UserDataType} from './lib/definitions';
 
 import Home from './pages/Home';
@@ -25,15 +25,14 @@ import UserContext from './lib/UserContext';
 import PrefContext from './lib/PrefContext';
 
 export default function App() {
-	//const queryClient = useQueryClient();
-	const [preferences, setPreferences] = useState({ year: new Date().getFullYear() });
-    const [modalState, setModalState] = useState({
-        isMenuOpen: false,
-        isUpdateAllModalOpen: false,
-        isAddNewAccountModalOpen: false
-    });
+	const [preferences, setPreferences] = useState({year: new Date().getFullYear()});
+	const [modalState, setModalState] = useState({
+		isMenuOpen: false,
+		isUpdateAllModalOpen: false,
+		isAddNewAccountModalOpen: false
+	});
 
-	const [years, setYears] = useState<string[]>([]);
+	const [years, setYears] = useState<string[] | number[]>([]);
 
 	const [userData, setUserData] = useState<UserDataType>({
 		id: '',
@@ -84,16 +83,20 @@ export default function App() {
 		if (queryError) toast.error(`Query Error: ${queryError}`);
 	}, [authError, queryError]);
 
-	const toggleMenu = () => setModalState((prev) => ({ ...prev, isMenuOpen: !prev.isMenuOpen }));
-    const toggleUpdateAllModal = () => setModalState((prev) => ({ ...prev, isUpdateAllModalOpen: !prev.isUpdateAllModalOpen }));
-    const toggleAddNewAccountModal = () => setModalState((prev) => ({ ...prev, isAddNewAccountModalOpen: !prev.isAddNewAccountModalOpen }));
+	const toggleMenu = () => setModalState((prev) => ({...prev, isMenuOpen: !prev.isMenuOpen}));
+	const toggleUpdateAllModal = () =>
+		setModalState((prev) => ({...prev, isUpdateAllModalOpen: !prev.isUpdateAllModalOpen}));
+	const toggleAddNewAccountModal = () =>
+		setModalState((prev) => ({...prev, isAddNewAccountModalOpen: !prev.isAddNewAccountModalOpen}));
 
 	console.log(userData);
 
 	return (
 		<PrefContext.Provider value={{preferences, setPreferences}}>
 			<UserContext.Provider value={{userData, setUserData}}>
-				{authLoading || queryLoading ? <Loading /> : (
+				{authLoading || queryLoading ? (
+					<Loading />
+				) : (
 					<Routes>
 						<Route path="/" element={<Home />} />
 						<Route path="/dashboard" element={<Dashboard />} />
@@ -103,17 +106,19 @@ export default function App() {
 						<Route path="*" element={<NotFound />} />
 					</Routes>
 				)}
-					
+
 				{modalState.isMenuOpen && (
-                    <AddMenu
-                        updateAllModal={toggleUpdateAllModal}
-                        addNewAccountModal={toggleAddNewAccountModal}
-                        toggleMenu={toggleMenu}
-                        menuState={modalState.isMenuOpen}
-                    />
-                )}
-                {modalState.isUpdateAllModalOpen && <UpdateAllModal isOpen={modalState.isUpdateAllModalOpen} toggle={toggleUpdateAllModal} />}
-                {modalState.isAddNewAccountModalOpen && <AddNewAccountModal closeModal={toggleAddNewAccountModal} />}
+					<AddMenu
+						updateAllModal={toggleUpdateAllModal}
+						addNewAccountModal={toggleAddNewAccountModal}
+						toggleMenu={toggleMenu}
+						menuState={modalState.isMenuOpen}
+					/>
+				)}
+				{modalState.isUpdateAllModalOpen && (
+					<UpdateAllModal isOpen={modalState.isUpdateAllModalOpen} toggle={toggleUpdateAllModal} />
+				)}
+				{modalState.isAddNewAccountModalOpen && <AddNewAccountModal closeModal={toggleAddNewAccountModal} />}
 				<Card className="h-fit max-h-fit py-4 px-1 min-w-fit max-w-max fixed bottom-20 left-1/2 transform -translate-x-1/2 flex justify-evenly items-center">
 					{years.map((y, i) => (
 						<Button
