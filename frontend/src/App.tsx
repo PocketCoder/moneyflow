@@ -150,7 +150,7 @@ function App() {
 					/>
 				)}
 				{isUpdateAllModalOpen && (
-					<UpdateAllModal usrData={userData} isOpen={isUpdateAllModalOpen} toggle={toggleUpdateAllModal} />
+					<UpdateAllModal isOpen={isUpdateAllModalOpen} toggle={toggleUpdateAllModal} />
 				)}
 				{isAddNewAccountModalOpen && <AddNewAccountModal closeModal={toggleAddNewAccountModal} />}
 				<Card className="h-fit max-h-fit py-4 px-1 min-w-fit max-w-max fixed bottom-20 left-1/2 transform -translate-x-1/2 flex justify-evenly items-center">
