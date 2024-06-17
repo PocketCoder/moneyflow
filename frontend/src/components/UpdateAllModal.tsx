@@ -5,10 +5,12 @@ import UpdateCard from './UpdateCard';
 import {DatePicker, Dialog, DialogPanel, Title, Subtitle, Button, Text} from '@tremor/react';
 import {XMarkIcon, DocumentPlusIcon} from '@heroicons/react/24/outline';
 import {useAuth0} from '@auth0/auth0-react';
+import {toast} from 'react-toastify';
+import {useMutation} from 'react-query';
 
 export default function UpdateAllModal({isOpen, toggle}) {
 	const {getAccessTokenSilently, loginWithRedirect} = useAuth0();
-	const {userData} = useContext(UserContext);
+	const userData = useContext(UserContext);
 	const [date, setDate] = useState(new Date());
 	const [newData, setNewData] = useState([]);
 
@@ -21,28 +23,25 @@ export default function UpdateAllModal({isOpen, toggle}) {
 		setNewData((prevUpdates) => ({...prevUpdates, [accountObj.account]: newUpdate}));
 	};
 
-	async function pushNewData() {
-		let token;
-		try {
-			token = await getAccessTokenSilently();
-		} catch (e) {
-			console.error(`Token Failed: ${e}`);
-			await loginWithRedirect({
-				appState: {
-					returnTo: '/dashboard'
+
+	const pushNewData = useMutation(
+			async () => {
+				const token = await getAccessTokenSilently();
+				return await pushUpdates(newData, userData, token);
+			},
+			{
+				onMutate: () => {
+					toast('Creating...');
+				},
+				onError: (error) => {
+					toast.error(`Mutation Error: ${error}`);
+				},
+				onSuccess: () => {
+					toast.success('Accounts Updated');
+					toggle();
 				}
-			});
-		}
-		try {
-			if (!token) throw new Error('Not authenticated');
-			const result = await pushUpdates(newData, userData, token);
-			if (result?.success) {
-				toggle();
 			}
-		} catch (e) {
-			console.error(`Token Failed: ${e}`);
-		}
-	}
+		).mutate();
 
 	return (
 		<Dialog open={isOpen} onClose={toggle} static={true} className="w-screen h-screen">
@@ -57,7 +56,7 @@ export default function UpdateAllModal({isOpen, toggle}) {
 						<Button className="mx-4" icon={XMarkIcon} size="xs" variant="secondary" color="red" onClick={toggle}>
 							Close
 						</Button>
-						<Button icon={DocumentPlusIcon} size="xs" variant="primary" onClick={pushNewData}>
+						<Button icon={DocumentPlusIcon} size="xs" variant="primary" onClick={() =>{pushNewData}}>
 							Save
 						</Button>
 					</div>
