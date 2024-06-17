@@ -54,7 +54,8 @@ export default function Accounts() {
 	return (
 		<>
 			{userData.accounts.map((a, i) => (
-				<Card key={i} className="my-2 mx-1 w-5/12 h-fit">
+				a.name === 'Net Worth' ? <></> :
+				<Card key={`${a.name}_${i}`} className="my-2 mx-1 w-5/12 h-fit">
 					<div className="flex flex-row justify-between items-center">
 						<div>
 							<Title>{a.name}</Title>
