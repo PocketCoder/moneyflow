@@ -12,11 +12,11 @@ import {addNewAccounts} from '../lib/functions';
 import {useAuth0} from '@auth0/auth0-react';
 import UserContext from '../lib/UserContext';
 import {toast} from 'react-toastify';
+import {useMutation} from 'react-query';
 
 export default function AddNewAccountModal({closeModal}) {
-	const {userData} = useContext(UserContext);
-	const {getAccessTokenSilently, loginWithRedirect} = useAuth0();
 	const userData = useContext(UserContext);
+	const {getAccessTokenSilently} = useAuth0();
 	const [accounts, setAccounts] = useState([{parent: '', name: '', type: '', balance: ''}]);
 
 	const addAccount = () => {
@@ -35,7 +35,8 @@ export default function AddNewAccountModal({closeModal}) {
 		setAccounts(updatedAccounts);
 	};
 
-	const saveAccounts = async () => {
+	async function saveAccounts() {
+		// Run checks before...
 		for (const a of accounts) {
 			if (a.balance == '') {
 				a.balance = '0';
@@ -48,24 +49,26 @@ export default function AddNewAccountModal({closeModal}) {
 				return;
 			}
 		}
-		let token;
-		try {
-			toast('Creating...');
-			token = await getAccessTokenSilently();
-			const result = await addNewAccounts(accounts, userData, token);
-			if (result?.success) {
-				toast.success('Account Added');
-				closeModal();
-			}
-		} catch (e) {
-			console.error(`Token Failed: ${e}`);
-			await loginWithRedirect({
-				appState: {
-					returnTo: '/dashboard'
+		// ...submitting to server
+		useMutation(
+			async () => {
+				const token = await getAccessTokenSilently();
+				return addNewAccounts(accounts, userData, token);
+			},
+			{
+				onMutate: () => {
+					toast('Creating...');
+				},
+				onError: (error) => {
+					toast.error(`Mutation Error: ${error}`);
+				},
+				onSuccess: () => {
+					toast.success('Account(s) Added');
+					closeModal();
 				}
-			});
-		}
-	};
+			}
+		).mutate();
+	}
 
 	return (
 		<div className="fixed top-0 left-0 w-full h-full flex items-center justify-center backdrop-blur-sm">
