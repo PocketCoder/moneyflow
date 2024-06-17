@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import {useAuth0} from '@auth0/auth0-react';
-import {useQueryClient, useQuery} from 'react-query';
+import {useQuery} from 'react-query';
 import {Routes, Route} from 'react-router-dom';
 import {Card, Button} from '@tremor/react';
 import {ToastContainer, toast} from 'react-toastify';
@@ -54,29 +54,30 @@ export default function App() {
 	} = useAuth0();
 
 	function authenticateUser() {
-        if (!authLoading && !isAuthenticated) {
-            loginWithRedirect({ appState: { returnTo: '/dashboard' } });
-        }
-    };
-
-    useEffect(() => {
-        authenticateUser();
-    }, [authLoading, isAuthenticated]);
-
-	const {
-		isLoading: queryLoading,
-		error: queryError
-	} = useQuery('userData', () => fetchUserData(user, getAccessTokenSilently, loginWithRedirect), {
-		enabled: isAuthenticated,
-		onSuccess: (data) => {
-			setUserData(data);
-			setYears(data.years);
-			toast.success('Data loaded!', {autoClose: 7000});
-		},
-		onError: (error) => {
-			toast.error(`fetchData Error: ${error}`);
+		if (!authLoading && !isAuthenticated) {
+			loginWithRedirect({appState: {returnTo: '/dashboard'}});
 		}
-	});
+	}
+
+	useEffect(() => {
+		authenticateUser();
+	}, [authLoading, isAuthenticated]);
+
+	const {isLoading: queryLoading, error: queryError} = useQuery(
+		'userData',
+		() => fetchUserData(user, getAccessTokenSilently, loginWithRedirect),
+		{
+			enabled: isAuthenticated,
+			onSuccess: (data) => {
+				setUserData(data);
+				setYears(data.years);
+				toast.success('Data loaded!', {autoClose: 7000});
+			},
+			onError: (error) => {
+				toast.error(`fetchData Error: ${error}`);
+			}
+		}
+	);
 
 	useEffect(() => {
 		if (authError) toast.error(`Auth0 Error: ${authError}`);
