@@ -1,10 +1,15 @@
 import {useState, useEffect} from 'react';
 import {useAuth0} from '@auth0/auth0-react';
+import { useQuery } from 'react-query';
 import {Routes, Route} from 'react-router-dom';
 import {Card, Button} from '@tremor/react';
+import {ToastContainer, toast} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
+
 import {getAccountsAndBalances, getUniqueBanks} from './lib/functions';
 import {getUserID} from './lib/data';
 import {UserDataType} from './lib/definitions';
+
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Accounts from './pages/Accounts';
@@ -16,11 +21,9 @@ import NavBar from './components/NavBar';
 import AddMenu from './components/AddMenu';
 import AddNewAccountModal from './components/AddNewAccountModal';
 import UpdateAllModal from './components/UpdateAllModal';
+
 import UserContext from './lib/UserContext';
 import PrefContext from './lib/PrefContext';
-
-import {ToastContainer, toast} from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.min.css';
 
 function App() {
 	const currYear = new Date().getFullYear();
