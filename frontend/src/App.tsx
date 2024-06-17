@@ -1,6 +1,6 @@
 import {useState, useEffect} from 'react';
 import {useAuth0} from '@auth0/auth0-react';
-import { useQuery } from 'react-query';
+import {useQueryClient, useQuery} from 'react-query';
 import {Routes, Route} from 'react-router-dom';
 import {Card, Button} from '@tremor/react';
 import {ToastContainer, toast} from 'react-toastify';
@@ -25,10 +25,64 @@ import UpdateAllModal from './components/UpdateAllModal';
 import UserContext from './lib/UserContext';
 import PrefContext from './lib/PrefContext';
 
-function App() {
-	const currYear = new Date().getFullYear();
+async function fetchUserData(user: any, getAccessTokenSilently: Function, loginWithRedirect: Function) {
+	const auth0id = user ? user.sub?.split('|')[1] : '';
+	const token = await getAccessTokenSilently().catch(async (e) => {
+		console.error(`Token Failed: ${e}`);
+		await loginWithRedirect({appState: {returnTo: '/dashboard'}});
+	});
+	const {accountArr, allYears, netWorth} = await getAccountsAndBalances(auth0id, token);
+	const uniqueBanks = getUniqueBanks(accountArr);
+	const dbID = await getUserID(auth0id, token);
+	return {
+		banks: uniqueBanks,
+		accounts: accountArr,
+		netWorth,
+		id: dbID,
+		email: user.email,
+		authID: auth0id,
+		years: allYears
+	};
+}
 
-	const {isLoading, isAuthenticated, error, user, getAccessTokenSilently, loginWithRedirect} = useAuth0();
+export default function App() {
+	const queryClient = useQueryClient();
+
+	const {
+		isLoading: authLoading,
+		isAuthenticated,
+		error: authError,
+		user,
+		getAccessTokenSilently,
+		loginWithRedirect
+	} = useAuth0();
+
+	function authenticateUser() {
+        if (!authLoading && !isAuthenticated) {
+            loginWithRedirect({ appState: { returnTo: '/dashboard' } });
+        }
+    };
+
+    useEffect(() => {
+        authenticateUser();
+    }, [authLoading, isAuthenticated]);
+
+	const {
+		isLoading: queryLoading,
+		isError,
+		data,
+		error: queryError
+	} = useQuery('userData', () => fetchUserData(user, getAccessTokenSilently, loginWithRedirect), {
+		enabled: isAuthenticated,
+		onSuccess: (data) => {
+			setUserData(data);
+			setYears(data.years);
+			toast.success('Data loaded!', {autoClose: 7000});
+		},
+		onError: (error) => {
+			toast.error(`fetchData Error: ${error}`);
+		}
+	});
 
 	const [userData, setUserData] = useState<UserDataType>({
 		id: '',
@@ -39,102 +93,35 @@ function App() {
 		banks: []
 	});
 
-	const [preferences, setPreferences] = useState({
-		year: currYear
-	});
+	const [preferences, setPreferences] = useState({ year: new Date().getFullYear() });
+    const [modalState, setModalState] = useState({
+        isMenuOpen: false,
+        isUpdateAllModalOpen: false,
+        isAddNewAccountModalOpen: false
+    });
 
 	const [years, setYears] = useState([]);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		if (error) toast.error(`Auth0 Error: ${error}`);
-	}, [error]);
-
-	function authenticateUser() {
-		if (!isLoading && !isAuthenticated) {
-			loginWithRedirect({appState: {returnTo: '/dashboard'}});
-		}
-	}
-
-	async function fetchData(auth0id: string) {
-		try {
-			setLoading(true);
-			let token;
-			try {
-				token = await getAccessTokenSilently();
-			} catch (e) {
-				console.error(`Token Failed: ${e}`);
-				await loginWithRedirect({
-					appState: {
-						returnTo: '/dashboard'
-					}
-				});
-			}
-			const {accountArr, allYears, netWorth} = await getAccountsAndBalances(auth0id, token);
-			const nw = netWorth;
-			setYears([...allYears]);
-			const uniqueBanks = getUniqueBanks(accountArr);
-			const dbID = await getUserID(auth0id, token);
-			setUserData((prevObj) => ({
-				...prevObj,
-				banks: uniqueBanks,
-				accounts: accountArr,
-				netWorth: nw,
-				id: dbID
-			}));
-			toast.success('Data loaded!', {
-				autoClose: 7000
-			});
-		} catch (error) {
-			toast.error(`fetchData Error: ${error}`);
-		} finally {
-			setLoading(false);
-		}
-	}
+		setLoading(authLoading || queryLoading);
+	}, [authLoading, queryLoading]);
 
 	useEffect(() => {
-		if (!isAuthenticated) {
-			authenticateUser();
-		} else {
-			if (user) {
-				const auth0id = user ? user.sub?.split('|')[1] : '';
-				const usrEmail = user.email ? user.email : '';
-				setUserData((prevObj) => ({
-					...prevObj,
-					email: usrEmail || '',
-					authID: auth0id || ''
-				}));
-				fetchData(auth0id);
-			}
-		}
-	}, [isAuthenticated, user]);
+		if (authError) toast.error(`Auth0 Error: ${authError}`);
+		if (queryError) toast.error(`Query Error: ${queryError}`);
+	}, [authError, queryError]);
 
-	const [isMenuOpen, setIsMenuOpen] = useState(false);
-	const [isUpdateAllModalOpen, setIsUpdateAllModalOpen] = useState(false);
-	const [isAddNewAccountModalOpen, setIsAddNewAccountModalOpen] = useState(false);
-
-	const toggleMenu = () => {
-		setIsMenuOpen((prev) => !prev);
-	};
-
-	const toggleUpdateAllModal = () => {
-		setIsUpdateAllModalOpen((prev) => !prev);
-	};
-
-	const toggleAddNewAccountModal = () => {
-		setIsAddNewAccountModalOpen((prev) => !prev);
-	};
+	const toggleMenu = () => setModalState((prev) => ({ ...prev, isMenuOpen: !prev.isMenuOpen }));
+    const toggleUpdateAllModal = () => setModalState((prev) => ({ ...prev, isUpdateAllModalOpen: !prev.isUpdateAllModalOpen }));
+    const toggleAddNewAccountModal = () => setModalState((prev) => ({ ...prev, isAddNewAccountModalOpen: !prev.isAddNewAccountModalOpen }));
 
 	console.log(userData);
 
 	return (
 		<PrefContext.Provider value={{preferences, setPreferences}}>
 			<UserContext.Provider value={{userData, setUserData}}>
-				{isLoading || loading ? (
-					<span>
-						<Loading />
-					</span>
-				) : (
+				{authLoading || queryLoading ? <Loading /> : (
 					<Routes>
 						<Route path="/" element={<Home />} />
 						<Route path="/dashboard" element={<Dashboard />} />
@@ -144,18 +131,17 @@ function App() {
 						<Route path="*" element={<NotFound />} />
 					</Routes>
 				)}
-				{isMenuOpen && (
-					<AddMenu
-						updateAllModal={toggleUpdateAllModal}
-						addNewAccountModal={toggleAddNewAccountModal}
-						toggleMenu={toggleMenu}
-						menuState={isMenuOpen}
-					/>
-				)}
-				{isUpdateAllModalOpen && (
-					<UpdateAllModal isOpen={isUpdateAllModalOpen} toggle={toggleUpdateAllModal} />
-				)}
-				{isAddNewAccountModalOpen && <AddNewAccountModal closeModal={toggleAddNewAccountModal} />}
+					
+				{modalState.isMenuOpen && (
+                    <AddMenu
+                        updateAllModal={toggleUpdateAllModal}
+                        addNewAccountModal={toggleAddNewAccountModal}
+                        toggleMenu={toggleMenu}
+                        menuState={modalState.isMenuOpen}
+                    />
+                )}
+                {modalState.isUpdateAllModalOpen && <UpdateAllModal isOpen={modalState.isUpdateAllModalOpen} toggle={toggleUpdateAllModal} />}
+                {modalState.isAddNewAccountModalOpen && <AddNewAccountModal closeModal={toggleAddNewAccountModal} />}
 				<Card className="h-fit max-h-fit py-4 px-1 min-w-fit max-w-max fixed bottom-20 left-1/2 transform -translate-x-1/2 flex justify-evenly items-center">
 					{years.map((y, i) => (
 						<Button
@@ -174,5 +160,3 @@ function App() {
 		</PrefContext.Provider>
 	);
 }
-
-export default App;
