@@ -6,8 +6,7 @@ import {Card, Button} from '@tremor/react';
 import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
-import {getAccountsAndBalances, getUniqueBanks} from './lib/functions';
-import {getUserID} from './lib/data';
+import {fetchUserData} from './lib/functions'
 import {UserDataType} from './lib/definitions';
 
 import Home from './pages/Home';
@@ -24,26 +23,6 @@ import UpdateAllModal from './components/UpdateAllModal';
 
 import UserContext from './lib/UserContext';
 import PrefContext from './lib/PrefContext';
-
-async function fetchUserData(user: any, getAccessTokenSilently: Function, loginWithRedirect: Function) {
-	const auth0id = user ? user.sub?.split('|')[1] : '';
-	const token = await getAccessTokenSilently().catch(async (e) => {
-		console.error(`Token Failed: ${e}`);
-		await loginWithRedirect({appState: {returnTo: '/dashboard'}});
-	});
-	const {accountArr, allYears, netWorth} = await getAccountsAndBalances(auth0id, token);
-	const uniqueBanks = getUniqueBanks(accountArr);
-	const dbID = await getUserID(auth0id, token);
-	return {
-		banks: uniqueBanks,
-		accounts: accountArr,
-		netWorth,
-		id: dbID,
-		email: user.email,
-		authID: auth0id,
-		years: allYears
-	};
-}
 
 export default function App() {
 	//const queryClient = useQueryClient();

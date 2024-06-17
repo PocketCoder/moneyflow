@@ -10,6 +10,26 @@ export function dateFormatter(dateString: string) {
 	return date.toLocaleDateString('en-GB', options);
 }
 
+export async function fetchUserData(user: any, getAccessTokenSilently: Function, loginWithRedirect: Function) {
+	const auth0id = user ? user.sub?.split('|')[1] : '';
+	const token = await getAccessTokenSilently().catch(async (e) => {
+		console.error(`Token Failed: ${e}`);
+		await loginWithRedirect({appState: {returnTo: '/dashboard'}});
+	});
+	const {accountArr, allYears, netWorth} = await getAccountsAndBalances(auth0id, token);
+	const uniqueBanks = getUniqueBanks(accountArr);
+	const dbID = await getUserID(auth0id, token);
+	return {
+		banks: uniqueBanks,
+		accounts: accountArr,
+		netWorth,
+		id: dbID,
+		email: user.email,
+		authID: auth0id,
+		years: allYears
+	};
+}
+
 export function calcNetWorthHistory(userData) {
 	let historyObj = {};
 	for (const a of userData.accounts) {
@@ -38,10 +58,8 @@ export async function getAccountsAndBalances(auth0id: string, token: string) {
 	let accounts;
 	try {
 		accounts = await fetchAccounts(usrID, token);
-		// Handle the data here
 	} catch (error) {
-		// Handle errors
-		console.error('Error fetching accounts:', error);
+		throw new Error(`Error fetching accounts: ${error}`);
 	}
 	let allYears: string[] = [];
 	for (const account of accounts) {
@@ -112,10 +130,8 @@ export async function pushUpdates(updates, usrData: object, token: string) {
 		if (result.success) {
 			return result;
 		}
-		// Handle the data here
 	} catch (error) {
-		// Handle errors
-		console.error('Error fetching accounts:', error);
+		throw new Error(`Error fetching accounts: ${error}`);
 	}
 }
 
