@@ -45,7 +45,7 @@ export default function UpdateAllModal({isOpen, toggle}) {
 	}
 
 	return (
-		<Dialog open={isOpen} onClose={toggle} static={true} className='w-screen h-screen'>
+		<Dialog open={isOpen} onClose={toggle} static={true} className="w-screen h-screen">
 			<DialogPanel className="min-w-fit max-w-screen h-full max-h-full">
 				<div className="flex justify-between items-center">
 					<div>
