@@ -16,6 +16,7 @@ import {toast} from 'react-toastify';
 export default function AddNewAccountModal({closeModal}) {
 	const {userData} = useContext(UserContext);
 	const {getAccessTokenSilently, loginWithRedirect} = useAuth0();
+	const userData = useContext(UserContext);
 	const [accounts, setAccounts] = useState([{parent: '', name: '', type: '', balance: ''}]);
 
 	const addAccount = () => {
