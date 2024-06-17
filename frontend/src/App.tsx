@@ -47,6 +47,14 @@ async function fetchUserData(user: any, getAccessTokenSilently: Function, loginW
 
 export default function App() {
 	//const queryClient = useQueryClient();
+	const [preferences, setPreferences] = useState({ year: new Date().getFullYear() });
+    const [modalState, setModalState] = useState({
+        isMenuOpen: false,
+        isUpdateAllModalOpen: false,
+        isAddNewAccountModalOpen: false
+    });
+
+	const [years, setYears] = useState([]);
 
 	const {
 		isLoading: authLoading,
@@ -92,20 +100,6 @@ export default function App() {
 		netWorth: {},
 		banks: []
 	});
-
-	const [preferences, setPreferences] = useState({ year: new Date().getFullYear() });
-    const [modalState, setModalState] = useState({
-        isMenuOpen: false,
-        isUpdateAllModalOpen: false,
-        isAddNewAccountModalOpen: false
-    });
-
-	const [years, setYears] = useState([]);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		setLoading(authLoading || queryLoading);
-	}, [authLoading, queryLoading]);
 
 	useEffect(() => {
 		if (authError) toast.error(`Auth0 Error: ${authError}`);
