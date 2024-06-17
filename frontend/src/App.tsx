@@ -33,7 +33,16 @@ export default function App() {
         isAddNewAccountModalOpen: false
     });
 
-	const [years, setYears] = useState([]);
+	const [years, setYears] = useState<string[]>([]);
+
+	const [userData, setUserData] = useState<UserDataType>({
+		id: '',
+		authID: '',
+		email: '',
+		accounts: [],
+		netWorth: {},
+		banks: []
+	});
 
 	const {
 		isLoading: authLoading,
@@ -56,8 +65,6 @@ export default function App() {
 
 	const {
 		isLoading: queryLoading,
-		isError,
-		data,
 		error: queryError
 	} = useQuery('userData', () => fetchUserData(user, getAccessTokenSilently, loginWithRedirect), {
 		enabled: isAuthenticated,
@@ -69,15 +76,6 @@ export default function App() {
 		onError: (error) => {
 			toast.error(`fetchData Error: ${error}`);
 		}
-	});
-
-	const [userData, setUserData] = useState<UserDataType>({
-		id: '',
-		authID: '',
-		email: '',
-		accounts: [],
-		netWorth: {},
-		banks: []
 	});
 
 	useEffect(() => {
