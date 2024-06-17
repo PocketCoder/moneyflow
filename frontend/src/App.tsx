@@ -46,7 +46,7 @@ async function fetchUserData(user: any, getAccessTokenSilently: Function, loginW
 }
 
 export default function App() {
-	const queryClient = useQueryClient();
+	//const queryClient = useQueryClient();
 
 	const {
 		isLoading: authLoading,
