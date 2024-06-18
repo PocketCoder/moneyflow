@@ -40,7 +40,8 @@ export default function App() {
 		email: '',
 		accounts: [],
 		netWorth: {},
-		banks: []
+		banks: [],
+		prefs: {}
 	});
 
 	const {

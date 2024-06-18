@@ -34,12 +34,18 @@ app.get('/', (req, res) => {
 
 app.get('/authID/:id', checkJwt, async (req, res) => {
 	try {
-		const id = await prisma.users.findUnique({
+		const user = await prisma.users.findUnique({
 			where: {
 				auth0id: req.params.id
+			},
+			select: {
+				id: true,
+				name: true,
+				auth0id: true,
+				preferences: true
 			}
 		});
-		res.status(200).json(id.id);
+		res.status(200).json(user);
 	} catch (e) {
 		console.error(`Error in /authID/${req.params.id}`);
 		console.error(e);
@@ -61,6 +67,24 @@ app.get('/accounts/:id', checkJwt, async (req, res) => {
 	} catch (e) {
 		console.error('Error in fetchAccounts(): ' + e);
 		res.status(500).json({error: 'Internal Server Error'});
+	}
+});
+
+app.post('/preferences', checkJwt, async (req, res) => {
+	const body = req.body;
+	try {
+		const goal = await prisma.users.update({
+			where: {
+				id: body.user
+			},
+			data: {
+				preferences: body.newPrefs
+			}
+		});
+		res.status(201).json({success: true});
+	} catch (e) {
+		res.status(500).json({success: false, error: e});
+		throw new Error(`Error updating preferences: ${e}`);
 	}
 });
 

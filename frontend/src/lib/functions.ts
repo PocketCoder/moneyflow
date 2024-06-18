@@ -1,4 +1,4 @@
-import {fetchAccounts, getUserID, updateAccounts, pushNewAccounts} from './data';
+import {fetchAccounts, getUserByAuthID, updateAccounts, pushNewAccounts} from './data';
 
 export function valueFormatter(number: number) {
 	return `${new Intl.NumberFormat('en-GB', {style: 'currency', currency: 'GBP'}).format(number).toString()}`;
@@ -18,15 +18,17 @@ export async function fetchUserData(user: any, getAccessTokenSilently: Function,
 	});
 	const {accountArr, allYears, netWorth} = await getAccountsAndBalances(auth0id, token);
 	const uniqueBanks = getUniqueBanks(accountArr);
-	const dbID = await getUserID(auth0id, token);
+	const dbUser = await getUserByAuthID(auth0id, token);
+
 	return {
 		banks: uniqueBanks,
 		accounts: accountArr,
 		netWorth,
-		id: dbID,
+		id: dbUser.id,
 		email: user.email,
 		authID: auth0id,
-		years: allYears
+		years: allYears,
+		prefs: dbUser.preferences
 	};
 }
 
@@ -52,12 +54,12 @@ export function calcNetWorthHistory(userData) {
 }
 
 export async function getAccountsAndBalances(auth0id: string, token: string) {
-	const usrID = await getUserID(auth0id, token);
+	const {id} = await getUserByAuthID(auth0id, token);
 	const accountArr = [];
 	let netWorth;
 	let accounts;
 	try {
-		accounts = await fetchAccounts(usrID, token);
+		accounts = await fetchAccounts(id, token);
 	} catch (error) {
 		throw new Error(`Error fetching accounts: ${error}`);
 	}

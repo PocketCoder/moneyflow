@@ -1,17 +1,58 @@
 import {useAuth0} from '@auth0/auth0-react';
-import {useContext} from 'react';
+import {useContext, useState} from 'react';
+
+import {TextInput, Button} from '@tremor/react';
+import {TrophyIcon, ChevronRightIcon} from '@heroicons/react/24/outline';
+import {toast} from 'react-toastify';
+import {useMutation} from 'react-query';
+
 import UserContext from '../lib/UserContext';
+import PrefContext from '../lib/PrefContext.tsx';
+
+import Accounts from '../components/profile/Accounts.tsx';
 import {SignupButton} from '../components/buttons/SignUpButton';
 import {LoginButton} from '../components/buttons/LoginButton';
 import {LogoutButton} from '../components/buttons/LogoutButton';
-import {TextInput, Button} from '@tremor/react';
-import {TrophyIcon, ChevronRightIcon} from '@heroicons/react/24/outline';
+
 import {calcNetWorthHistory} from '../lib/functions';
-import Accounts from '../components/profile/Accounts.tsx';
+import { pushNewPreferences } from '../lib/data.ts';
 
 export default function Profile() {
-	const {user} = useAuth0();
+	const {user, getAccessTokenSilently} = useAuth0();
+
 	const {userData, setUserData} = useContext(UserContext);
+	const {preferences: prefs} = useContext(PrefContext);
+	const goal = userData.prefs['goal'][prefs.year] || 0;
+
+	const [newGoal, setNewGoal] = useState(goal);
+
+	function setGoal(goal) {
+		setNewGoal(goal);
+	}
+
+	const mutation = useMutation(
+		async () => {
+			userData.prefs['goal'][prefs.year] = parseInt(newGoal);
+			const token = await getAccessTokenSilently();
+			return pushNewPreferences(userData.id, userData.prefs, token);
+		},
+		{
+			onMutate: () => {
+				toast('Saving...');
+			},
+			onError: (error) => {
+				toast.error(`Mutation Error: ${error}`);
+			},
+			onSuccess: () => {
+				toast.success('Goal Updated');
+			}
+		}
+	);
+
+	function saveNewGoal() {
+		mutation.mutate();
+	};
+
 	return (
 		<main className="p-6 h-full w-full mb-16">
 			<h1 className="text-2xl">Profile</h1>
@@ -45,7 +86,10 @@ export default function Profile() {
 						<div className="mt-6 w-full">
 							<div className="w-full flex justify-between items-center py-2 px-4 my-2 border-solid border-gray-300 border rounded-md">
 								<span>End of year goal</span>
-								<TextInput className="w-1/3" type="text" icon={TrophyIcon} />
+								<div className='flex justify-end items-center w-2/6'>
+									<TextInput className="w-1/2" type="text" icon={TrophyIcon} placeholder={`Current: ${goal}`} onValueChange={(e) => {setGoal(e)}} />
+									<Button onClick={saveNewGoal} size='xs' className='ml-4'>Save Goal</Button>
+								</div>
 							</div>
 						</div>
 						<div className="mt-6 w-full flex flex-wrap flex-row justify-between items-start">
