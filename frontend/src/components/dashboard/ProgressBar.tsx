@@ -4,7 +4,7 @@ import {valueFormatter} from '../../lib/functions';
 export default function MyProgressBar({start, goal, curr}) {
 	const networth = valueFormatter(curr);
 	return (
-		<Card className="max-w-sm mx-auto">
+		<Card className="mx-auto w-1/3">
 			<Flex>
 				<Text>{valueFormatter(start)}</Text>
 				<Text>
