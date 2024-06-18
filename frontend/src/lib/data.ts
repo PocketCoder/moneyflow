@@ -26,7 +26,7 @@ export async function pushNewPreferences(id: string, preferences: object, token:
 	const dataPackage = {
 		user: id,
 		newPrefs: preferences
-	}
+	};
 	try {
 		const res = await fetch(`${process.env.VITE_SERVER}/preferences/`, {
 			method: 'POST',
@@ -36,7 +36,7 @@ export async function pushNewPreferences(id: string, preferences: object, token:
 			},
 			body: JSON.stringify(dataPackage)
 		});
-		
+
 		if (!res.ok) {
 			throw new Error(`HTTP error! Status: ${res.status}`);
 		}
@@ -117,9 +117,13 @@ export async function pushNewAccounts(data: object, token: string) {
 	}
 }
 
-export async function pushNewTags(data: {id: string; accountID: string; tags: Array<string>}, token: string) {
+export async function pushNewTags(id: string, account: object, token: string) {
+	const data = {
+		account,
+		user: id
+	};
 	try {
-		const res = await fetch(`${process.env.VITE_SERVER}/tags/${data.id}`, {
+		const res = await fetch(`${process.env.VITE_SERVER}/tags/${id}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

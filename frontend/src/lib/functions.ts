@@ -4,6 +4,40 @@ export function valueFormatter(number: number) {
 	return `${new Intl.NumberFormat('en-GB', {style: 'currency', currency: 'GBP'}).format(number).toString()}`;
 }
 
+export function transformNetWorthData(data, year) {
+	const result = {
+		touchable: 0,
+		untouchable: 0,
+		other: 0
+	};
+	data.forEach((account) => {
+		if (account.years.hasOwnProperty(year) && account.years[year].length > 0) {
+			const latestEntry = account.years[year][account.years[year].length - 1];
+			const total = parseFloat(latestEntry.amount);
+			if (account.name !== 'Net Worth') {
+				if (account.tags.includes('touchable')) {
+					result['touchable'] += total;
+				} else if (account.tags.includes('untouchable')) {
+					result['untouchable'] += total;
+				} else {
+					result['other'] += total;
+				}
+			}
+		}
+	});
+
+	const formattedResult = Object.entries(result).map(([name, value]) => ({
+		name,
+		value
+	}));
+
+	let unique: Array<string> = [];
+	Object.keys(result).forEach((key) => {
+		unique.push(key);
+	});
+	return {formattedResult, unique};
+}
+
 export function dateFormatter(dateString: string) {
 	const date = new Date(dateString);
 	const options = {year: 'numeric', month: 'short'};

@@ -13,7 +13,7 @@ model accounts {
   name     String     @db.VarChar(255)
   type     String     @db.VarChar(255)
   parent   String?    @db.VarChar(255)
-  tags     String[]   @default(["touchable"])
+  tags     String[]   @default(["touchable", "active"])
   users    users?     @relation(fields: [owner], references: [id], onDelete: Cascade, onUpdate: NoAction)
   balances balances[]
 }
