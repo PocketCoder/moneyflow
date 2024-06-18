@@ -23,25 +23,24 @@ export default function UpdateAllModal({isOpen, toggle}) {
 		setNewData((prevUpdates) => ({...prevUpdates, [accountObj.account]: newUpdate}));
 	};
 
-
 	const pushNewData = useMutation(
-			async () => {
-				const token = await getAccessTokenSilently();
-				return await pushUpdates(newData, userData, token);
+		async () => {
+			const token = await getAccessTokenSilently();
+			return await pushUpdates(newData, userData, token);
+		},
+		{
+			onMutate: () => {
+				toast('Creating...');
 			},
-			{
-				onMutate: () => {
-					toast('Creating...');
-				},
-				onError: (error) => {
-					toast.error(`Mutation Error: ${error}`);
-				},
-				onSuccess: () => {
-					toast.success('Accounts Updated');
-					toggle();
-				}
+			onError: (error) => {
+				toast.error(`Mutation Error: ${error}`);
+			},
+			onSuccess: () => {
+				toast.success('Accounts Updated');
+				toggle();
 			}
-		).mutate();
+		}
+	).mutate();
 
 	return (
 		<Dialog open={isOpen} onClose={toggle} static={true} className="w-screen h-screen">
@@ -56,7 +55,13 @@ export default function UpdateAllModal({isOpen, toggle}) {
 						<Button className="mx-4" icon={XMarkIcon} size="xs" variant="secondary" color="red" onClick={toggle}>
 							Close
 						</Button>
-						<Button icon={DocumentPlusIcon} size="xs" variant="primary" onClick={() =>{pushNewData}}>
+						<Button
+							icon={DocumentPlusIcon}
+							size="xs"
+							variant="primary"
+							onClick={() => {
+								pushNewData;
+							}}>
 							Save
 						</Button>
 					</div>

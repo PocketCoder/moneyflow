@@ -31,7 +31,7 @@ export type UserDataType = {
 	id: string;
 	authID: string;
 	email: string;
-	banks: string[]; // SELECT (parent) FROM accounts ; then .filter();
+	banks: string[];
 	accounts: object[];
 	netWorth: any;
 	prefs: object;

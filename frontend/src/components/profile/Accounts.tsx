@@ -53,50 +53,53 @@ export default function Accounts() {
 
 	return (
 		<>
-			{userData.accounts.map((a, i) => (
-				a.name === 'Net Worth' ? <></> :
-				<Card key={`${a.name}_${i}`} className="my-2 mx-1 w-5/12 h-fit">
-					<div className="flex flex-row justify-between items-center">
-						<div>
-							<Title>{a.name}</Title>
-							<Subtitle>{a.parent}</Subtitle>
-							<Text>{a.type}</Text>
-						</div>
-						<div>
-							<div className="flex items-center mt-2">
-								<TextInput
-									value={a.newTag || ''}
-									onChange={(e) => handleNewTagChange(i, e.target.value)}
-									placeholder="Add new tag"
-									className="mx-1"
-								/>
-								<Button
-									onClick={() => handleAddTag(i)}
-									size="xs"
-									className="p-0 mx-1 bg-transparent border-none hover:bg-blue-300">
-									<PlusCircleIcon className="text-black h-6" />
-								</Button>
+			{userData.accounts.map((a, i) =>
+				a.name === 'Net Worth' ? (
+					<></>
+				) : (
+					<Card key={`${a.name}_${i}`} className="my-2 mx-1 w-5/12 h-fit">
+						<div className="flex flex-row justify-between items-center">
+							<div>
+								<Title>{a.name}</Title>
+								<Subtitle>{a.parent}</Subtitle>
+								<Text>{a.type}</Text>
 							</div>
-						</div>
-					</div>
-					<div className="w-full mt-5 flex flex-row justify-start items-center flex-wrap">
-						{a.tags.map((t, z) => (
-							<div key={`${t}_${z}`} className="flex items-center mr-4 my-1">
-								<>
-									<Badge>{t}</Badge>
+							<div>
+								<div className="flex items-center mt-2">
+									<TextInput
+										value={a.newTag || ''}
+										onChange={(e) => handleNewTagChange(i, e.target.value)}
+										placeholder="Add new tag"
+										className="mx-1"
+									/>
 									<Button
-										onClick={() => handleRemoveTag(i, z)}
+										onClick={() => handleAddTag(i)}
 										size="xs"
-										className="p-0 mx-1 bg-transparent border-none hover:bg-blue-300"
-										tooltip="Delete tag">
-										<MinusCircleIcon className="text-black h-6" />
+										className="p-0 mx-1 bg-transparent border-none hover:bg-blue-300">
+										<PlusCircleIcon className="text-black h-6" />
 									</Button>
-								</>
+								</div>
 							</div>
-						))}
-					</div>
-				</Card>
-			))}
+						</div>
+						<div className="w-full mt-5 flex flex-row justify-start items-center flex-wrap">
+							{a.tags.map((t, z) => (
+								<div key={`${t}_${z}`} className="flex items-center mr-4 my-1">
+									<>
+										<Badge>{t}</Badge>
+										<Button
+											onClick={() => handleRemoveTag(i, z)}
+											size="xs"
+											className="p-0 mx-1 bg-transparent border-none hover:bg-blue-300"
+											tooltip="Delete tag">
+											<MinusCircleIcon className="text-black h-6" />
+										</Button>
+									</>
+								</div>
+							))}
+						</div>
+					</Card>
+				)
+			)}
 		</>
 	);
 }
