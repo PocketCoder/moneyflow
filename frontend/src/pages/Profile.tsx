@@ -1,8 +1,8 @@
 import {useAuth0} from '@auth0/auth0-react';
 import {useContext, useState} from 'react';
 
-import {Title, TextInput, Button} from '@tremor/react';
-import {TrophyIcon, ChevronRightIcon} from '@heroicons/react/24/outline';
+import {Title, Text, TextInput, Button} from '@tremor/react';
+import {TrophyIcon, ChevronRightIcon, InformationCircleIcon} from '@heroicons/react/24/outline';
 import {toast} from 'react-toastify';
 import {useMutation} from 'react-query';
 
@@ -10,6 +10,7 @@ import UserContext from '../lib/UserContext';
 import PrefContext from '../lib/PrefContext.tsx';
 
 import Accounts from '../components/profile/Accounts.tsx';
+import InfoBox from '../components/profile/InfoBox';
 import {SignupButton} from '../components/buttons/SignUpButton';
 import {LoginButton} from '../components/buttons/LoginButton';
 import {LogoutButton} from '../components/buttons/LogoutButton';
@@ -25,6 +26,7 @@ export default function Profile() {
 	const goal = userData.prefs['goal'][prefs.year] || 0;
 
 	const [newGoal, setNewGoal] = useState(goal);
+	const [isInfoOpen, setIsInfoOpen] = useState(false);
 
 	function setGoal(goal) {
 		setNewGoal(goal);
@@ -55,6 +57,7 @@ export default function Profile() {
 
 	return (
 		<main className="p-6 h-full w-full mb-16">
+			<InfoBox isOpen={isInfoOpen} setIsOpen={setIsInfoOpen} />
 			<h1 className="text-2xl">Profile</h1>
 			{!user && (
 				<>
@@ -103,7 +106,10 @@ export default function Profile() {
 							</div>
 						</div>
 						<div className="mt-6 w-full">
-							<Title>Account Editor</Title>
+							<div className='flex'>
+								<Title className='mr-2'>Account Editor</Title>
+								<Button icon={InformationCircleIcon} variant='light' onClick={() => setIsInfoOpen(true)}></Button>
+							</div>
 							<div className="flex flex-wrap flex-row justify-between items-start">
 								<Accounts />
 							</div>
