@@ -22,6 +22,32 @@ export async function fetchAccounts(userID: string, token: string) {
 	}
 }
 
+export async function pushNewPreferences(id: string, preferences: object, token: string) {
+	const dataPackage = {
+		user: id,
+		newPrefs: preferences
+	}
+	try {
+		const res = await fetch(`${process.env.VITE_SERVER}/preferences/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				authorization: `Bearer ${token}`
+			},
+			body: JSON.stringify(dataPackage)
+		});
+		
+		if (!res.ok) {
+			throw new Error(`HTTP error! Status: ${res.status}`);
+		}
+		const data = res.json();
+		return data;
+	} catch (error) {
+		console.error('Error: ', error);
+		throw new Error(error);
+	}
+}
+
 export async function getUserByAuthID(authID: string, token: string) {
 	try {
 		const res = await fetch(`${process.env.VITE_SERVER}/authID/${authID}`, {
