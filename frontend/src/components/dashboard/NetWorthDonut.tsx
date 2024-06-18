@@ -1,77 +1,17 @@
 import {DonutChart, Legend} from '@tremor/react';
 import {valueFormatter} from '../../lib/functions';
 
-export default function NetWorthDonut({data, year}) {
-	function transformData(data, year) {
-		const result = {};
-
-		// Iterate over each account
-		data.forEach((account) => {
-			// Check if the specified year exists in the account data
-			if (account.years.hasOwnProperty(year) && account.years[year].length > 0) {
-				const latestEntry = account.years[year][account.years[year].length - 1];
-				const total = parseFloat(latestEntry.amount);
-
-				if (account.name !== 'Net Worth') {
-					// Aggregate the balances for each bank
-					if (result.hasOwnProperty(account.parent)) {
-						result[account.parent] += total;
-					} else {
-						result[account.parent] = total;
-					}
-				}
-			}
-		});
-
-		// Transform the aggregated data into the desired format
-		const formattedResult = Object.entries(result).map(([name, value]) => ({
-			name,
-			value
-		}));
-
-		let unique: Array<string> = [];
-		Object.keys(result).forEach((key) => {
-			unique.push(key);
-		});
-		return {formattedResult, unique};
-	}
-
-	const chartData = transformData(data, year);
-	const colours = [
-		'rose',
-		'pink',
-		'fuchsia',
-		'purple',
-		'violet',
-		'indigo',
-		'blue',
-		'sky',
-		'cyan',
-		'teal',
-		'emerald',
-		'green',
-		'lime',
-		'yellow',
-		'amber',
-		'orange',
-		'red',
-		'stone',
-		'neutral',
-		'zinc',
-		'gray',
-		'slate'
-	];
-	const chartcolours = colours.slice(0, chartData.unique.length);
+export default function NetWorthDonut({data}) {
 	return (
-		<div className="flex flex-row justify-evenly items-center w-1/2">
+		<div className="flex flex-col justify-between items-center w-full h-full">
 			<DonutChart
-				data={chartData.formattedResult}
-				variant="pie"
-				showAnimation={true}
-				colors={chartcolours}
+				data={data.formattedResult}
+				variant="donut"
+				colors={['sky', 'violet', 'gray']}
 				valueFormatter={valueFormatter}
+				className="h-full text-3xl"
 			/>
-			<Legend categories={chartData.unique} colors={chartcolours} className="max-w-xs" />
+			{/*<Legend categories={chartData.unique} colors={['sky', 'violet', 'gray']} className="max-w-xs" />*/}
 		</div>
 	);
 }
