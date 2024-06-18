@@ -21,7 +21,7 @@ export default function AccountSpark({account}) {
 			categories={['amount']}
 			index={'date'}
 			colors={['emerald']}
-			className="h-8 w-full pt-2"
+			className="h-12 w-full"
 		/>
 	);
 }
