@@ -3,7 +3,6 @@ import {PlusIcon, Squares2X2Icon, CalendarIcon, UserIcon} from '@heroicons/react
 import {NavLink} from 'react-router-dom';
 
 export default function Navbar({toggleMenu}) {
-	console.log(window.location.pathname)
 	return (
 		<nav className="h-16 w-full flex row fixed bottom-0 text-white">
 			<ul className="bg-teal-600 flex items-center justify-around w-full h-full">
