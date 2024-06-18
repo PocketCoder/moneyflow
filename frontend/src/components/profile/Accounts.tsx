@@ -3,7 +3,11 @@ import clsx from 'clsx';
 import {useAuth0} from '@auth0/auth0-react';
 import {Card, Title, Subtitle, Text, Button, TextInput, Switch} from '@tremor/react';
 import {PlusCircleIcon, XMarkIcon} from '@heroicons/react/24/outline';
+import {toast} from 'react-toastify';
+import {useMutation} from 'react-query';
+
 import UserContext from '../../lib/UserContext';
+
 import {pushNewTags} from '../../lib/data';
 
 export default function Accounts() {
@@ -16,34 +20,16 @@ export default function Accounts() {
 		if (newTag) {
 			updatedAccounts[accountIndex].tags.push(newTag);
 			updatedAccounts[accountIndex].newTag = '';
+			tagChangeMutation.mutate(updatedAccounts[accountIndex]);
 			setUserData({...userData, accounts: updatedAccounts});
-			try {
-				const token = await getAccessTokenSilently();
-				await pushNewTags(
-					{id: userData.id, accountID: userData.accounts[accountIndex].id, tags: userData.accounts[accountIndex].tags},
-					token
-				);
-			} catch (err) {
-				console.error('Error', err);
-				throw new Error(err);
-			}
 		}
 	};
 
 	const handleRemoveTag = async (accountIndex, tagIndex) => {
 		const updatedAccounts = [...userData.accounts];
 		updatedAccounts[accountIndex].tags.splice(tagIndex, 1);
+		tagChangeMutation.mutate(updatedAccounts[accountIndex]);
 		setUserData({...userData, accounts: updatedAccounts});
-		try {
-			const token = await getAccessTokenSilently();
-			await pushNewTags(
-				{id: userData.id, accountID: userData.accounts[accountIndex].id, tags: updatedAccounts[accountIndex].tags},
-				token
-			);
-		} catch (err) {
-			console.error('Error', err);
-			throw new Error(err);
-		}
 	};
 
 	const handleNewTagChange = async (accountIndex, value) => {
@@ -51,6 +37,55 @@ export default function Accounts() {
 		updatedAccounts[accountIndex].newTag = value;
 		setUserData({...userData, accounts: updatedAccounts});
 	};
+
+	function handleSwitchChange(a) {
+		if (a.tags.includes('touchable')) {
+			const i = a.tags.indexOf('touchable');
+			a.tags.splice(i, 1);
+			a.tags.push('untouchable');
+		} else if (a.tags.includes('untouchable')) {
+			const i = a.tags.indexOf('untouchable');
+			a.tags.splice(i, 1);
+			a.tags.push('touchable');
+		}
+		switchChangeMutation.mutate(a);
+	}
+
+	const tagChangeMutation = useMutation(
+		async (a: object) => {
+			const token = await getAccessTokenSilently();
+			return pushNewTags(userData.id, a, token);
+		},
+		{
+			onMutate: () => {
+				toast('Saving...');
+			},
+			onError: (error) => {
+				toast.error(`Tag Change Error: ${error}`);
+			},
+			onSuccess: () => {
+				toast.success('Tags Updated');
+			}
+		}
+	);
+
+	const switchChangeMutation = useMutation(
+		async (a: object) => {
+			const token = await getAccessTokenSilently();
+			return pushNewTags(userData.id, a, token);
+		},
+		{
+			onMutate: () => {
+				toast('Saving...');
+			},
+			onError: (error) => {
+				toast.error(`Switch Change Error: ${error}`);
+			},
+			onSuccess: () => {
+				toast.success('Status Updated');
+			}
+		}
+	);
 
 	return (
 		<>
