@@ -18,7 +18,7 @@ export default function AccountCard({account}) {
 	}
 	return (
 		<Card
-			className="flex-col justify-between h-60 border-x-1 border-b-2 border-b-gray-200 border-x-gray-200 hover:border-gray-200 transition-all ease-in-out cursor-pointer"
+			className="flex-col justify-between h-60 w-60 border-x-1 border-b-2 border-b-gray-200 border-x-gray-200 hover:border-gray-200 transition-all ease-in-out cursor-pointer"
 			decoration="top"
 			decorationColor={account.type === 'Debt' ? 'red' : 'indigo'}>
 			<Title>{account.name}</Title>
@@ -31,7 +31,8 @@ export default function AccountCard({account}) {
 			<BadgeDelta
 				deltaType={diff > 0 ? 'moderateIncrease' : diff < 0 ? 'moderateDecrease' : 'unchanged'}
 				isIncreasePositive={true}
-				size="xs">
+				size="xs"
+				className="mt-2">
 				{diff}%
 			</BadgeDelta>
 			<AccountSpark account={account} />
