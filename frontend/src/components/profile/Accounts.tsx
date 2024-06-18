@@ -40,14 +40,14 @@ export default function Accounts() {
 
 	function handleTouchSwitchChange(a) {
 		const status = a.tags.includes('touchable') ? 'touchable' : 'untouchable';
-		a.tags = a.tags.filter(tag => tag !== status);
+		a.tags = a.tags.filter((tag) => tag !== status);
 		a.tags.push(status === 'touchable' ? 'untouchable' : 'touchable');
 		switchChangeMutation.mutate(a);
 	}
 
 	function handleActiveSwitchChange(a) {
 		const status = a.tags.includes('active') ? 'active' : 'inactive';
-		a.tags = a.tags.filter(tag => tag !== status);
+		a.tags = a.tags.filter((tag) => tag !== status);
 		a.tags.push(status === 'active' ? 'inactive' : 'active');
 		switchChangeMutation.mutate(a);
 	}
@@ -106,7 +106,7 @@ export default function Accounts() {
 									<Text
 										className={clsx({
 											'text-black': a.tags.includes('inactive'),
-											'underline': a.tags.includes('inactive')
+											underline: a.tags.includes('inactive')
 										})}>
 										Inactive
 									</Text>
@@ -118,7 +118,7 @@ export default function Accounts() {
 									<Text
 										className={clsx({
 											'text-black': a.tags.includes('active'),
-											'underline': a.tags.includes('active')
+											underline: a.tags.includes('active')
 										})}>
 										Active
 									</Text>
