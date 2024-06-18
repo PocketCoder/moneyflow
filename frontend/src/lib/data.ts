@@ -26,7 +26,7 @@ export async function pushNewPreferences(id: string, preferences: object, token:
 	const dataPackage = {
 		user: id,
 		newPrefs: preferences
-	}
+	};
 	try {
 		const res = await fetch(`${process.env.VITE_SERVER}/preferences/`, {
 			method: 'POST',
@@ -36,7 +36,7 @@ export async function pushNewPreferences(id: string, preferences: object, token:
 			},
 			body: JSON.stringify(dataPackage)
 		});
-		
+
 		if (!res.ok) {
 			throw new Error(`HTTP error! Status: ${res.status}`);
 		}

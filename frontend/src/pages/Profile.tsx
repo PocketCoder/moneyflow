@@ -1,7 +1,7 @@
 import {useAuth0} from '@auth0/auth0-react';
 import {useContext, useState} from 'react';
 
-import {TextInput, Button} from '@tremor/react';
+import {Title, TextInput, Button} from '@tremor/react';
 import {TrophyIcon, ChevronRightIcon} from '@heroicons/react/24/outline';
 import {toast} from 'react-toastify';
 import {useMutation} from 'react-query';
@@ -15,7 +15,7 @@ import {LoginButton} from '../components/buttons/LoginButton';
 import {LogoutButton} from '../components/buttons/LogoutButton';
 
 import {calcNetWorthHistory} from '../lib/functions';
-import { pushNewPreferences } from '../lib/data.ts';
+import {pushNewPreferences} from '../lib/data.ts';
 
 export default function Profile() {
 	const {user, getAccessTokenSilently} = useAuth0();
@@ -51,7 +51,7 @@ export default function Profile() {
 
 	function saveNewGoal() {
 		mutation.mutate();
-	};
+	}
 
 	return (
 		<main className="p-6 h-full w-full mb-16">
