@@ -92,8 +92,11 @@ export default function Profile() {
 								</div>
 							</div>
 						</div>
-						<div className="mt-6 w-full flex flex-wrap flex-row justify-between items-start">
-							<Accounts />
+						<div className="mt-6 w-full">
+							<Title>Account Editor</Title>
+							<div className="flex flex-wrap flex-row justify-between items-start">
+								<Accounts />
+							</div>
 						</div>
 						<div className="mt-6 w-full">
 							<div className="w-full flex justify-between items-center py-2 px-4 my-2 border-solid border-gray-300 border rounded-md">
