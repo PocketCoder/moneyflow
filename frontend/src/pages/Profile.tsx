@@ -106,9 +106,9 @@ export default function Profile() {
 							</div>
 						</div>
 						<div className="mt-6 w-full">
-							<div className='flex'>
-								<Title className='mr-2'>Account Editor</Title>
-								<Button icon={InformationCircleIcon} variant='light' onClick={() => setIsInfoOpen(true)}></Button>
+							<div className="flex">
+								<Title className="mr-2">Account Editor</Title>
+								<Button icon={InformationCircleIcon} variant="light" onClick={() => setIsInfoOpen(true)}></Button>
 							</div>
 							<div className="flex flex-wrap flex-row justify-between items-start">
 								<Accounts />
