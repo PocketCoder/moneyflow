@@ -22,7 +22,7 @@ export async function fetchAccounts(userID: string, token: string) {
 	}
 }
 
-export async function getUserID(authID: string, token: string) {
+export async function getUserByAuthID(authID: string, token: string) {
 	try {
 		const res = await fetch(`${process.env.VITE_SERVER}/authID/${authID}`, {
 			method: 'GET',
