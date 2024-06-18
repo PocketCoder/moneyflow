@@ -47,7 +47,7 @@ export default function NetWorthChart() {
 				valueFormatter={valueFormatter}
 				showAnimation={true}
 				autoMinValue={true}
-				yAxisWidth={70}
+				yAxisWidth={90}
 				maxValue={40000}
 				customTooltip={customTooltip}
 			/>
