@@ -61,6 +61,24 @@ app.get('/accounts/:id', checkJwt, async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+app.post('/preferences', checkJwt, async (req, res) => {
+    const body = req.body;
+    try {
+        const goal = await prisma.users.update({
+            where: {
+                id: body.user
+            },
+            data: {
+                preferences: body.newPrefs
+            }
+        });
+        res.status(201).json({ success: true });
+    }
+    catch (e) {
+        res.status(500).json({ success: false, error: e });
+        throw new Error(`Error updating preferences: ${e}`);
+    }
+});
 app.post('/accounts/:id', checkJwt, async (req, res) => {
     const body = req.body;
     let error;
