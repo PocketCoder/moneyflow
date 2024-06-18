@@ -13,6 +13,7 @@ const BankRows = ({banks, accounts, openModal}) => {
 						{accounts
 							.filter((account) => account.parent === bank)
 							.map((account, accIndex) => (
+								account.tags.includes('inactive') ? <></> :
 								<div className="mx-2 first:ml-0" key={accIndex} onClick={() => openModal(account)}>
 									<AccountCard account={account} />
 								</div>
