@@ -24,10 +24,11 @@ export async function fetchUserData(user: any, getAccessTokenSilently: Function,
 		banks: uniqueBanks,
 		accounts: accountArr,
 		netWorth,
-		id: dbID,
+		id: dbUser.id,
 		email: user.email,
 		authID: auth0id,
-		years: allYears
+		years: allYears,
+		prefs: dbUser.preferences
 	};
 }
 
@@ -58,7 +59,7 @@ export async function getAccountsAndBalances(auth0id: string, token: string) {
 	let netWorth;
 	let accounts;
 	try {
-		accounts = await fetchAccounts(usrID, token);
+		accounts = await fetchAccounts(id, token);
 	} catch (error) {
 		throw new Error(`Error fetching accounts: ${error}`);
 	}
