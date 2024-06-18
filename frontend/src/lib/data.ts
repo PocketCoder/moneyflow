@@ -121,7 +121,7 @@ export async function pushNewTags(id: string, account: object, token: string) {
 	const data = {
 		account,
 		user: id
-	}
+	};
 	try {
 		const res = await fetch(`${process.env.VITE_SERVER}/tags/${id}`, {
 			method: 'POST',
