@@ -38,16 +38,17 @@ export default function Accounts() {
 		setUserData({...userData, accounts: updatedAccounts});
 	};
 
-	function handleSwitchChange(a) {
-		if (a.tags.includes('touchable')) {
-			const i = a.tags.indexOf('touchable');
-			a.tags.splice(i, 1);
-			a.tags.push('untouchable');
-		} else if (a.tags.includes('untouchable')) {
-			const i = a.tags.indexOf('untouchable');
-			a.tags.splice(i, 1);
-			a.tags.push('touchable');
-		}
+	function handleTouchSwitchChange(a) {
+		const status = a.tags.includes('touchable') ? 'touchable' : 'untouchable';
+		a.tags = a.tags.filter(tag => tag !== status);
+		a.tags.push(status === 'touchable' ? 'untouchable' : 'touchable');
+		switchChangeMutation.mutate(a);
+	}
+
+	function handleActiveSwitchChange(a) {
+		const status = a.tags.includes('active') ? 'active' : 'inactive';
+		a.tags = a.tags.filter(tag => tag !== status);
+		a.tags.push(status === 'active' ? 'inactive' : 'active');
 		switchChangeMutation.mutate(a);
 	}
 
