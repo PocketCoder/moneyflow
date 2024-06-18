@@ -1,7 +1,7 @@
 import {useAuth0} from '@auth0/auth0-react';
 import {useContext, useState} from 'react';
 
-import {Title, Text, TextInput, Button} from '@tremor/react';
+import {Title, TextInput, Button, Accordion, AccordionBody, AccordionHeader, AccordionList} from '@tremor/react';
 import {TrophyIcon, ChevronRightIcon, InformationCircleIcon} from '@heroicons/react/24/outline';
 import {toast} from 'react-toastify';
 import {useMutation} from 'react-query';
@@ -106,13 +106,17 @@ export default function Profile() {
 							</div>
 						</div>
 						<div className="mt-6 w-full">
-							<div className="flex">
-								<Title className="mr-2">Account Editor</Title>
-								<Button icon={InformationCircleIcon} variant="light" onClick={() => setIsInfoOpen(true)}></Button>
-							</div>
-							<div className="flex flex-wrap flex-row justify-center items-start">
-								<Accounts />
-							</div>
+							<AccordionList>
+								<Accordion>
+									<AccordionHeader>
+										<Title className="mr-2">Account Editor</Title>
+										<Button icon={InformationCircleIcon} variant="light" onClick={() => setIsInfoOpen(true)}></Button>
+									</AccordionHeader>
+									<AccordionBody className="flex flex-wrap flex-row justify-center items-start">
+										<Accounts />
+									</AccordionBody>
+								</Accordion>
+							</AccordionList>
 						</div>
 						<div className="mt-6 w-full">
 							<div className="w-full flex justify-between items-center py-2 px-4 my-2 border-solid border-gray-300 border rounded-md">
