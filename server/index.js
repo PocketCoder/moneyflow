@@ -147,19 +147,19 @@ app.post('/tags/:id', checkJwt, async (req, res) => {
     try {
         const updateAccount = await prisma.accounts.update({
             where: {
-                id: req.body.accountID,
-                owner: req.body.id
+                id: req.body.account.id,
+                owner: req.body.user
             },
             data: {
-                tags: req.body.tags
+                tags: req.body.account.tags
             }
         });
         console.log(updateAccount);
+        res.status(201).json({ success: true });
     }
     catch (err) {
         res.status(500).json({ success: false, error: err });
     }
-    res.status(201).json({ success: true });
 });
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
