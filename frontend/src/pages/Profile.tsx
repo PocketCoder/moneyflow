@@ -86,9 +86,19 @@ export default function Profile() {
 						<div className="w-full">
 							<div className="w-full flex justify-between items-center py-2 px-4 my-2 border-solid border-gray-300 border rounded-md">
 								<span>End of year goal</span>
-								<div className='flex justify-end items-center w-2/6'>
-									<TextInput className="w-1/2" type="text" icon={TrophyIcon} placeholder={`Current: ${goal}`} onValueChange={(e) => {setGoal(e)}} />
-									<Button onClick={saveNewGoal} size='xs' className='ml-4'>Save Goal</Button>
+								<div className="flex justify-end items-center w-2/6">
+									<TextInput
+										className="w-1/2"
+										type="text"
+										icon={TrophyIcon}
+										placeholder={`Current: ${goal}`}
+										onValueChange={(e) => {
+											setGoal(e);
+										}}
+									/>
+									<Button onClick={saveNewGoal} size="xs" className="ml-4">
+										Save Goal
+									</Button>
 								</div>
 							</div>
 						</div>
