@@ -123,27 +123,31 @@ export default function Accounts() {
 										Active
 									</Text>
 								</div>
-								<div className="flex flex-row w-full justify-evenly">
-									<Text
-										className={clsx({
-											'text-black': a.tags.includes('untouchable'),
-											'underline': a.tags.includes('untouchable')
-										})}>
-										Untouchable
-									</Text>
-									<Switch
-										className="px-2"
-										defaultChecked={a.tags.includes('touchable')}
-										onChange={(e) => handleTouchSwitchChange(a)}
-									/>
-									<Text
-										className={clsx({
-											'text-black': a.tags.includes('touchable'),
-											'underline': a.tags.includes('touchable')
-										})}>
-										Touchable
-									</Text>
-								</div>
+								{a.type === 'Debt' ? (
+									<></>
+								) : (
+									<div className="flex flex-row w-full justify-evenly">
+										<Text
+											className={clsx({
+												'text-black': a.tags.includes('untouchable'),
+												underline: a.tags.includes('untouchable')
+											})}>
+											Untouchable
+										</Text>
+										<Switch
+											className="px-2"
+											defaultChecked={a.tags.includes('touchable')}
+											onChange={(e) => handleTouchSwitchChange(a)}
+										/>
+										<Text
+											className={clsx({
+												'text-black': a.tags.includes('touchable'),
+												underline: a.tags.includes('touchable')
+											})}>
+											Touchable
+										</Text>
+									</div>
+								)}
 							</div>
 						</div>
 						<div className="w-full mt-5 flex flex-row justify-between items-center">
