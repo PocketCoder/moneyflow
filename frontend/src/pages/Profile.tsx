@@ -83,7 +83,7 @@ export default function Profile() {
 								</div>
 							</div>
 						</div>
-						<div className="mt-6 w-full">
+						<div className="w-full">
 							<div className="w-full flex justify-between items-center py-2 px-4 my-2 border-solid border-gray-300 border rounded-md">
 								<span>End of year goal</span>
 								<div className='flex justify-end items-center w-2/6'>
