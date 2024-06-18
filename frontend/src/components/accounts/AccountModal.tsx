@@ -25,8 +25,13 @@ import {valueFormatter, dateFormatter} from '../../lib/functions';
 export default function AccountModal({isOpen, setIsOpen, account}) {
 	const {preferences} = useContext(PrefContext);
 	const year = preferences.year;
-	const chartData = account.years[year];
-	chartData.sort((a, b) => new Date(a.date) - new Date(b.date));
+	let chartData = [];
+	if (!account.years[year]) {
+		chartData = [];
+	} else {
+		chartData = account.years[year];
+		chartData.sort((a, b) => new Date(a.date) - new Date(b.date));
+	}
 	const formattedData = chartData.map((item) => ({
 		...item,
 		date: dateFormatter(item.date)
