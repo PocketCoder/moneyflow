@@ -121,6 +121,7 @@ export default function Accounts() {
 										</Text>
 										<Switch
 											className="px-2"
+											color="emerald"
 											defaultChecked={a.tags.includes('active')}
 											onChange={(e) => handleActiveSwitchChange(a)}
 										/>
@@ -145,6 +146,7 @@ export default function Accounts() {
 											</Text>
 											<Switch
 												className="px-2"
+												color="sky"
 												defaultChecked={a.tags.includes('touchable')}
 												onChange={(e) => handleTouchSwitchChange(a)}
 											/>
