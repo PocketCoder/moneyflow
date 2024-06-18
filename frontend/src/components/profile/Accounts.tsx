@@ -94,7 +94,7 @@ export default function Accounts() {
 				a.name === 'Net Worth' ? (
 					<></>
 				) : (
-					<Card key={`${a.name}_${i}`} className="my-2 mx-1 w-5/12 h-fit">
+					<Card key={`${a.name}_${i}`} className="my-2 mx-1 min-w-fit w-[49%] h-fit">
 						<div className="flex flex-row justify-between items-start">
 							<div>
 								<Title>{a.name}</Title>

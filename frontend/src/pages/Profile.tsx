@@ -110,7 +110,7 @@ export default function Profile() {
 								<Title className="mr-2">Account Editor</Title>
 								<Button icon={InformationCircleIcon} variant="light" onClick={() => setIsInfoOpen(true)}></Button>
 							</div>
-							<div className="flex flex-wrap flex-row justify-between items-start">
+							<div className="flex flex-wrap flex-row justify-center items-start">
 								<Accounts />
 							</div>
 						</div>
