@@ -1,8 +1,9 @@
 import {useContext} from 'react';
+import clsx from 'clsx';
 import {useAuth0} from '@auth0/auth0-react';
+import {Card, Title, Subtitle, Text, Button, TextInput, Switch} from '@tremor/react';
+import {PlusCircleIcon, XMarkIcon} from '@heroicons/react/24/outline';
 import UserContext from '../../lib/UserContext';
-import {Card, Title, Subtitle, Text, Badge, Button, TextInput} from '@tremor/react';
-import {MinusCircleIcon, PlusCircleIcon} from '@heroicons/react/24/outline';
 import {pushNewTags} from '../../lib/data';
 
 export default function Accounts() {
