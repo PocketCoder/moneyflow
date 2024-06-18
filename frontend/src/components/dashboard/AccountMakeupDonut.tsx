@@ -63,7 +63,7 @@ export default function AccountMakeupDonut({data, year}) {
 	];
 	const chartcolours = colours.slice(0, chartData.unique.length);
 	return (
-		<div className="flex flex-row justify-evenly items-center w-1/2">
+		<div className="flex flex-row justify-start items-center w-2/3">
 			<DonutChart
 				data={chartData.formattedResult}
 				variant="pie"
@@ -71,7 +71,7 @@ export default function AccountMakeupDonut({data, year}) {
 				colors={chartcolours}
 				valueFormatter={valueFormatter}
 			/>
-			<Legend categories={chartData.unique} colors={chartcolours} className="max-w-xs" />
+			{/*<Legend categories={chartData.unique} colors={chartcolours} />*/}
 		</div>
 	);
 }
