@@ -34,4 +34,5 @@ export type UserDataType = {
 	banks: string[]; // SELECT (parent) FROM accounts ; then .filter();
 	accounts: object[];
 	netWorth: any;
+	prefs: object;
 };
