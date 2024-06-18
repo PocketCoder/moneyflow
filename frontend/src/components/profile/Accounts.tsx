@@ -150,7 +150,9 @@ export default function Accounts() {
 							<Text className="mr-2">Tags:</Text>
 							<div className="w-full flex flex-row justify-start items-center flex-nowrap overflow-y-scroll">
 								{a.tags.map((t, z) =>
-									t === 'touchable' || t === 'untouchable' ? <></> : (
+									t === 'touchable' || t === 'untouchable' || t === 'active' || t === 'inactive' ? (
+										<></>
+									) : (
 										<div
 											key={`${t}_${z}`}
 											className="flex justify-start items-center mr-1 p-1 border-solid border-2 rounded">
