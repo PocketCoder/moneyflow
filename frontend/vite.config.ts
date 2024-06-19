@@ -10,6 +10,9 @@ export default defineConfig(({command, mode}) => {
 		plugins: [react()],
 		define: {
 			'process.env': env
-		}
+		},
+		  server: {
+			historyApiFallback: true // Important to add this for SPA routing
+		  }
 	};
 });
