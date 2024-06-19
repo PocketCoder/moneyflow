@@ -40,7 +40,7 @@ export default function UpdateAllModal({isOpen, toggle}) {
 				toggle();
 			}
 		}
-	).mutate();
+	);
 
 	return (
 		<Dialog open={isOpen} onClose={toggle} static={true} className="w-screen h-screen">
@@ -60,7 +60,7 @@ export default function UpdateAllModal({isOpen, toggle}) {
 							size="xs"
 							variant="primary"
 							onClick={() => {
-								pushNewData;
+								pushNewData.mutate();
 							}}>
 							Save
 						</Button>
