@@ -11,8 +11,8 @@ export default defineConfig(({command, mode}) => {
 		define: {
 			'process.env': env
 		},
-		  server: {
+		server: {
 			historyApiFallback: true // Important to add this for SPA routing
-		  }
+		}
 	};
 });

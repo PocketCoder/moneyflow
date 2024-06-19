@@ -1,4 +1,4 @@
-import {DonutChart, Legend} from '@tremor/react';
+import {DonutChart, Title, Legend} from '@tremor/react';
 import {valueFormatter} from '../../lib/functions';
 
 export default function AccountMakeupDonut({data, year}) {
@@ -63,7 +63,8 @@ export default function AccountMakeupDonut({data, year}) {
 	];
 	const chartcolours = colours.slice(0, chartData.unique.length);
 	return (
-		<div className="flex flex-row justify-start items-center w-2/3">
+		<div className="flex flex-col justify-between items-center w-1/2">
+			<Title className="mb-4">Net Worth Account Breakdown</Title>
 			<DonutChart
 				data={chartData.formattedResult}
 				variant="pie"

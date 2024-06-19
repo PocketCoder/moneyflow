@@ -9,7 +9,7 @@ export default function NetWorthDonut({data}) {
 				variant="donut"
 				colors={['sky', 'violet', 'gray']}
 				valueFormatter={valueFormatter}
-				className="h-full text-3xl"
+				className="h-full text-xl md:text-3xl"
 			/>
 			{/*<Legend categories={chartData.unique} colors={['sky', 'violet', 'gray']} className="max-w-xs" />*/}
 		</div>

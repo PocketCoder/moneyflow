@@ -1,10 +1,12 @@
-import {Card, Flex, ProgressBar, Text} from '@tremor/react';
+import {Card, Flex, ProgressBar, Title, Text} from '@tremor/react';
 import {valueFormatter} from '../../lib/functions';
 
 export default function MyProgressBar({start, goal, curr}) {
 	const networth = valueFormatter(curr);
 	return (
-		<Card className="mx-auto w-1/3">
+		<div className='flex flex-col justify-between items-center w-3/4 md:w-[40%]'>
+			<Title className='mb-4'>Goal Progress</Title>
+			<Card className="mx-auto w-full">
 			<Flex>
 				<Text>{valueFormatter(start)}</Text>
 				<Text>
@@ -14,5 +16,6 @@ export default function MyProgressBar({start, goal, curr}) {
 			</Flex>
 			<ProgressBar value={(curr / goal) * 100} color="teal" className="mt-3" />
 		</Card>
+		</div>
 	);
 }
