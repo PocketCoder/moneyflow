@@ -26,8 +26,8 @@ export default function Dashboard() {
 	return (
 		<main className="p-6 min-h-full h-full w-full mb-16">
 			<h1 className="text-2xl">Dashboard</h1>
-			<div className="flex flex-wrap justify-start items-center mt-4 mb-20 w-full">
-				<div className="flex justify-evenly items-center my-4 w-full h-[33vh]">
+			<div className="flex flex-wrap justify-start items-center mt-4 mb-20 w-full min-h-fit">
+				<div className="flex flex-col justify-evenly items-center my-4 w-full h-[70vh] md:h-[33vh] md:flex-row">
 					<div className="flex flex-col items-center justify-around w-1/3 h-full">
 						<div className="text-center">
 							<Metric>{touchableTotal}</Metric>
@@ -50,10 +50,10 @@ export default function Dashboard() {
 						</div>
 					</div>
 				</div>
-				<div className='flex-col my-4 mx-auto w-10/12 h-auto"'>
+				<div className="flex flex-col my-4 mx-auto w-10/12 h-auto">
 					<NetWorthChart />
 				</div>
-				<div className="flex justify-evenly items-center my-4 w-full">
+				<div className="flex flex-col justify-evenly items-center my-4 w-full h-[50vh] md:flex-row">
 					<ProgressBar start={start} goal={goal} curr={nw} />
 					<AccountMakeupDonut data={userData.accounts} year={prefs.year} />
 				</div>

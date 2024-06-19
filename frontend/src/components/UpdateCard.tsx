@@ -1,4 +1,4 @@
-import {Card, Bold, Subtitle, Text, NumberInput, BadgeDelta} from '@tremor/react';
+import {Card, Title, Subtitle, Text, NumberInput, BadgeDelta} from '@tremor/react';
 import {CurrencyPoundIcon} from '@heroicons/react/24/outline';
 import {calcPercDiff} from '../lib/functions';
 
@@ -7,7 +7,6 @@ export default function UpdateCard({account, newData, setNewData}) {
 	if (account.name === 'Net Worth') {
 		return <></>;
 	}
-	console.log(account);
 	let lastUpdate: object;
 	if (account.years[currYear]) {
 		const latestBal: object = account.years[currYear][account.years[currYear].length - 1];
@@ -34,13 +33,13 @@ export default function UpdateCard({account, newData, setNewData}) {
 		<Card className="flex flex-col justify-between m-2 w-5/12">
 			<div className="flex flex-row justify-between w-full h-1/3">
 				<div>
-					<Bold>{account.name}</Bold>
+					<Title>{account.name}</Title>
 					<Subtitle>
 						{account.parent} &bull; {account.type}
 					</Subtitle>
 					<Text>
 						{account.type === 'Debt' ? '-' : ''}
-						{lastUpdate.date}: £{lastUpdate.amount}
+						{lastUpdate.date} &mdash; £{lastUpdate.amount}
 					</Text>
 				</div>
 				<div className="flex flex-col justify-evenly items-end">

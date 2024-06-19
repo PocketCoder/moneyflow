@@ -9,8 +9,8 @@ import {toast} from 'react-toastify';
 import {useMutation} from 'react-query';
 
 export default function UpdateAllModal({isOpen, toggle}) {
-	const {getAccessTokenSilently, loginWithRedirect} = useAuth0();
-	const userData = useContext(UserContext);
+	const {getAccessTokenSilently} = useAuth0();
+	const {userData} = useContext(UserContext);
 	const [date, setDate] = useState(new Date());
 	const [newData, setNewData] = useState([]);
 
@@ -43,8 +43,8 @@ export default function UpdateAllModal({isOpen, toggle}) {
 	);
 
 	return (
-		<Dialog open={isOpen} onClose={toggle} static={true} className="w-screen h-screen">
-			<DialogPanel className="min-w-fit max-w-screen h-full max-h-full">
+		<Dialog open={isOpen} onClose={toggle} static={true} className="w-screen h-screen max-h-screen">
+			<DialogPanel className="w-full min-w-full min-h-full h-full overflow-y-scroll">
 				<div className="flex justify-between items-center">
 					<div>
 						<Title>Update Balances</Title>
@@ -66,7 +66,7 @@ export default function UpdateAllModal({isOpen, toggle}) {
 						</Button>
 					</div>
 				</div>
-				<div className="w-full h-4/5 flex flex-col justify-between items-start my-4">
+				<div className="w-full flex flex-col justify-between items-start my-4">
 					<div className="flex flex-row justify-center items-center w-full">
 						<Text>Date of update: </Text>
 						<DatePicker
@@ -77,7 +77,7 @@ export default function UpdateAllModal({isOpen, toggle}) {
 							className="max-w-sm ml-10"
 						/>
 					</div>
-					<div className="overflow-y-scroll w-full h-full flex flex-wrap justify-evenly p-2">
+					<div className="overflow-y-scroll w-full h-[70vh] flex flex-wrap justify-evenly p-2">
 						{data &&
 							data.map((a, i) => <UpdateCard newData={newData} setNewData={updateAccount} account={a} key={i} />)}
 					</div>
