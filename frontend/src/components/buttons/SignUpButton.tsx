@@ -18,7 +18,7 @@ export const SignupButton = () => {
 	return (
 		!isAuthenticated && (
 			<Button size="xl" onClick={handleSignup}>
-				Log in
+				Sign Up
 			</Button>
 		)
 	);
