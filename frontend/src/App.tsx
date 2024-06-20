@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import {useAuth0} from '@auth0/auth0-react';
 import {useQuery} from 'react-query';
-import {Routes, Route} from 'react-router-dom';
+import {Routes, Route, Navigate} from 'react-router-dom';
 import {Card, Button} from '@tremor/react';
 import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
@@ -101,8 +101,8 @@ export default function App() {
 				) : (
 					<Routes>
 						<Route path="/" element={<Home />} />
-						<Route path="/dashboard" element={<Dashboard />} />
-						<Route path="/accounts" element={<Accounts />} />
+						<Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/" />} />
+						<Route path="/accounts" element={isAuthenticated ? <Accounts /> : <Navigate to="/" />} />
 						<Route path="/profile" element={<Profile />} />
 						<Route path="/callback" element={<Callback />} />
 						<Route path="*" element={<NotFound />} />
