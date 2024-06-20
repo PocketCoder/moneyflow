@@ -121,7 +121,15 @@ export default function App() {
 				)}
 				{modalState.isAddNewAccountModalOpen && <AddNewAccountModal closeModal={toggleAddNewAccountModal} />}
 				<Card className="h-fit max-h-fit py-4 px-1 min-w-fit max-w-max fixed bottom-20 left-1/2 transform -translate-x-1/2 flex justify-evenly items-center">
-					{years
+					{!years.length ? (
+						<Button	
+						size="xs"
+							key={`no_years_button`}
+							variant={'secondary'}
+							className="mx-5">
+						No data	
+					</Button>
+					) : (years
 						.sort((a, b) => b - a)
 						.map((y, i) => (
 							<Button
@@ -132,7 +140,8 @@ export default function App() {
 								onClick={() => setPreferences({year: y})}>
 								{y}
 							</Button>
-						))}
+						))
+					)}
 				</Card>
 				<NavBar toggleMenu={toggleMenu} />
 				<ToastContainer />
