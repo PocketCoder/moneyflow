@@ -59,10 +59,11 @@ export default function App() {
 		}
 	}
 
+	/*
 	useEffect(() => {
 		authenticateUser();
 	}, [authLoading, isAuthenticated]);
-
+	*/
 	const {isLoading: queryLoading, error: queryError} = useQuery(
 		'userData',
 		() => fetchUserData(user, getAccessTokenSilently, loginWithRedirect),
