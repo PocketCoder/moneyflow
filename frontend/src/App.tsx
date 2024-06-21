@@ -10,6 +10,7 @@ import {fetchUserData} from './lib/functions';
 import {UserDataType} from './lib/definitions';
 
 import Home from './pages/Home';
+import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
 import Accounts from './pages/Accounts';
 import Profile from './pages/Profile';
@@ -102,6 +103,7 @@ export default function App() {
 				) : (
 					<Routes>
 						<Route path="/" element={<Home />} />
+						<Route path="/onboarding/*" element={<Onboarding />} />
 						<Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/" />} />
 						<Route path="/accounts" element={isAuthenticated ? <Accounts /> : <Navigate to="/" />} />
 						<Route path="/profile" element={<Profile />} />
