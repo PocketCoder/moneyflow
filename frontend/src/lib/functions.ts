@@ -1,4 +1,4 @@
-import {fetchAccounts, getUserByAuthID, updateAccounts, pushNewAccounts} from './data';
+import {fetchAccounts, getUserByAuthID, updateAccounts, pushNewAccounts, setUpNewUser} from './data';
 
 export function valueFormatter(number: number) {
 	return `${new Intl.NumberFormat('en-GB', {style: 'currency', currency: 'GBP'}).format(number).toString()}`;
@@ -50,9 +50,12 @@ export async function fetchUserData(user: any, getAccessTokenSilently: Function,
 		console.error(`Token Failed: ${e}`);
 		await loginWithRedirect({appState: {returnTo: '/dashboard'}});
 	});
+	let dbUser = await getUserByAuthID(auth0id, token);
+	if (!dbUser) {
+		dbUser = await setUpNewUser(user, token);
+	}
 	const {accountArr, allYears, netWorth} = await getAccountsAndBalances(auth0id, token);
 	const uniqueBanks = getUniqueBanks(accountArr);
-	const dbUser = await getUserByAuthID(auth0id, token);
 
 	return {
 		banks: uniqueBanks,
