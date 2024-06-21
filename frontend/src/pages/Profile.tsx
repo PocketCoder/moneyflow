@@ -24,6 +24,7 @@ export default function Profile() {
 	const {userData, setUserData} = useContext(UserContext);
 	const {preferences: prefs} = useContext(PrefContext);
 	let goal = 0;
+
 	if (user) {
 		goal = userData.prefs['goal'][prefs.year];
 	}

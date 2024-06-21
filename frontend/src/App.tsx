@@ -64,6 +64,7 @@ export default function App() {
 		authenticateUser();
 	}, [authLoading, isAuthenticated]);
 	*/
+
 	const {isLoading: queryLoading, error: queryError} = useQuery(
 		'userData',
 		() => fetchUserData(user, getAccessTokenSilently, loginWithRedirect),
