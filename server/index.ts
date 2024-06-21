@@ -32,6 +32,25 @@ app.get('/', (req, res) => {
 	res.send('Express on Vercel');
 });
 
+app.post('/user/', checkJwt, async (req, res) => {
+	const currYear = new Date().getFullYear();
+	const authID = req.body.sub.split('|')[1];
+	try {
+		const user = await prisma.users.create({
+			data: {
+				name: req.body.nickname,
+				auth0id: authID,
+				preferences: {goal: {currYear: 0}}
+			}
+		});
+		res.status(200).json(user);
+	} catch (e) {
+		console.error(`Error in /user/`);
+		console.error(e);
+		res.status(500).json({error: 'Internal Server Error'});
+	}
+});
+
 app.get('/authID/:id', checkJwt, async (req, res) => {
 	try {
 		const user = await prisma.users.findUnique({

@@ -142,3 +142,25 @@ export async function pushNewTags(id: string, account: object, token: string) {
 		throw new Error(error);
 	}
 }
+
+export async function setUpNewUser(user: any, token: string) {
+	try {
+		const res = await fetch(`${process.env.VITE_SERVER}/user/`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				authorization: `Bearer ${token}`
+			},
+			body: JSON.stringify(user)
+		});
+		const result = await res.json();
+		if (!result.success) {
+			throw new Error(result.error);
+		} else {
+			return result;
+		}
+	} catch (error) {
+		console.log('Error:' + error);
+		throw new Error(error);
+	}
+}
