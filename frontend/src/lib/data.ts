@@ -24,7 +24,7 @@ export async function fetchAccounts(userID: string, token: string) {
 
 export async function pushNewPreferences(id: string, preferences: object, token: string) {
 	const dataPackage = {
-		user: id,
+		id: id,
 		newPrefs: preferences
 	};
 	try {
