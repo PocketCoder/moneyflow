@@ -17,10 +17,10 @@ import {useMutation} from 'react-query';
 export default function AddNewAccountModal({closeModal}) {
 	const userData = useContext(UserContext);
 	const {getAccessTokenSilently} = useAuth0();
-	const [accounts, setAccounts] = useState([{parent: '', name: '', type: '', balance: ''}]);
+	const [accounts, setAccounts] = useState([{parent: '', name: '', type: '', balance: '', date: new Date()}]);
 
 	const addAccount = () => {
-		setAccounts([...accounts, {parent: '', name: '', type: '', balance: ''}]);
+		setAccounts([...accounts, {parent: '', name: '', type: '', balance: '', date: new Date()}]);
 	};
 
 	const removeAccount = (index) => {
