@@ -192,8 +192,9 @@ export async function setNewGoal(newGoal, token, userData) {
 		throw new Error('setGoal: ', error);
 	}
 }
+
 export async function addNewAccounts(accounts: object[], usrData: object, token: string) {
-	// TODO: Add in calculate new net worth
+	// TODO: Add in calculate new net worth. Or submit with accounts data.
 	const data = {
 		id: usrData.id,
 		accounts: accounts
@@ -207,6 +208,7 @@ export async function addNewAccounts(accounts: object[], usrData: object, token:
 	} catch (error) {
 		// Handle errors
 		console.error('Error adding new accounts:', error);
+		throw new Error('Error adding new accounts: ' + error);
 	}
 }
 

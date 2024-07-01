@@ -62,9 +62,9 @@ export default function Dashboard() {
 						<div className="h-full w-full">
 							<NetWorthDonut data={NetWorthDonutData} />
 							{/* 
-                <Metric>{valueFormatter(nw)}</Metric>
-                <Title>Total Net Worth</Title>
-              */}
+								<Metric>{valueFormatter(nw)}</Metric>
+								<Title>Total Net Worth</Title>
+							*/}
 						</div>
 					</div>
 					<div className="flex flex-col items-center justify-around w-1/3 h-full">
