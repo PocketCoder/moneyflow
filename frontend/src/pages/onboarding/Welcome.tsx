@@ -1,9 +1,8 @@
 import logo from '../../../public/logo.png';
 
-export default function Welcome({nextStep, prevStep}) {
+export default function Welcome() {
 	return (
 		<div className="h-full w-full mt-4">
-			<h1 className="text-3xl">Welcome</h1>
 			<div className="flex justify-start items-center mt-6">
 				<img src={logo} className="w-16 mr-4" />
 				<h2 className="text-3xl">Welcome to Moneyflow</h2>
@@ -26,9 +25,7 @@ export default function Welcome({nextStep, prevStep}) {
 				</p>
 
 				<h4 className="font-bold text-xl mt-4">Get Started</h4>
-				<p className="mt-1">
-					Join Money Flow today and take control of your finances. Your journey to financial clarity begins here.
-				</p>
+				<p className="mt-1">Click next to set up your first accounts.</p>
 			</div>
 		</div>
 	);
