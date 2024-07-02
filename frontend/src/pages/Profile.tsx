@@ -23,12 +23,16 @@ export default function Profile() {
 
 	const {userData, setUserData} = useContext(UserContext);
 	const {preferences: prefs} = useContext(PrefContext);
-	const goal = userData.prefs['goal'][prefs.year] || 0;
+	let goal = 0;
 
-	const [newGoal, setNewGoal] = useState(goal);
+	if (user) {
+		goal = userData.prefs['goal'][prefs.year];
+	}
+
+	const [newGoal, setNewGoal] = useState<number | string>(goal);
 	const [isInfoOpen, setIsInfoOpen] = useState(false);
 
-	function setGoal(goal) {
+	function setGoal(goal: string | number) {
 		setNewGoal(goal);
 	}
 

@@ -1,4 +1,4 @@
-import {fetchAccounts, getUserByAuthID, updateAccounts, pushNewAccounts} from './data';
+import {fetchAccounts, getUserByAuthID, updateAccounts, pushNewAccounts, setUpNewUser, pushNewGoal} from './data';
 
 export function valueFormatter(number: number) {
 	return `${new Intl.NumberFormat('en-GB', {style: 'currency', currency: 'GBP'}).format(number).toString()}`;
@@ -50,9 +50,12 @@ export async function fetchUserData(user: any, getAccessTokenSilently: Function,
 		console.error(`Token Failed: ${e}`);
 		await loginWithRedirect({appState: {returnTo: '/dashboard'}});
 	});
+	let dbUser = await getUserByAuthID(auth0id, token);
+	if (!dbUser) {
+		dbUser = await setUpNewUser(user, token);
+	}
 	const {accountArr, allYears, netWorth} = await getAccountsAndBalances(auth0id, token);
 	const uniqueBanks = getUniqueBanks(accountArr);
-	const dbUser = await getUserByAuthID(auth0id, token);
 
 	return {
 		banks: uniqueBanks,
@@ -171,8 +174,27 @@ export async function pushUpdates(updates, usrData: object, token: string) {
 	}
 }
 
+export async function setNewGoal(newGoal, token, userData) {
+	const newPreferences = {...userData.prefs};
+	const currYear = new Date().getFullYear();
+	newPreferences['goal'][currYear] = newGoal;
+	const data = {
+		id: userData.id,
+		newPrefs: newPreferences
+	};
+	try {
+		const result = await pushNewGoal(data, token);
+		if (result.success) {
+			return result;
+		}
+	} catch (error) {
+		console.error('Error setting goal:', error);
+		throw new Error('setGoal: ', error);
+	}
+}
+
 export async function addNewAccounts(accounts: object[], usrData: object, token: string) {
-	// TODO: Add in calculate new net worth
+	// TODO: Add in calculate new net worth. Or submit with accounts data.
 	const data = {
 		id: usrData.id,
 		accounts: accounts
@@ -186,6 +208,7 @@ export async function addNewAccounts(accounts: object[], usrData: object, token:
 	} catch (error) {
 		// Handle errors
 		console.error('Error adding new accounts:', error);
+		throw new Error('Error adding new accounts: ' + error);
 	}
 }
 

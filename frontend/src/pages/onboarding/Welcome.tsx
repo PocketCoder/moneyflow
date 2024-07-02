@@ -1,11 +1,8 @@
-import {Link} from 'react-router-dom';
-import {Button} from '@tremor/react';
-import logo from '../../public/logo.png';
+import logo from '../../../public/logo.png';
 
-export default function Home() {
+export default function Welcome() {
 	return (
-		<main className="flex flex-col items-start p-6 min-h-full h-full w-full mb-16">
-			<h1 className="text-2xl">Home</h1>
+		<div className="h-full w-full mt-4">
 			<div className="flex justify-start items-center mt-6">
 				<img src={logo} className="w-16 mr-4" />
 				<h2 className="text-3xl">Welcome to Moneyflow</h2>
@@ -28,15 +25,8 @@ export default function Home() {
 				</p>
 
 				<h4 className="font-bold text-xl mt-4">Get Started</h4>
-				<p className="mt-1">
-					Join Money Flow today and take control of your finances. Your journey to financial clarity begins here.
-				</p>
+				<p className="mt-1">Click next to set up your first accounts.</p>
 			</div>
-			<div className="w-full mt-6 flex justify-center">
-				<Link to="/profile">
-					<Button>Sign up or Sign in</Button>
-				</Link>
-			</div>
-		</main>
+		</div>
 	);
 }

@@ -32,6 +32,25 @@ app.get('/', (req, res) => {
 	res.send('Express on Vercel');
 });
 
+app.post('/user/', checkJwt, async (req, res) => {
+	const currYear = new Date().getFullYear();
+	const authID = req.body.sub.split('|')[1];
+	try {
+		const user = await prisma.users.create({
+			data: {
+				name: req.body.nickname,
+				auth0id: authID,
+				preferences: {goal: {[currYear]: 0}}
+			}
+		});
+		res.status(200).json(user);
+	} catch (e) {
+		console.error(`Error in /user/`);
+		console.error(e);
+		res.status(500).json({error: 'Internal Server Error'});
+	}
+});
+
 app.get('/authID/:id', checkJwt, async (req, res) => {
 	try {
 		const user = await prisma.users.findUnique({
@@ -73,9 +92,9 @@ app.get('/accounts/:id', checkJwt, async (req, res) => {
 app.post('/preferences', checkJwt, async (req, res) => {
 	const body = req.body;
 	try {
-		const goal = await prisma.users.update({
+		const preferences = await prisma.users.update({
 			where: {
-				id: body.user
+				id: body.id
 			},
 			data: {
 				preferences: body.newPrefs
@@ -129,17 +148,19 @@ app.post('/accounts/add/:id', checkJwt, async (req, res) => {
 			const account = await prisma.accounts.create({
 				data: {owner: req.body.id, name: accounts[a].name, type: accounts[a].type, parent: accounts[a].parent}
 			});
-			const date = new Date();
 			const bal = parseFloat(accounts[a].balance);
 			if (bal) {
 				const newBalance = await prisma.balances.create({
 					data: {
 						account: account.id,
-						date: date,
+						date: accounts[a].date,
 						amount: bal
 					}
 				});
+			} else {
+				throw new Error('Balance error is NaN.');
 			}
+
 		} catch (e) {
 			error = e;
 			throw new Error(`Error inserting new balances: ${e}.`);

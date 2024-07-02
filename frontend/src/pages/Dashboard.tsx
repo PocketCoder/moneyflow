@@ -1,5 +1,7 @@
-import {useContext, useState} from 'react';
-import {Title, Metric} from '@tremor/react';
+import {useContext, useMemo} from 'react';
+import {Title, Metric, Button} from '@tremor/react';
+import {ChevronDoubleRightIcon} from '@heroicons/react/24/outline';
+import {useNavigate} from 'react-router-dom';
 
 import UserContext from '../lib/UserContext';
 import PrefContext from '../lib/PrefContext';
@@ -14,14 +16,44 @@ import {valueFormatter, transformNetWorthData} from '../lib/functions';
 export default function Dashboard() {
 	const {userData} = useContext(UserContext);
 	const {preferences: prefs} = useContext(PrefContext);
-	const len = userData.netWorth[prefs.year].length;
-	const nw = userData.netWorth[prefs.year][len - 1].amount;
-	const goal = userData.prefs['goal'][prefs.year];
-	const start = userData.netWorth[prefs.year][0].amount | 0;
 
-	const NetWorthDonutData = transformNetWorthData(userData.accounts, prefs.year);
-	const touchableTotal = valueFormatter(NetWorthDonutData.formattedResult[0].value);
-	const untouchableTotal = valueFormatter(NetWorthDonutData.formattedResult[1].value);
+	const newUser = userData.accounts.length === 0;
+
+	const {nw, goal, start, NetWorthDonutData, touchableTotal, untouchableTotal} = useMemo(() => {
+		if (newUser) return {};
+
+		const len = userData.netWorth[prefs.year].length;
+		const nw = userData.netWorth[prefs.year][len - 1].amount;
+		const goal = userData.prefs.goal[prefs.year];
+		const start = userData.netWorth[prefs.year][0].amount || 0;
+
+		const NetWorthDonutData = transformNetWorthData(userData.accounts, prefs.year);
+		const touchableTotal = valueFormatter(NetWorthDonutData.formattedResult[0].value);
+		const untouchableTotal = valueFormatter(NetWorthDonutData.formattedResult[1].value);
+
+		return {nw, goal, start, NetWorthDonutData, touchableTotal, untouchableTotal};
+	}, [userData, prefs, newUser]);
+
+	if (newUser) {
+		const navigate = useNavigate();
+		return (
+			<main className="p-6 min-h-full h-full w-full mb-16">
+				<h1 className="text-2xl">Dashboard</h1>
+				<div className="h-full w-full flex flex-col justify-center items-center">
+					<h2>No Data</h2>
+					<Button
+						size="lg"
+						icon={ChevronDoubleRightIcon}
+						iconPosition="right"
+						onClick={() => {
+							navigate('../onboarding/', {relative: 'path'});
+						}}>
+						Begin Onboarding
+					</Button>
+				</div>
+			</main>
+		);
+	}
 
 	return (
 		<main className="p-6 min-h-full h-full w-full mb-16">
@@ -37,7 +69,7 @@ export default function Dashboard() {
 					<div className="flex flex-col items-center justify-around w-1/3 h-full">
 						<div className="h-full w-full">
 							<NetWorthDonut data={NetWorthDonutData} />
-							{/*
+							{/* 
 								<Metric>{valueFormatter(nw)}</Metric>
 								<Title>Total Net Worth</Title>
 							*/}
