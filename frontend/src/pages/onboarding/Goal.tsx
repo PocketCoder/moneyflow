@@ -82,7 +82,7 @@ export default function Goal({nw, goal, setGoal}) {
 					</div>
 					<div className="w-full md:w-3/5 h-full flex flex-col items-center justify-center mt-6 md:mt-0">
 						<ProgressBar value={(nw / localGoal) * 100} className="" />
-						<Subtitle>{(nw / localGoal) * 100}%</Subtitle>
+						<Subtitle>{Math.round((nw / localGoal) * 100)}%</Subtitle>
 					</div>
 					<div className="w-full md:w-fit h-full ml-0 md:ml-4">
 						<Metric>£{localGoal}</Metric>
