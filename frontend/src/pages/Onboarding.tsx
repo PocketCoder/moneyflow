@@ -58,7 +58,7 @@ export default function Onbording() {
 			<div className="flex items-center justify-between w-full h-fit">
 				<h1 className="text-2xl">Onboarding</h1>
 				<div className="flex flex-row items-center ">
-					<span className="mr-6 font-bold">{stepNames[currentStep]}</span>
+					<span className="mr-2 md:mr-6 font-bold">{stepNames[currentStep]}</span>
 					<ProgressCircle value={(curr / end) * 100} size="md">
 						<span>
 							{curr} / {end}

@@ -92,12 +92,14 @@ export default function Setup({accounts, setAccounts, setNW}) {
 			<p>
 				Add in your accounts with the bank, the account name (official or your own), the type, and a starting balance.
 			</p>
-			<Button icon={PlusIcon} iconPosition="left" className="mt-4" onClick={addAccount}>
-				Add another account
-			</Button>
-			<Button icon={DocumentPlusIcon} iconPosition="left" className="mt-4 ml-8" onClick={saveAccounts}>
-				Save All
-			</Button>
+			<div className='flex justify-evenly items-center md:justify-start'>
+				<Button icon={PlusIcon} iconPosition="left" className="mt-4" onClick={addAccount}>
+					Add another account
+				</Button>
+				<Button icon={DocumentPlusIcon} iconPosition="left" className="mt-4 md:ml-8" onClick={saveAccounts}>
+					Save All
+				</Button>
+			</div>
 			<div className="p-4 overflow-y-scroll h-2/3">
 				{accounts.map((a, i) => (
 					<AddNewAccountCard key={i} index={i} account={a} rmAcc={removeAccount} updateAccount={updateAccount} />

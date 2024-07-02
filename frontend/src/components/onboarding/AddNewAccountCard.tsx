@@ -3,13 +3,13 @@ import {BuildingLibraryIcon, WalletIcon, CurrencyPoundIcon, XMarkIcon} from '@he
 
 export default function AddNewAccountCard({index, account, rmAcc, updateAccount}) {
 	return (
-		<Card className="mt-8 mb-4 w-4/6 flex justify-between items-start">
-			<div className="w-2/5">
+		<Card className="mt-8 mb-4 w-full md:w-4/6 flex flex-col md:flex-row justify-between items-start">
+			<div className="w-full md:w-2/5">
 				<TextInput
 					type="text"
 					placeholder="Bank Name..."
 					value={account.parent}
-					className="w-full"
+					className="w-full mt-2 md:mt-0"
 					icon={BuildingLibraryIcon}
 					onValueChange={(e) => {
 						updateAccount(index, 'parent', e);
@@ -19,16 +19,16 @@ export default function AddNewAccountCard({index, account, rmAcc, updateAccount}
 					type="text"
 					placeholder="Account Name..."
 					value={account.name}
-					className="w-full mt-1"
+					className="w-full mt-2 md:mt-1"
 					icon={WalletIcon}
 					onValueChange={(e) => {
 						updateAccount(index, 'name', e);
 					}}
 				/>
 			</div>
-			<div className="w-2/5 ml-2">
+			<div className="w-full md:w-2/5 md:ml-2">
 				<Select
-					className="w-full"
+					className="mt-2 md:mt-0 w-full"
 					placeholder="Account type..."
 					enableClear={true}
 					value={account.type}
@@ -51,7 +51,7 @@ export default function AddNewAccountCard({index, account, rmAcc, updateAccount}
 				<TextInput
 					type="text"
 					placeholder="Balance... (default:  £0)"
-					className="w-full mt-1"
+					className="w-full mt-2 md:mt-1"
 					icon={CurrencyPoundIcon}
 					value={account.balance}
 					defaultValue="0"
@@ -60,7 +60,7 @@ export default function AddNewAccountCard({index, account, rmAcc, updateAccount}
 					}}
 				/>
 			</div>
-			<div className="w-1/6">
+			<div className="mx-auto mt-2 md:mt-0 md:w-1/6">
 				<Button icon={XMarkIcon} size="sm" color="red" onClick={() => rmAcc(index)}></Button>
 			</div>
 		</Card>

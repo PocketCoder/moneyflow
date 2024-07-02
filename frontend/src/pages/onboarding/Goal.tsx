@@ -75,16 +75,16 @@ export default function Goal({nw, goal, setGoal}) {
 						Save
 					</Button>
 				</div>
-				<div className="flex items-center flex-wrap h-16 my-4">
-					<div className="w-fit h-full mr-4">
+				<div className="flex flex-col md:flex-row md:justify-start items-center h-40 md:h-16 my-4">
+					<div className="w-full md:w-fit h-full mr-0 md:mr-4">
 						<Metric>£{nw}</Metric>
 						<Text>Current</Text>
 					</div>
-					<div className="w-3/5 h-full flex flex-col items-center justify-center">
+					<div className="w-full md:w-3/5 h-full flex flex-col items-center justify-center mt-6 md:mt-0">
 						<ProgressBar value={(nw / localGoal) * 100} className="" />
 						<Subtitle>{(nw / localGoal) * 100}%</Subtitle>
 					</div>
-					<div className="w-fit h-full ml-4">
+					<div className="w-full md:w-fit h-full ml-0 md:ml-4">
 						<Metric>£{localGoal}</Metric>
 						<Text>Goal</Text>
 					</div>

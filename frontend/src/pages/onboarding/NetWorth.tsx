@@ -22,7 +22,7 @@ export default function NetWorth({accounts, nw}) {
 				</div>
 				<div className="min-w-full max-w-full h-1/3 px-4 flex flex-col md:flex-row md:flex-wrap overflow-scroll">
 					{accounts.map((e, i) => (
-						<Card key={`${e.name}_${i}`} className="my-1 mx-.5 md:m-1 w-96 flex justify-between items-center">
+						<Card key={`${e.name}_${i}`} className="my-1 mx-.5 md:m-1 w-full md:w-96 flex justify-between items-center">
 							<div>
 								<Title>{e.name}</Title>
 								<Text>{e.type}</Text>
