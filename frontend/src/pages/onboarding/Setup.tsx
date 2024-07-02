@@ -92,7 +92,7 @@ export default function Setup({accounts, setAccounts, setNW}) {
 			<p>
 				Add in your accounts with the bank, the account name (official or your own), the type, and a starting balance.
 			</p>
-			<div className='flex justify-evenly items-center md:justify-start'>
+			<div className="flex justify-evenly items-center md:justify-start">
 				<Button icon={PlusIcon} iconPosition="left" className="mt-4" onClick={addAccount}>
 					Add another account
 				</Button>
