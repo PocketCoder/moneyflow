@@ -13,18 +13,16 @@ export default function Accounts() {
 		setIsOpen(true);
 	};
 	return (
-		<>
-			<main className="p-6 h-full w-full mb-16">
-				<h1 className="text-2xl">Accounts</h1>
-				<div className="flex-row justify-start items-center mt-4">
-					{userData.accounts ? (
-						<BankRows banks={userData.banks} accounts={userData.accounts} openModal={openModal} />
-					) : (
-						<p>Loading...</p>
-					)}
-				</div>
-			</main>
+		<main className="p-6 h-full w-full">
 			{isOpen && <AccountModal isOpen={isOpen} setIsOpen={setIsOpen} account={selectedAccount} />}
-		</>
+			<h1 className="text-2xl">Accounts</h1>
+			<div className="flex-row justify-start items-center mt-4">
+				{userData.accounts ? (
+					<BankRows banks={userData.banks} accounts={userData.accounts} openModal={openModal} />
+				) : (
+					<p>Loading...</p>
+				)}
+			</div>
+		</main>
 	);
 }
