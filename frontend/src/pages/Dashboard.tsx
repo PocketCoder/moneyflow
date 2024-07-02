@@ -1,6 +1,6 @@
 import {useContext, useMemo} from 'react';
 import {Title, Metric, Button} from '@tremor/react';
-import { ChevronDoubleRightIcon } from '@heroicons/react/24/outline';
+import {ChevronDoubleRightIcon} from '@heroicons/react/24/outline';
 import {useNavigate} from 'react-router-dom';
 
 import UserContext from '../lib/UserContext';
@@ -41,7 +41,15 @@ export default function Dashboard() {
 				<h1 className="text-2xl">Dashboard</h1>
 				<div className="h-full w-full flex flex-col justify-center items-center">
 					<h2>No Data</h2>
-					<Button size='lg' icon={ChevronDoubleRightIcon} iconPosition='right' onClick={() => {navigate('../onboarding/', { relative: "path" })}}>Begin Onboarding</Button>
+					<Button
+						size="lg"
+						icon={ChevronDoubleRightIcon}
+						iconPosition="right"
+						onClick={() => {
+							navigate('../onboarding/', {relative: 'path'});
+						}}>
+						Begin Onboarding
+					</Button>
 				</div>
 			</main>
 		);

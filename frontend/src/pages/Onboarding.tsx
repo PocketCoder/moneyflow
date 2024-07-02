@@ -51,7 +51,7 @@ export default function Onbording() {
 		const baseUrl = window.location.origin;
 		const dashboardUrl = `${baseUrl}/dashboard`;
 		window.location.href = dashboardUrl;
-	  };
+	}
 
 	return (
 		<main className="p-6 min-h-full h-full w-full mb-16">
@@ -85,10 +85,7 @@ export default function Onbording() {
 					</Button>
 				)}
 				{currentStep + 1 === end ? (
-					<Button
-						onClick={navigateAndRefresh}>
-						Finish
-					</Button>
+					<Button onClick={navigateAndRefresh}>Finish</Button>
 				) : (
 					<Button
 						onClick={nextStep}
