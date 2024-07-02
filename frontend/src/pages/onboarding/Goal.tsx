@@ -15,12 +15,14 @@ export default function Goal({nw, goal, setGoal}) {
 	const [localGoal, setLocalGoal] = useState(goal);
 
 	useEffect(() => {
-		if (goal !== 0) {
-			setGoal(nw * 2);
+		if (goal === 0) {
+			const newGoal = nw * 2;
+			setLocalGoal(newGoal);
+			setGoal(newGoal);
 		} else {
-			setGoal(nw + 1000);
+			setLocalGoal(goal);
 		}
-	}, [nw, goal, setGoal]);
+	}, [nw, goal]);
 
 	function parseInput(e) {
 		if (parseFloat(e)) {
