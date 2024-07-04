@@ -51,8 +51,14 @@ export default function UpdateAllModal({isOpen, toggle}) {
 						<Subtitle>Update the balances in your accounts.</Subtitle>
 						<Text>Leave blank if the balance has remaind the same.</Text>
 					</div>
-					<div>
-						<Button className="mx-4" icon={XMarkIcon} size="xs" variant="secondary" color="red" onClick={toggle}>
+					<div className="flex flex-col justify-around items-center md:block">
+						<Button
+							className="mx-4 md:mb-0 mb-2"
+							icon={XMarkIcon}
+							size="xs"
+							variant="secondary"
+							color="red"
+							onClick={toggle}>
 							Close
 						</Button>
 						<Button

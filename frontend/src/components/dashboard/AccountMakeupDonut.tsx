@@ -72,7 +72,7 @@ export default function AccountMakeupDonut({data, year}) {
 				colors={chartcolours}
 				valueFormatter={valueFormatter}
 			/>
-			{/*<Legend categories={chartData.unique} colors={chartcolours} />*/}
+			<Legend categories={chartData.unique} colors={chartcolours} />
 		</div>
 	);
 }

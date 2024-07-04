@@ -30,7 +30,7 @@ export default function UpdateCard({account, newData, setNewData}) {
 		setNewData({account: accountName, parent: account.parent}, value);
 	};
 	return (
-		<Card className="flex flex-col justify-between m-2 w-5/12">
+		<Card className="flex flex-col justify-between my-2 md:m-2 w-full md:w-5/12">
 			<div className="flex flex-row justify-between w-full h-1/3">
 				<div>
 					<Title>{account.name}</Title>

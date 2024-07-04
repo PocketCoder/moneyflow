@@ -124,7 +124,9 @@ export default function App() {
 				{modalState.isUpdateAllModalOpen && (
 					<UpdateAllModal isOpen={modalState.isUpdateAllModalOpen} toggle={toggleUpdateAllModal} />
 				)}
-				{modalState.isAddNewAccountModalOpen && <AddNewAccountModal closeModal={toggleAddNewAccountModal} />}
+				{modalState.isAddNewAccountModalOpen && (
+					<AddNewAccountModal isOpen={modalState.isAddNewAccountModalOpen} toggle={toggleAddNewAccountModal} />
+				)}
 				{newUser ? <></> : <YearSelector years={years} preferences={preferences} setPreferences={setPreferences} />}
 				<NavBar toggleMenu={toggleMenu} />
 				<ToastContainer />
