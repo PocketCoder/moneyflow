@@ -56,17 +56,17 @@ export default function Dashboard() {
 	}
 
 	return (
-		<main className="p-6 min-h-full h-full w-full mb-16">
+		<main className="p-6 min-h-full h-full w-full">
 			<h1 className="text-2xl">Dashboard</h1>
-			<div className="flex flex-wrap justify-start items-center mt-4 mb-20 w-full min-h-fit">
-				<div className="flex flex-col justify-evenly items-center my-4 w-full h-[70vh] md:h-[33vh] md:flex-row">
-					<div className="flex flex-col items-center justify-around w-1/3 h-full">
+			<div className="flex flex-wrap justify-start items-center mt-0 md:mt-4 mb-20 w-full min-h-fit">
+				<div className="flex flex-col justify-start md:justify-around items-center my-0 md:my-4 w-full h-[65vh] md:h-[33vh] md:flex-row">
+					<div className="flex flex-col items-center justify-around w-full md:w-1/3 h-1/4 md:h-full">
 						<div className="text-center">
 							<Metric>{touchableTotal}</Metric>
 							<Title>Touchable Total</Title>
 						</div>
 					</div>
-					<div className="flex flex-col items-center justify-around w-1/3 h-full">
+					<div className="flex flex-col items-center justify-around w-full md:w-1/3 h-1/2 md:h-full">
 						<div className="h-full w-full">
 							<NetWorthDonut data={NetWorthDonutData} />
 							{/* 
@@ -75,14 +75,14 @@ export default function Dashboard() {
 							*/}
 						</div>
 					</div>
-					<div className="flex flex-col items-center justify-around w-1/3 h-full">
+					<div className="flex flex-col items-center justify-around w-full md:w-1/3 h-1/4 md:h-full">
 						<div className="text-center">
 							<Metric>{untouchableTotal}</Metric>
 							<Title>Untouchable Total</Title>
 						</div>
 					</div>
 				</div>
-				<div className="flex flex-col my-4 mx-auto w-10/12 h-auto">
+				<div className="flex flex-col my-4 mx-auto w-full md:w-10/12 h-auto">
 					<NetWorthChart />
 				</div>
 				<div className="flex flex-col justify-evenly items-center my-4 w-full h-[50vh] md:flex-row">
