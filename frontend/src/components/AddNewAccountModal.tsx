@@ -1,5 +1,5 @@
 import {useState, useContext} from 'react';
-import {TextInput, Title, Subtitle, Button, Card, Select, SelectItem, Divider} from '@tremor/react';
+import {TextInput, Title, Subtitle, Button, Dialog, DialogPanel, Select, SelectItem, Divider} from '@tremor/react';
 import {
 	PlusIcon,
 	XMarkIcon,
@@ -14,7 +14,7 @@ import UserContext from '../lib/UserContext';
 import {toast} from 'react-toastify';
 import {useMutation} from 'react-query';
 
-export default function AddNewAccountModal({closeModal}) {
+export default function AddNewAccountModal({isOpen, toggle}) {
 	const userData = useContext(UserContext);
 	const {getAccessTokenSilently} = useAuth0();
 	const [accounts, setAccounts] = useState([{parent: '', name: '', type: '', balance: '', date: new Date()}]);
@@ -64,15 +64,15 @@ export default function AddNewAccountModal({closeModal}) {
 				},
 				onSuccess: () => {
 					toast.success('Account(s) Added');
-					closeModal();
+					toggle();
 				}
 			}
 		).mutate();
 	}
 
 	return (
-		<div className="fixed top-0 left-0 w-full h-full flex items-center justify-center backdrop-blur-sm">
-			<Card className="w-2/3 h-2/3 p-6 bg-white border">
+		<Dialog open={isOpen} onClose={toggle} static={true} className="w-screen h-screen max-h-screen">
+			<DialogPanel className="w-full min-w-full min-h-full h-full overflow-y-scroll">
 				<Title>Add New Account</Title>
 				<Subtitle>Add a new bank and any accounts you hold with them, and their balances.</Subtitle>
 				{accounts.map((account, index) => (
@@ -134,14 +134,14 @@ export default function AddNewAccountModal({closeModal}) {
 					Add Bank Account
 				</Button>
 				<div className="w-full h-fit flex justify-end items-end my-4">
-					<Button className="mr-2" icon={XMarkIcon} size="xs" variant="secondary" color="red" onClick={closeModal}>
+					<Button className="mr-2" icon={XMarkIcon} size="xs" variant="secondary" color="red" onClick={toggle}>
 						Close
 					</Button>
 					<Button icon={DocumentPlusIcon} size="xs" onClick={saveAccounts}>
 						Save
 					</Button>
 				</div>
-			</Card>
-		</div>
+			</DialogPanel>
+		</Dialog>
 	);
 }
