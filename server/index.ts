@@ -73,8 +73,8 @@ app.put('/user', checkJwt, async (req, res) => {
 				auth0id: req.query.id
 			},
 			data: {
-				name: req.params.userData.name,
-				preferences: req.params.userData.preferences
+				name: req.body.userData.name,
+				preferences: req.body.userData.preferences
 			}
 		});
 		res.status(200).json({success: true, user: updateUser});
