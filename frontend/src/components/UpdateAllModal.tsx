@@ -17,8 +17,10 @@ export default function UpdateAllModal({isOpen, toggle}) {
 	const data = userData.accounts;
 
 	const updateAccount = (accountObj, value) => {
-		if (value === '') return;
-		value.replace(/,/g, '');
+		if (value === '') {
+			value = 0;
+		}
+		value.replace(/[^0-9.]/g, '');
 		const newUpdate = {...accountObj, date: date, amount: value};
 		setNewData((prevUpdates) => ({...prevUpdates, [accountObj.account]: newUpdate}));
 	};
