@@ -97,6 +97,19 @@ app.delete('/user', checkJwt, async (req, res) => {
 	}
 });
 
+// CRUD Accounts //
+// CREATE
+app.post('/accounts', checkJwt, async (req, res) => {
+	try {
+		const createAccounts = await prisma.accounts.createManyAndReturn({
+			data: req.body.accounts
+		});
+		res.status(201).json({success: true, createAccounts});
+	} catch (e) {
+		res.status(500).json({success: true, error: `Error CREATE /accounts: ${e}`});
+	}
+});
+
 // DELETE THESE WHEN MIGRATED
 app.get('/authID/:id', checkJwt, async (req, res) => {
 	try {

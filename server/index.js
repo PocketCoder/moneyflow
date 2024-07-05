@@ -83,6 +83,17 @@ app.delete('/user', checkJwt, async (req, res) => {
         res.status(500).json({ succes: false, error: `Error DELETE /user: ${e}` });
     }
 });
+app.post('/accounts', checkJwt, async (req, res) => {
+    try {
+        const createAccounts = await prisma.accounts.createManyAndReturn({
+            data: req.body.accounts
+        });
+        res.status(201).json({ success: true, createAccounts });
+    }
+    catch (e) {
+        res.status(500).json({ success: true, error: `Error CREATE /accounts: ${e}` });
+    }
+});
 app.get('/authID/:id', checkJwt, async (req, res) => {
     try {
         const user = await prisma.users.findUnique({
