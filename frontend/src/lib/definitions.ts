@@ -36,3 +36,30 @@ export type UserDataType = {
 	netWorth: any;
 	prefs: object;
 };
+
+type UUID = string;
+type DateTime = string; // ISO string format
+type Decimal = string; // Decimal as string for precision
+
+export interface DBAccount {
+  id: UUID;
+  owner: UUID;
+  name: string;
+  type: string;
+  parent: string;
+  tags: string[];
+}
+
+export interface DBBalance {
+  id: UUID;
+  account: UUID;
+  date: DateTime;
+  amount: Decimal;
+}
+
+export interface DBUser {
+  id: UUID;
+  name: string;
+  auth0id: string;
+  preferences: any; // Use `any` type for JSON field
+}
