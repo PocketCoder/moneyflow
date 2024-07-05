@@ -32,6 +32,8 @@ app.get('/', (req, res) => {
 	res.send('Express on Vercel');
 });
 
+// CRUD User //
+// CREATE
 app.post('/user/', checkJwt, async (req, res) => {
 	const currYear = new Date().getFullYear();
 	const authID = req.body.sub.split('|')[1];
@@ -43,14 +45,59 @@ app.post('/user/', checkJwt, async (req, res) => {
 				preferences: {goal: {[currYear]: 0}}
 			}
 		});
-		res.status(200).json(user);
+		res.status(201).json({success: true, user: user});
 	} catch (e) {
-		console.error(`Error in /user/`);
-		console.error(e);
-		res.status(500).json({error: 'Internal Server Error'});
+		res.status(500).json({succes: false, error: `Error POST /user: ${e}`});
 	}
 });
 
+// READ
+app.get('/user', checkJwt, async (req, res) => {
+	try {
+		const user = await prisma.users.findUnique({
+			where: {
+				auth0id: req.params.id
+			}
+		});
+		res.status(200).json({success: true, user: user});
+	} catch (e) {
+		res.status(500).json({succes: false, error: `Error GET /user: ${e}`});
+	}
+});
+
+// UPDATE
+app.put('/user', checkJwt, async (req, res) => {
+	try {
+		const updateUser = await prisma.user.update({
+			where: {
+				auth0id: req.query.id
+			},
+			data: {
+				name: req.params.userData.name,
+				preferences: req.params.userData.preferences
+			}
+		});
+		res.status(200).json({success: true, user: updateUser});
+	} catch (e) {
+		res.status(500).json({succes: false, error: `Error PUT /user: ${e}`});
+	}
+});
+
+// DELETE
+app.delete('/user', checkJwt, async (req, res) => {
+	try {
+		const deleteUser = await prisma.user.delete({
+			where: {
+				auth0id: req.query.id
+			}
+		  });
+		  res.status(200).json({success: true});
+	} catch (e) {
+		res.status(500).json({succes: false, error: `Error DELETE /user: ${e}`});
+	}
+});
+
+// DELETE THESE WHEN MIGRATED
 app.get('/authID/:id', checkJwt, async (req, res) => {
 	try {
 		const user = await prisma.users.findUnique({
