@@ -65,3 +65,23 @@ export interface DBUser {
 	auth0id: string;
 	preferences: any; // Use `any` type for JSON field
 }
+
+// Client Types
+
+export interface CliUser {
+	name: string;
+	preferences: any; // Use `any` type for JSON field
+}
+
+export interface CliAccount {
+	name: string;
+	type: string;
+	parent: string; // Bank
+	tags: string[];
+}
+
+export interface CliBalance {
+	account: string;
+	amount: Decimal;
+	date: DateTime;
+}
