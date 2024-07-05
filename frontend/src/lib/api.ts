@@ -1,5 +1,6 @@
 import {DBUser} from './definitions.ts';
 import axios, { AxiosInstance } from 'axios';
+import axios, {AxiosInstance} from 'axios';
 
 // Defaults
 const api: AxiosInstance = axios.create({
@@ -11,7 +12,7 @@ const api: AxiosInstance = axios.create({
 //TODO: Call on page load/login
 export function setAuthToken(token: string) {
 	api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-};
+}
 
 // CRUD User
 

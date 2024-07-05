@@ -41,25 +41,27 @@ type UUID = string;
 type DateTime = string; // ISO string format
 type Decimal = string; // Decimal as string for precision
 
+// DB Types
+
 export interface DBAccount {
-  id: UUID;
-  owner: UUID;
-  name: string;
-  type: string;
-  parent: string;
-  tags: string[];
+	id: UUID;
+	owner: UUID;
+	name: string;
+	type: string;
+	parent: string;
+	tags: string[];
 }
 
 export interface DBBalance {
-  id: UUID;
-  account: UUID;
-  date: DateTime;
-  amount: Decimal;
+	id: UUID;
+	account: UUID;
+	date: DateTime;
+	amount: Decimal;
 }
 
 export interface DBUser {
-  id: UUID;
-  name: string;
-  auth0id: string;
-  preferences: any; // Use `any` type for JSON field
+	id: UUID;
+	name: string;
+	auth0id: string;
+	preferences: any; // Use `any` type for JSON field
 }
