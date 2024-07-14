@@ -22,7 +22,8 @@ export const Auth0ProviderWithNavigate = ({children}) => {
 			clientId={clientId}
 			authorizationParams={{
 				redirect_uri: redirectUri,
-				audience: process.env.VITE_AUTH0_AUDIENCE
+				audience: process.env.VITE_AUTH0_AUDIENCE,
+				scope: 'openid profile email offline_access'
 			}}
 			onRedirectCallback={onRedirectCallback}
 			useRefreshTokens={true}
