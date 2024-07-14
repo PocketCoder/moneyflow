@@ -5,6 +5,7 @@ import {Routes, Route, Navigate} from 'react-router-dom';
 import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
+import {setAuthToken} from './lib/api';
 import {fetchUserData} from './lib/functions';
 import {UserDataType} from './lib/definitions';
 
@@ -32,6 +33,8 @@ export default function App() {
 		isUpdateAllModalOpen: false,
 		isAddNewAccountModalOpen: false
 	});
+
+	const [isTokenSet, setIsTokenSet] = useState(false);
 
 	const [years, setYears] = useState<string[] | number[]>([]);
 
@@ -62,26 +65,31 @@ export default function App() {
 
 	/*
 	useEffect(() => {
-		authenticateUser();
-	}, [authLoading, isAuthenticated]);
-	*/
-
-	const {isLoading: queryLoading, error: queryError} = useQuery(
-		'userData',
-		() => fetchUserData(user, getAccessTokenSilently, loginWithRedirect),
-		{
-			enabled: isAuthenticated,
-			onSuccess: (data) => {
-				setUserData(data);
-				setYears(data.years);
-				toast.success('Data loaded!', {autoClose: 7000});
-			},
-			onError: (error) => {
-				toast.error(`fetchData Error: ${error}`);
+		async function fetchToken() {
+			if (isAuthenticated) {
+				const token = await getAccessTokenSilently();
+				setAuthToken(token);
+				setIsTokenSet(true);
+			} else {
+				authenticateUser();
 			}
 		}
-	);
+		fetchToken();
+	}, [isAuthenticated]);
 
+	const {isLoading: queryLoading, error: queryError} = useQuery('userData', () => fetchUserData(user), {
+		staleTime: 5 * 60 * 1000,
+		cacheTime: 60 * 60 * 1000,
+		enabled: isAuthenticated && isTokenSet,
+		onSuccess: (data) => {
+			setUserData(data);
+			setYears(data.years);
+			toast.success('Data loaded!', {autoClose: 7000});
+		},
+		onError: (error) => {
+			toast.error(`fetchData Error: ${error}`);
+		}
+	});
 	useEffect(() => {
 		if (authError) toast.error(`Auth0 Error: ${authError}`);
 		if (queryError) toast.error(`Query Error: ${queryError}`);
