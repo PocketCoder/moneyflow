@@ -112,7 +112,7 @@ export default function App() {
 				) : (
 					<Routes>
 						<Route path="/" element={<Home />} />
-						<Route path="/onboarding/*" element={<Onboarding />} />
+						<Route path="/onboarding/*" element={isAuthenticated ? <Onboarding /> : <Navigate to="/" />} />
 						<Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/" />} />
 						<Route path="/accounts" element={isAuthenticated ? <Accounts /> : <Navigate to="/" />} />
 						<Route path="/profile" element={<Profile />} />
