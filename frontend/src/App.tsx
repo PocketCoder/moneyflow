@@ -63,7 +63,6 @@ export default function App() {
 		}
 	}
 
-	/*
 	useEffect(() => {
 		async function fetchToken() {
 			if (isAuthenticated) {
@@ -90,6 +89,7 @@ export default function App() {
 			toast.error(`fetchData Error: ${error}`);
 		}
 	});
+
 	useEffect(() => {
 		if (authError) toast.error(`Auth0 Error: ${authError}`);
 		if (queryError) toast.error(`Query Error: ${queryError}`);
