@@ -71,7 +71,6 @@ export async function getUserByAuthID(authID: string, token: string) {
 }
 
 export async function updateAccounts(data: object, token: string) {
-	console.log(data);
 	try {
 		const res = await fetch(`${process.env.VITE_SERVER}/accounts/${data.id}`, {
 			method: 'POST',
