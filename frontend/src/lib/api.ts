@@ -178,9 +178,11 @@ export async function getBalances(id: string): Promise<DBBalance[]> {
 }
 
 export async function updateBalances(id: string, balances: DBBalance[]): Promise<{success: boolean}> {
+export async function updateBalances(id: string, accID: string, balances: DBBalance[]): Promise<{success: boolean}> {
 	ensureToken();
 	try {
 		const res = await api.put(`/balances?id=${id}`, balances);
+		const res = await api.put(`/balances?id=${id}&accID=${accID}`, balances);
 		return res.data;
 	} catch (error) {
 		console.error(`updateBalances: ${error}`);
