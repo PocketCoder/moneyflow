@@ -22,6 +22,37 @@ function ensureToken() {
 	}
 }
 
+// Request interceptor
+api.interceptors.request.use(
+	(config) => {
+		console.log('Outgoing request config:', config);
+		return config;
+	},
+	(error) => {
+		console.error('Request error:', error);
+		return Promise.reject(error);
+	}
+);
+
+// Response interceptor
+api.interceptors.response.use(
+	(response) => {
+		console.log('Response received:', response);
+		return response;
+	},
+	(error) => {
+		if (error.response) {
+			console.error('Response error data:', error.response.data);
+			console.error('Response error status:', error.response.status);
+			console.error('Response error headers:', error.response.headers);
+		} else if (error.request) {
+			console.error('No response received:', error.request);
+		} else {
+			console.error('Error setting up request:', error.message);
+		}
+		return Promise.reject(error);
+	}
+);
 // CRUD User
 
 export async function createUser(user: any): Promise<{success: boolean, error?: string, user?: DBUser}> {
