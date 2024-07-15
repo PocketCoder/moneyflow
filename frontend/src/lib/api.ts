@@ -119,9 +119,11 @@ export async function createAccounts(accounts: CliAccount[]): Promise<{success: 
 }
 
 export async function getAccounts(id: string): Promise<DBAccount[]> {
+export async function getAccounts(id: string, inclBals: boolean): Promise<{success: boolean; data: DBAccount[]}> {
 	ensureToken();
 	try {
 		const res = await api.get(`/accounts?id=${id}`);
+		const res = await api.get(`/accounts?id=${id}&includeBals=${inclBals}`);
 		return res.data;
 	} catch (error) {
 		console.error(`getAccounts: ${error}`);
