@@ -37,20 +37,20 @@ app.post('/user/', checkJwt, async (req, res) => {
         res.status(201).json({ success: true, user: user });
     }
     catch (e) {
-        res.status(500).json({ succes: false, error: `Error POST /user: ${e}` });
+        res.status(500).json({ success: false, error: `Error POST /user: ${e}` });
     }
 });
 app.get('/user', checkJwt, async (req, res) => {
     try {
         const user = await prisma.users.findUnique({
             where: {
-                auth0id: req.params.id
+                auth0id: req.query.id
             }
         });
         res.status(200).json({ success: true, user: user });
     }
     catch (e) {
-        res.status(500).json({ succes: false, error: `Error GET /user: ${e}` });
+        res.status(500).json({ success: false, error: `Error GET /user: ${e}` });
     }
 });
 app.put('/user', checkJwt, async (req, res) => {
@@ -67,7 +67,7 @@ app.put('/user', checkJwt, async (req, res) => {
         res.status(200).json({ success: true, user: updateUser });
     }
     catch (e) {
-        res.status(500).json({ succes: false, error: `Error PUT /user: ${e}` });
+        res.status(500).json({ success: false, error: `Error PUT /user: ${e}` });
     }
 });
 app.delete('/user', checkJwt, async (req, res) => {
@@ -80,18 +80,159 @@ app.delete('/user', checkJwt, async (req, res) => {
         res.status(200).json({ success: true });
     }
     catch (e) {
-        res.status(500).json({ succes: false, error: `Error DELETE /user: ${e}` });
+        res.status(500).json({ success: false, error: `Error DELETE /user: ${e}` });
     }
 });
 app.post('/accounts', checkJwt, async (req, res) => {
+    let errors = [];
+    let accounts = [];
+    for (const a of req.body.accounts) {
+        try {
+            const dbAcc = await prisma.accounts.create({
+                data: {
+                    owner: req.query.id,
+                    ...a
+                }
+            });
+            accounts.push(dbAcc);
+        }
+        catch (e) {
+            errors.push({ account: a, error: e });
+        }
+    }
+    if (errors.length == 0) {
+        res.status(201).json({ success: true, data: accounts });
+    }
+    res.status(500).json({ success: false, error: errors });
+});
+app.get('/accounts', checkJwt, async (req, res) => {
+    if (req.query.includeBals) {
+        try {
+            const accounts = await prisma.accounts.findMany({
+                where: {
+                    owner: req.query.id
+                },
+                include: {
+                    balances: true
+                }
+            });
+            res.status(200).json({ success: true, data: accounts });
+        }
+        catch (e) {
+            res.status(500).json({ success: false, error: `Error GET /accounts?includeBals=true: ${e}` });
+        }
+    }
+    else {
+        try {
+            const accounts = await prisma.accounts.findMany({
+                where: {
+                    owner: req.query.id
+                }
+            });
+            res.status(200).json(accounts);
+        }
+        catch (e) {
+            res.status(500).json({ success: false, error: `Error GET /accounts?includeBals=false: ${e}` });
+        }
+    }
+});
+app.put('/accounts', checkJwt, async (req, res) => {
+    let errors = [];
+    let accounts = [];
+    for (const a of req.body.accounts) {
+        try {
+            const dbAcc = await prisma.accounts.update({
+                where: {
+                    owner: req.query.id,
+                    id: a.id
+                },
+                data: {
+                    ...a
+                }
+            });
+            accounts.push(dbAcc);
+        }
+        catch (e) {
+            errors.push({ account: a, error: e });
+        }
+    }
+    if (errors.length == 0) {
+        res.status(201).json({ success: true, data: accounts });
+    }
+    res.status(201).json({ success: false, error: errors });
+});
+app.delete('/accounts', checkJwt, async (req, res) => {
     try {
-        const createAccounts = await prisma.accounts.createManyAndReturn({
-            data: req.body.accounts
+        const deleteAccount = await prisma.accounts.delete({
+            where: {
+                owner: req.query.id,
+                id: req.body.account.id
+            }
         });
-        res.status(201).json({ success: true, createAccounts });
+        res.status(200).json({ success: true });
     }
     catch (e) {
-        res.status(500).json({ success: true, error: `Error CREATE /accounts: ${e}` });
+        res.status(500).json({ success: false, error: `Error DELETE /accounts: ${e}` });
+    }
+});
+app.post('/balances', checkJwt, async (req, res) => {
+    let errors = [];
+    let balances = [];
+    for (const b of req.body.balances) {
+        try {
+            const dbBal = await prisma.balances.create({
+                data: {
+                    owner: req.query.id,
+                    ...b
+                }
+            });
+            balances.push(dbBal);
+        }
+        catch (e) {
+            errors.push({ balance: b, error: e });
+        }
+    }
+    if (errors.length == 0) {
+        res.status(201).json({ success: true, data: balances });
+    }
+    res.status(500).json({ success: false, error: errors });
+});
+app.put('/balances', checkJwt, async (req, res) => {
+    let errors = [];
+    let balances = [];
+    for (const b of req.body.balances) {
+        try {
+            const dbBal = await prisma.balances.update({
+                where: {
+                    account: req.query.id,
+                    id: b.accID
+                },
+                data: {
+                    ...b
+                }
+            });
+            balances.push(dbBal);
+        }
+        catch (e) {
+            errors.push({ balance: b, error: e });
+        }
+    }
+    if (errors.length == 0) {
+        res.status(201).json({ success: true, data: balances });
+    }
+    res.status(201).json({ success: false, error: errors });
+});
+app.delete('/balances', checkJwt, async (req, res) => {
+    try {
+        const deleteBal = await prisma.balances.delete({
+            where: {
+                id: req.body.balance.id
+            }
+        });
+        res.status(200).json({ success: true });
+    }
+    catch (e) {
+        res.status(500).json({ success: false, error: `Error DELETE /balances: ${e}` });
     }
 });
 app.get('/authID/:id', checkJwt, async (req, res) => {
