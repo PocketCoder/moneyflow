@@ -73,6 +73,11 @@ export async function getUser(authID: string): Promise<{success: boolean, error?
 		return res.data;
 	} catch (error) {
 		console.error(`getUser: ${error}`);
+		if (error.response) {
+			console.error('Response data:', error.response.data);
+			console.error('Response status:', error.response.status);
+			console.error('Response headers:', error.response.headers);
+		}
 		throw new Error(`getUser: ${error}`);
 	}
 }
