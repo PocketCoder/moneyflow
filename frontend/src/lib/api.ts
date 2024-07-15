@@ -1,4 +1,4 @@
-import {DBUser, CliUser, DBAccount, CliAccount, DBBalance} from './definitions.ts';
+import {DBUser, CliUser, DBAccount, CliAccount, DBBalance, CliBalance} from './definitions.ts';
 import axios, {AxiosInstance} from 'axios';
 
 let isTokenSet = false;
@@ -6,11 +6,9 @@ let isTokenSet = false;
 // Defaults
 const api: AxiosInstance = axios.create({
 	baseURL: process.env.VITE_SERVER,
-	timeout: 1000,
 	headers: {'Content-Type': 'application/json'}
 });
 
-//TODO: Call on page load/login
 export function setAuthToken(token: string) {
 	api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 	isTokenSet = true;
@@ -53,9 +51,10 @@ api.interceptors.response.use(
 		return Promise.reject(error);
 	}
 );
+
 // CRUD User
 
-export async function createUser(user: any): Promise<{success: boolean, error?: string, user?: DBUser}> {
+export async function createUser(user: any): Promise<{success: boolean; error?: string; user?: DBUser}> {
 	ensureToken();
 	try {
 		const res = await api.post(`/user`, user);
@@ -66,10 +65,10 @@ export async function createUser(user: any): Promise<{success: boolean, error?: 
 	}
 }
 
-export async function getUser(authID: string): Promise<{success: boolean, error?: string, user?: DBUser}> {
+export async function getUser(authID: string): Promise<{success: boolean; error?: string; user?: DBUser}> {
 	ensureToken();
 	try {
-		const res = await api.get(`/user?ID=${authID}`);
+		const res = await api.get(`/user?id=${authID}`);
 		return res.data;
 	} catch (error) {
 		console.error(`getUser: ${error}`);
@@ -82,11 +81,14 @@ export async function getUser(authID: string): Promise<{success: boolean, error?
 	}
 }
 
-export async function updateUser(authID: string, userData: CliUser): Promise<{success: boolean, error?: string, user?: DBUser}> {
+export async function updateUser(
+	authID: string,
+	userData: CliUser
+): Promise<{success: boolean; error?: string; user?: DBUser}> {
 	// TODO: Merge userData with current. Here or server.
 	ensureToken();
 	try {
-		const res = await api.put(`/user?ID=${authID}`, userData);
+		const res = await api.put(`/user?id=${authID}`, userData);
 		return res.data;
 	} catch (error) {
 		console.error(`updateUser: ${error}`);
@@ -94,10 +96,10 @@ export async function updateUser(authID: string, userData: CliUser): Promise<{su
 	}
 }
 
-export async function deleteUser(authID: string): Promise<{success: boolean, error?: string}> {
+export async function deleteUser(authID: string): Promise<{success: boolean; error?: string}> {
 	ensureToken();
 	try {
-		const res = await api.delete(`/user?ID=${authID}`);
+		const res = await api.delete(`/user?id=${authID}`);
 		return res.data;
 	} catch (error) {
 		console.error(`deleteUser: ${error}`);
@@ -107,10 +109,10 @@ export async function deleteUser(authID: string): Promise<{success: boolean, err
 
 // CRUD Accounts
 
-export async function createAccounts(accounts: CliAccount[]): Promise<{success: boolean}> {
+export async function createAccounts(id: string, accounts: CliAccount[]): Promise<{success: boolean}> {
 	ensureToken();
 	try {
-		const res = await api.post('/accounts', accounts);
+		const res = await api.post(`/accounts?id=${id}`, accounts);
 		return res.data;
 	} catch (error) {
 		console.error(`createAccounts: ${error}`);
@@ -118,11 +120,9 @@ export async function createAccounts(accounts: CliAccount[]): Promise<{success: 
 	}
 }
 
-export async function getAccounts(id: string): Promise<DBAccount[]> {
 export async function getAccounts(id: string, inclBals: boolean): Promise<{success: boolean; data: DBAccount[]}> {
 	ensureToken();
 	try {
-		const res = await api.get(`/accounts?id=${id}`);
 		const res = await api.get(`/accounts?id=${id}&includeBals=${inclBals}`);
 		return res.data;
 	} catch (error) {
@@ -131,7 +131,7 @@ export async function getAccounts(id: string, inclBals: boolean): Promise<{succe
 	}
 }
 
-export async function updateAccounts(id: string, accounts: CliBalance[] | DBAccount): Promise<{success: boolean}> {
+export async function updateAccounts(id: string, accounts: DBAccount[]): Promise<{success: boolean}> {
 	ensureToken();
 	try {
 		const res = await api.put(`/accounts?id=${id}`, accounts);
@@ -142,10 +142,10 @@ export async function updateAccounts(id: string, accounts: CliBalance[] | DBAcco
 	}
 }
 
-export async function deleteAccounts(id: string, accounts: any /*FIXME: Add Type*/): Promise<{success: boolean}> {
+export async function deleteAccounts(id: string, account: any /*FIXME: Add Type*/): Promise<{success: boolean}> {
 	ensureToken();
 	try {
-		const res = await api.delete(`/accounts?id=${id}`, accounts);
+		const res = await api.delete(`/accounts?id=${id}`, account);
 		return res.data;
 	} catch (error) {
 		console.error(`deleteAccounts: ${error}`);
@@ -155,10 +155,10 @@ export async function deleteAccounts(id: string, accounts: any /*FIXME: Add Type
 
 // CRUD Balances
 
-export async function createBalances(balances: CliAccount[]): Promise<{success: boolean}> {
+export async function createBalances(id: string, balances: CliBalance[]): Promise<{success: boolean}> {
 	ensureToken();
 	try {
-		const res = await api.post('/balances', balances);
+		const res = await api.post(`/balances?id=${id}`, balances);
 		return res.data;
 	} catch (error) {
 		console.error(`createBalances: ${error}`);
@@ -177,11 +177,9 @@ export async function getBalances(id: string): Promise<DBBalance[]> {
 	}
 }
 
-export async function updateBalances(id: string, balances: DBBalance[]): Promise<{success: boolean}> {
 export async function updateBalances(id: string, accID: string, balances: DBBalance[]): Promise<{success: boolean}> {
 	ensureToken();
 	try {
-		const res = await api.put(`/balances?id=${id}`, balances);
 		const res = await api.put(`/balances?id=${id}&accID=${accID}`, balances);
 		return res.data;
 	} catch (error) {
@@ -190,10 +188,10 @@ export async function updateBalances(id: string, accID: string, balances: DBBala
 	}
 }
 
-export async function deleteBalances(id: string, balances: any /*FIXME: Add Type*/): Promise<{success: boolean}> {
+export async function deleteBalances(id: string, balance: any /*FIXME: Add Type*/): Promise<{success: boolean}> {
 	ensureToken();
 	try {
-		const res = await api.delete(`/balances?id=${id}`, balances);
+		const res = await api.delete(`/balances?id=${id}`, balance);
 		return res.data;
 	} catch (error) {
 		console.error(`deleteBalances: ${error}`);
