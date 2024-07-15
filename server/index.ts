@@ -302,6 +302,8 @@ app.get('/accounts/:id', checkJwt, async (req, res) => {
 	}
 });
 
+// END DELETE
+
 app.post('/preferences', checkJwt, async (req, res) => {
 	const body = req.body;
 	try {
@@ -373,7 +375,6 @@ app.post('/accounts/add/:id', checkJwt, async (req, res) => {
 			} else {
 				throw new Error('Balance error is NaN.');
 			}
-
 		} catch (e) {
 			error = e;
 			throw new Error(`Error inserting new balances: ${e}.`);
