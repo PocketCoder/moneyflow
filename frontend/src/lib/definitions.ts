@@ -50,6 +50,7 @@ export interface DBAccount {
 	type: string;
 	parent: string;
 	tags: string[];
+	balances?: DBBalance[];
 }
 
 export interface DBBalance {
