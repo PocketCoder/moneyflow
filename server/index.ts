@@ -32,6 +32,21 @@ app.get('/', (req, res) => {
 	res.send('Express on Vercel');
 });
 
+async function getDBID(authsub: string): Promise<string | null> {
+	const auth0id = authsub.split('|')[1];
+	try {
+		const user = await prisma.users.findUnique({
+			where: {
+				auth0id: auth0id
+			}
+		});
+		return user ? user.id : null;
+	} catch (e: any) {
+		console.error(`Error in getDBID: ${e}`);
+		throw new Error(e);
+	}
+}
+
 // CRUD User //
 // CREATE
 app.post('/user/', checkJwt, async (req, res) => {
