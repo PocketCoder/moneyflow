@@ -4,6 +4,7 @@ import {UserProvider} from '@auth0/nextjs-auth0/client';
 import './globals.css';
 
 import NavBar from '@/components/NavBar';
+import Header from '@/components/Header';
 
 const comfortaa = Comfortaa({
 	variable: '--font-Comfortaa-sans',
@@ -26,8 +27,9 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<UserProvider>
-					{children}
 				<body className={`${comfortaa.variable} antialiased`}>
+					<Header />
+					<main className="p-4 mt-14 mb-20 h-full w-full">{children}</main>
 					<NavBar />
 				</body>
 			</UserProvider>
