@@ -69,6 +69,7 @@ export default async function EditAccountPage({params}: {params: Promise<{id: st
 									<span key={i} className="text-sm text-blue-500">
 										{i !== 0 ? ', ' : ''}
 										{'#' + tag}
+										{/* TODO: Make editable */}
 									</span>
 								))}
 							</div>
