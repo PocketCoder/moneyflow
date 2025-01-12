@@ -34,7 +34,7 @@ export default async function AccountPage({params}: {params: Promise<{id: string
 		<>
 			<header className="flex gap-1">
 				<div className="flex flex-col gap-1 h-full">
-					<Link href={'/edit/'}>
+					<Link href={`/edit/account/${id}`}>
 						<Card className="w-12 h-12 p-1 flex items-center gap-1 hover:bg-blue-600 transition-all hover:text-white">
 							<PencilIcon className="h-8 mx-auto" />
 						</Card>
