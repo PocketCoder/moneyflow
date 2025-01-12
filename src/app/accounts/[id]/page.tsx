@@ -6,7 +6,7 @@ import {sql} from '@vercel/postgres';
 import {ChevronLeftIcon} from '@heroicons/react/24/outline';
 import {PencilIcon} from '@heroicons/react/24/outline';
 import {Card} from '@/components/Tremor/Card';
-import {Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRoot, TableRow} from '@/components/Tremor/Table';
+import HistoryTable from '@/components/HistoryTable';
 import BalanceChart from '@/components/BalanceChart';
 import {formatter} from '@/lib/utils';
 
@@ -104,27 +104,7 @@ export default async function AccountPage({params}: {params: Promise<{id: string
 						</Card>
 					</div>
 				</div>
-				<Card className="w-full md:w-1/2 h-fit">
-					<h2 className="text-xl font-bold mb-2">History</h2>
-					<TableRoot>
-						<Table>
-							<TableHead>
-								<TableRow>
-									<TableHeaderCell>Date</TableHeaderCell>
-									<TableHeaderCell>Amount (£)</TableHeaderCell>
-								</TableRow>
-							</TableHead>
-							<TableBody>
-								{formattedBalances.map((balance: BalanceData, i: number) => (
-									<TableRow key={i}>
-										<TableCell>{balance.date}</TableCell>
-										<TableCell>{formatter.format(balance.amount)}</TableCell>
-									</TableRow>
-								))}
-							</TableBody>
-						</Table>
-					</TableRoot>
-				</Card>
+				<HistoryTable balanceData={formattedBalances} />
 			</section>
 		</>
 	);
