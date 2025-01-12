@@ -37,3 +37,9 @@ export const hasErrorInput = [
 	// ring color
 	'ring-red-200 dark:ring-red-700/30'
 ];
+
+export const formatter = new Intl.NumberFormat('en-GB', {
+	style: 'currency',
+	currency: 'GBP',
+	trailingZeroDisplay: 'stripIfInteger'
+});
