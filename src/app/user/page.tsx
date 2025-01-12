@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import {getSession} from '@auth0/nextjs-auth0';
 import {UserProfile} from '@auth0/nextjs-auth0/client';
 
@@ -10,7 +11,7 @@ export default async function User() {
 	return (
 		user && (
 			<div>
-				<img src={user.picture!} alt={user.name!} />
+				<Image src={user.picture!} width={100} height={100} alt={user.name!} />
 				<h2>{user.name}</h2>
 				<p>{user.email}</p>
 			</div>

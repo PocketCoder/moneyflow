@@ -9,7 +9,7 @@ async function updateBalances(formData: FormData) {
 	'use server';
 
 	const date = new Date(formData.get('date') as string);
-	const accounts = JSON.parse(formData.get('accounts') as string) as AccountData[];
+	//const accounts = JSON.parse(formData.get('accounts') as string) as AccountData[];
 
 	try {
 		const balanceEntries: Partial<BalanceData>[] = Array.from(formData.entries())
