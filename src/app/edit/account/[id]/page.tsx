@@ -10,6 +10,7 @@ import {Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRoot, Tabl
 import {Input} from '@/components/Tremor/Input';
 import {Button} from '@/components/Tremor/Button';
 import {revalidatePath} from 'next/cache';
+import DeleteButtonAndDialog from '@/components/DeleteButtonAndDialog';
 
 export default async function EditAccountPage({params}: {params: Promise<{id: string}>}) {
 	const id = (await params).id;
@@ -24,6 +25,14 @@ export default async function EditAccountPage({params}: {params: Promise<{id: st
 			date: new Date(balance.date).toISOString().split('T')[0],
 			amount: balance.amount ? parseFloat(balance.amount) || 0 : 0
 		}));
+
+	async function deleteAccountAndBalances() {
+		'use server';
+		const dbResult = await sql`DELETE FROM accounts WHERE id=${id}`;
+		const dbResult2 = await sql`DELETE FROM balances WHERE account=${id}`;
+		revalidatePath(`/accounts/`);
+	}
+
 	async function updateAccountAndBalances(data: FormData) {
 		'use server';
 		const account_name = data.get('account_name') as string;
@@ -48,9 +57,10 @@ export default async function EditAccountPage({params}: {params: Promise<{id: st
 			<form action={updateAccountAndBalances}>
 				<header className="flex gap-1">
 					<div className="flex flex-col gap-1 h-full">
-						<Button type="submit" className="">
+						<Button type="submit">
 							<CheckIcon className="h-8 mx-auto" />
 						</Button>
+						<DeleteButtonAndDialog callback={deleteAccountAndBalances} />
 						<Link href={'/accounts/'}>
 							<Card className="h-20 p-1 flex items-center gap-1 hover:bg-blue-600 transition-all hover:text-white">
 								<ChevronLeftIcon className="h-10 mx-auto" />
