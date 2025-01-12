@@ -29,11 +29,6 @@ export interface AccountData {
 	type: AccountType;
 	parent: string; // Bank
 	tags: string[];
-	/*
-	balance: {
-		amount: Decimal;
-		updatedAt: DateTime;
-	};*/
 }
 
 export interface BalanceData {
