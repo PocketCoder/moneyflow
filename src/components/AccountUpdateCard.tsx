@@ -1,0 +1,50 @@
+import {AccountData, BalanceData} from '@/lib/types';
+import Image from 'next/image';
+import {sql} from '@vercel/postgres';
+import {bankLogos} from '@/lib/bankLogos';
+import {Card} from '@/components/Tremor/Card';
+import {Input} from '@/components/Tremor/Input';
+import BalanceSpark from '@/components/BalanceSpark';
+
+export default async function AccountUpdateCard({account}: {account: AccountData}) {
+	const balancesResult = await sql`SELECT * FROM balances WHERE account = ${account.id}`;
+	const balances = balancesResult.rows as BalanceData[];
+	const formattedBalances: BalanceData[] = balances
+		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+		.map((balance) => ({
+			...balance,
+			date: new Intl.DateTimeFormat('en-GB', {
+				month: 'short',
+				year: 'numeric'
+			}).format(new Date(balance.date)),
+			amount: parseFloat(balance.amount)
+		}));
+	return (
+		<Card className="min-w-[300px] h-[300px] flex flex-col justify-evenly items-start">
+			{bankLogos[account.parent.toUpperCase()] ? (
+				<Image src={`${bankLogos[account.parent.toUpperCase()]}`} alt={account.parent} width={60} height={20} />
+			) : (
+				<span className="text-md text-gray-800">{account.parent}</span>
+			)}
+			<h3 className="font-bold text-lg">{account.name}</h3>
+			<BalanceSpark data={formattedBalances} type={account.type} width={'100%'} height={'33%'} />
+			{formattedBalances.length > 0 && (
+				<div className="flex flex-col items-start justify-start gap-1 my-2">
+					<span className="text-sm text-gray-700">
+						Last Balance: £{formattedBalances[formattedBalances.length - 1].amount}
+					</span>
+					<span className="text-xs text-gray-500">
+						Updated on: {formattedBalances[formattedBalances.length - 1].date}
+					</span>
+				</div>
+			)}
+			<Input
+				className="mt-2"
+				type="number"
+				name={`amount-${account.id}`}
+				defaultValue={formattedBalances.length > 0 ? formattedBalances[formattedBalances.length - 1].amount : 0}
+				placeholder="Enter new amount"
+			/>
+		</Card>
+	);
+}
