@@ -1,17 +1,12 @@
 import type {Metadata} from 'next';
-import {Geist, Geist_Mono} from 'next/font/google';
+import {Comfortaa} from 'next/font/google';
 import {UserProvider} from '@auth0/nextjs-auth0/client';
 import './globals.css';
 
 import NavBar from '@/components/NavBar';
 
-const geistSans = Geist({
-	variable: '--font-geist-sans',
-	subsets: ['latin']
-});
-
-const geistMono = Geist_Mono({
-	variable: '--font-geist-mono',
+const comfortaa = Comfortaa({
+	variable: '--font-Comfortaa-sans',
 	subsets: ['latin']
 });
 
@@ -31,8 +26,8 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<UserProvider>
-				<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 					{children}
+				<body className={`${comfortaa.variable} antialiased`}>
 					<NavBar />
 				</body>
 			</UserProvider>
