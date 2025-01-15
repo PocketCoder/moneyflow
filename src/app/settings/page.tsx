@@ -10,15 +10,15 @@ export default async function Settings() {
 	// TODO: Redo Goals.
 	return (
 		<main className="flex flex-col gap-4">
-			<Card className="flex justify-between items-center">
-				<h2 className="font-bold text-lg">Name</h2>
-				<div className="flex w-90 gap-4">
+			<Card className="flex items-center justify-between">
+				<h2 className="text-lg font-bold">Name</h2>
+				<div className="w-90 flex gap-4">
 					<Input placeholder="Name" className="w-80" defaultValue={userData.name} />
 					<Button variant="primary">Save</Button>
 				</div>
 			</Card>
-			<Card className="flex flex-col justify-between items-between gap-2">
-				<h2 className="font-bold text-lg">Goal</h2>
+			<Card className="items-between flex flex-col justify-between gap-2">
+				<h2 className="text-lg font-bold">Goal</h2>
 			</Card>
 		</main>
 	);

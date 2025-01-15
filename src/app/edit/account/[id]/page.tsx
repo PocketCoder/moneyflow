@@ -54,18 +54,18 @@ export default async function EditAccountPage({params}: {params: Promise<{id: st
 		<>
 			<form action={updateAccountAndBalances}>
 				<header className="flex gap-1">
-					<div className="flex flex-col gap-1 h-full">
+					<div className="flex h-full flex-col gap-1">
 						<Button type="submit">
-							<CheckIcon className="h-8 mx-auto" />
+							<CheckIcon className="mx-auto h-8" />
 						</Button>
 						<DeleteButtonAndDialog callback={deleteAccountAndBalances} />
 						<Link href={'/accounts/'}>
-							<Card className="h-20 p-1 flex items-center gap-1 hover:bg-blue-600 transition-all hover:text-white">
-								<ChevronLeftIcon className="h-10 mx-auto" />
+							<Card className="flex h-20 items-center gap-1 p-1 transition-all hover:bg-blue-600 hover:text-white">
+								<ChevronLeftIcon className="mx-auto h-10" />
 							</Card>
 						</Link>
 					</div>
-					<Card className="flex justify-between items-center">
+					<Card className="flex items-center justify-between">
 						<div className="flex flex-col items-start gap-2">
 							<Input className="text-2xl font-bold" defaultValue={account.name} type="text" name="account_name" />
 							<div className="flex gap-2">
@@ -97,8 +97,8 @@ export default async function EditAccountPage({params}: {params: Promise<{id: st
 					</Card>
 				</header>
 				<section className="mt-2 flex flex-col gap-4">
-					<Card className="w-full h-fit">
-						<h2 className="text-xl font-bold mb-2">History</h2>
+					<Card className="h-fit w-full">
+						<h2 className="mb-2 text-xl font-bold">History</h2>
 						<TableRoot>
 							<Table>
 								<TableHead>

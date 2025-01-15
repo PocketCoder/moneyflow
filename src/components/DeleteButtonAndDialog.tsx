@@ -20,7 +20,7 @@ export default function DeleteButtonAndDialog({callback}: {callback: () => Promi
 		<Dialog>
 			<DialogTrigger asChild>
 				<Button variant="destructive">
-					<BackspaceIcon className="h-8 mx-auto" />
+					<BackspaceIcon className="mx-auto h-8" />
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-lg">

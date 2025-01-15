@@ -21,7 +21,7 @@ export default async function Home() {
 		}));
 	return (
 		<main>
-			<Card className="w-full md:w-2/3 h-60 md:h-[350px]">
+			<Card className="h-60 w-full md:h-[350px] md:w-2/3">
 				<BalanceChart data={formattedBalances} type={account.type} />
 			</Card>
 		</main>

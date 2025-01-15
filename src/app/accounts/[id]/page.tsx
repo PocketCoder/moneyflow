@@ -33,19 +33,19 @@ export default async function AccountPage({params}: {params: Promise<{id: string
 	return (
 		<>
 			<header className="flex gap-1">
-				<div className="flex flex-col gap-1 h-full">
+				<div className="flex h-full flex-col gap-1">
 					<Link href={`/edit/account/${id}`}>
-						<Card className="w-12 h-12 p-1 flex items-center gap-1 hover:bg-blue-600 transition-all hover:text-white">
-							<PencilIcon className="h-8 mx-auto" />
+						<Card className="flex h-12 w-12 items-center gap-1 p-1 transition-all hover:bg-blue-600 hover:text-white">
+							<PencilIcon className="mx-auto h-8" />
 						</Card>
 					</Link>
 					<Link href={'/accounts/'}>
-						<Card className="w-12 h-20 p-1 flex items-center gap-1 hover:bg-blue-600 transition-all hover:text-white">
-							<ChevronLeftIcon className="h-10 mx-auto" />
+						<Card className="flex h-20 w-12 items-center gap-1 p-1 transition-all hover:bg-blue-600 hover:text-white">
+							<ChevronLeftIcon className="mx-auto h-10" />
 						</Card>
 					</Link>
 				</div>
-				<Card className="flex justify-between items-center">
+				<Card className="flex items-center justify-between">
 					<div className="flex flex-col items-start">
 						<h1 className="text-2xl font-bold">{account.name}</h1>
 						<span className="text-gray-500">
@@ -70,12 +70,12 @@ export default async function AccountPage({params}: {params: Promise<{id: string
 				</Card>
 			</header>
 			<section className="mt-2 flex flex-col gap-4">
-				<div className="w-full h-fit flex gap-2 flex-wrap md:flex-nowrap">
-					<Card className="w-full md:w-2/3 h-60 md:h-[350px]">
+				<div className="flex h-fit w-full flex-wrap gap-2 md:flex-nowrap">
+					<Card className="h-60 w-full md:h-[350px] md:w-2/3">
 						<BalanceChart data={formattedBalances} type={account.type} />
 					</Card>
-					<div className="w-full md:w-1/3 h-fit md:h-[350px] flex flex-col gap-2">
-						<Card className="w-full h-fit md:h-1/3 flex items-center justify-between">
+					<div className="flex h-fit w-full flex-col gap-2 md:h-[350px] md:w-1/3">
+						<Card className="flex h-fit w-full items-center justify-between md:h-1/3">
 							<h2 className="text-xl font-bold">
 								Most Recent <br />
 								Balance
@@ -88,14 +88,14 @@ export default async function AccountPage({params}: {params: Promise<{id: string
 								<span>{formattedBalances[formattedBalances.length - 1].date || 'N/A'}</span>
 							</div>
 						</Card>
-						<Card className="w-full h-fit md:h-1/3 flex items-center justify-between">
+						<Card className="flex h-fit w-full items-center justify-between md:h-1/3">
 							<h2 className="text-xl font-bold">Difference</h2>
 							<span className="text-lg">
 								£{diff} {diffPercent == 'N/A' ? '' : `— ${diffPercent}%`}
 							</span>
 						</Card>
-						<Card className="w-full h-fit md:h-1/3 flex items-center justify-between">
-							<h2 className="text-xl font-bold mb-2">Starting Balance</h2>
+						<Card className="flex h-fit w-full items-center justify-between md:h-1/3">
+							<h2 className="mb-2 text-xl font-bold">Starting Balance</h2>
 							<div className="h-full">
 								<span className="text-3xl font-bold">{formatter.format(formattedBalances[0].amount)}</span>
 								<br />

@@ -20,16 +20,16 @@ export default async function AccountUpdateCard({account}: {account: AccountData
 			amount: parseFloat(balance.amount)
 		}));
 	return (
-		<Card className="min-w-[300px] h-[300px] flex flex-col justify-evenly items-start">
+		<Card className="flex h-[300px] min-w-[300px] flex-col items-start justify-evenly">
 			{bankLogos[account.parent.toUpperCase()] ? (
 				<Image src={`${bankLogos[account.parent.toUpperCase()]}`} alt={account.parent} width={60} height={20} />
 			) : (
 				<span className="text-md text-gray-800">{account.parent}</span>
 			)}
-			<h3 className="font-bold text-lg">{account.name}</h3>
+			<h3 className="text-lg font-bold">{account.name}</h3>
 			<BalanceSpark data={formattedBalances} type={account.type} width={'100%'} height={'33%'} />
 			{formattedBalances.length > 0 && (
-				<div className="flex flex-col items-start justify-start gap-1 my-2">
+				<div className="my-2 flex flex-col items-start justify-start gap-1">
 					<span className="text-sm text-gray-700">
 						Last Balance: £{formattedBalances[formattedBalances.length - 1].amount}
 					</span>

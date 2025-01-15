@@ -29,7 +29,7 @@ export default function RootLayout({
 			<UserProvider>
 				<body className={`${comfortaa.variable} antialiased`}>
 					<Header />
-					<main className="p-4 mt-14 mb-20 h-full w-full">{children}</main>
+					<main className="mb-20 mt-14 h-full w-full p-4">{children}</main>
 					<NavBar />
 				</body>
 			</UserProvider>

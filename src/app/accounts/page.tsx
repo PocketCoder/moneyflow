@@ -19,7 +19,7 @@ export default async function Accounts() {
 			return obj;
 		}, {});
 	return (
-		<section className="flex flex-wrap gap-4 mt-2">
+		<section className="mt-2 flex flex-wrap gap-4">
 			{Object.entries(ordered).map(([bank, accounts]) =>
 				bank === 'Net Worth' ? null : (
 					<div key={bank} className="space-y-2">

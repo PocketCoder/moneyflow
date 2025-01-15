@@ -5,8 +5,8 @@ import {formatter} from '@/lib/utils';
 
 export default function HistoryTable({balanceData}: {balanceData: BalanceData[]}) {
 	return (
-		<Card className="w-full md:w-1/2 h-fit">
-			<h2 className="text-xl font-bold mb-2">History</h2>
+		<Card className="h-fit w-full md:w-1/2">
+			<h2 className="mb-2 text-xl font-bold">History</h2>
 			<TableRoot>
 				<Table>
 					<TableHead>

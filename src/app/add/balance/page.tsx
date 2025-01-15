@@ -45,9 +45,9 @@ export default async function AddBalance() {
 	return (
 		<form action={updateBalances}>
 			<section>
-				<h1 className="text-center mb-2 font-bold text-lg">Update Balances</h1>
+				<h1 className="mb-2 text-center text-lg font-bold">Update Balances</h1>
 				<Input type="date" name="date" defaultValue={new Date().toISOString().split('T')[0]} className="mb-2" />
-				<div className="flex gap-8 flex-nowrap w-full h-full overflow-x-scroll">
+				<div className="flex h-full w-full flex-nowrap gap-8 overflow-x-scroll">
 					{rows.map((account, i) => (
 						<AccountUpdateCard key={i} account={account} />
 					))}

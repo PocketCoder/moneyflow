@@ -24,15 +24,15 @@ export default async function Account({account}: {account: AccountData}) {
 		<Link href={`/accounts/${account.id}`}>
 			<Card
 				className={clsx(
-					'flex justify-between items-center w-full md:w-90 h-40 p-4 hover:scale-[101%] transition-transform gap-4',
+					'md:w-90 flex h-40 w-full items-center justify-between gap-4 p-4 transition-transform hover:scale-[101%]',
 					{
 						'opacity-70': account.tags.includes('inactive'),
-						'border-red-500 border-t-4': account.type === 'Debt',
-						'border-purple-500 border-t-4': account.type === 'Pension'
+						'border-t-4 border-red-500': account.type === 'Debt',
+						'border-t-4 border-purple-500': account.type === 'Pension'
 					}
 				)}>
-				<div className="flex flex-col justify-evenly h-full">
-					<h3 className="font-bold text-lg">{account.name}</h3>
+				<div className="flex h-full flex-col justify-evenly">
+					<h3 className="text-lg font-bold">{account.name}</h3>
 					{bankLogos[account.parent.toUpperCase()] ? (
 						<Image src={`${bankLogos[account.parent.toUpperCase()]}`} alt={account.parent} width={60} height={20} />
 					) : (
