@@ -43,3 +43,8 @@ export const formatter = new Intl.NumberFormat('en-GB', {
 	currency: 'GBP',
 	trailingZeroDisplay: 'stripIfInteger'
 });
+
+export const currencyFormatter = (value: number | string) => {
+	value = parseFloat(value.toString());
+	return formatter.format(value);
+};
