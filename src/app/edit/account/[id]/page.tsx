@@ -28,8 +28,8 @@ export default async function EditAccountPage({params}: {params: Promise<{id: st
 
 	async function deleteAccountAndBalances() {
 		'use server';
-		const dbResult = await sql`DELETE FROM accounts WHERE id=${id}`;
-		const dbResult2 = await sql`DELETE FROM balances WHERE account=${id}`;
+		await sql`DELETE FROM accounts WHERE id=${id}`;
+		await sql`DELETE FROM balances WHERE account=${id}`;
 		revalidatePath(`/accounts/`);
 	}
 
@@ -38,15 +38,13 @@ export default async function EditAccountPage({params}: {params: Promise<{id: st
 		const account_name = data.get('account_name') as string;
 		const account_parent = data.get('account_parent') as string;
 		const account_type = data.get('account_type') as string;
-		const dbResult =
-			await sql`UPDATE accounts SET name=${account_name}, parent=${account_parent}, type=${account_type} WHERE id=${id}`;
+		await sql`UPDATE accounts SET name=${account_name}, parent=${account_parent}, type=${account_type} WHERE id=${id}`;
 		Object.keys(data).forEach(async (key: string) => {
 			if (key.endsWith('_amount') || key.endsWith('_date')) {
 				const balance_id = key.split('_')[0];
 				const balance_amount = data.get(key) as string;
 				const balance_date = data.get(`${balance_id}_date`) as string;
-				const dbResult =
-					await sql`UPDATE balances SET amount=${balance_amount}, date=${balance_date} WHERE id=${balance_id}`;
+				await sql`UPDATE balances SET amount=${balance_amount}, date=${balance_date} WHERE id=${balance_id}`;
 			}
 		});
 		revalidatePath(`/edit/account/${id}`);

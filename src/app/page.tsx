@@ -19,10 +19,6 @@ export default async function Home() {
 			}).format(new Date(balance.date)),
 			amount: balance.amount ? parseFloat(balance.amount) || 0 : 0
 		}));
-
-	const diff = formattedBalances[formattedBalances.length - 1].amount - formattedBalances[0].amount;
-	let diffPercent = ((diff / formattedBalances[0].amount) * 100).toFixed(0);
-	diffPercent = Number.isNaN(diffPercent) || diffPercent === 'Infinity' ? 'N/A' : diffPercent;
 	return (
 		<main>
 			<Card className="w-full md:w-2/3 h-60 md:h-[350px]">
