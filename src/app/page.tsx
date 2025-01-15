@@ -4,6 +4,7 @@ import {Card} from '@/components/Tremor/Card';
 import BalanceChart from '@/components/BalanceChart';
 
 export default async function Home() {
+	// TODO: Move to utils.ts
 	const accountResult = await sql`SELECT * FROM accounts WHERE owner=${process.env.USERID} AND name='Net Worth'`;
 	const account = accountResult.rows[0] as AccountData;
 	const balancesResult = await sql`SELECT amount, date FROM balances WHERE account = ${account.id}`;
