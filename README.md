@@ -6,6 +6,10 @@
 
 Ignore the minutiae and focus on the big picture. Spot trends over time and make informed decisions for your financial future.
 
+## NOT PRODUCTION READY
+
+This is a work in progress. It's not ready for production use.
+
 ## Features
 
 - Log balances of your accounts periodically
