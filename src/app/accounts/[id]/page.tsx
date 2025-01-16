@@ -1,33 +1,21 @@
-import type {AccountData, BalanceData} from '@/lib/types';
 import {bankLogos} from '@/lib/bankLogos';
 import Link from 'next/link';
 import Image from 'next/image';
-import {sql} from '@vercel/postgres';
 import {ChevronLeftIcon} from '@heroicons/react/24/outline';
 import {PencilIcon} from '@heroicons/react/24/outline';
 import {Card} from '@/components/Tremor/Card';
 import HistoryTable from '@/components/HistoryTable';
 import BalanceChart from '@/components/BalanceChart';
-import {formatter} from '@/lib/utils';
 import {formatBalances, formatter, getAccount, getBalances, getDiffPercent, getUserID} from '@/lib/utils';
+import {getSession} from '@auth0/nextjs-auth0';
 
 export default async function AccountPage({params}: {params: Promise<{id: string}>}) {
 	const id = (await params).id;
-	const accountResult = await sql`SELECT * FROM accounts WHERE owner=${process.env.USERID} AND id=${id}`;
-	const balancesResult = await sql`SELECT amount, date FROM balances WHERE account = ${id}`;
-	const account = accountResult.rows[0] as AccountData;
-	const balances = balancesResult.rows as BalanceData[];
-	const formattedBalances: BalanceData[] = balances
-		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-		.map((balance) => ({
-			...balance,
-			date: new Intl.DateTimeFormat('en-GB', {
-				month: 'short',
-				year: 'numeric'
-			}).format(new Date(balance.date)),
-			amount: balance.amount ? parseFloat(balance.amount) || 0 : 0
-		}));
-
+	const session = await getSession();
+	const userID = await getUserID(session!);
+	const account = await getAccount(id, userID);
+	const balances = await getBalances(id);
+	const formattedBalances = formatBalances(balances);
 	const diff = formattedBalances[formattedBalances.length - 1].amount - formattedBalances[0].amount;
 	const diffPercent = getDiffPercent(formattedBalances);
 	return (
