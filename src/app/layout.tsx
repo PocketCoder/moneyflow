@@ -1,6 +1,8 @@
 import type {Metadata} from 'next';
+import {redirect} from 'next/navigation';
 import {Comfortaa} from 'next/font/google';
-import {UserProvider} from '@auth0/nextjs-auth0/client';
+import {UserProfile, UserProvider} from '@auth0/nextjs-auth0/client';
+import {getSession} from '@auth0/nextjs-auth0';
 import './globals.css';
 
 import NavBar from '@/components/NavBar';
@@ -19,11 +21,16 @@ export const metadata: Metadata = {
 	}
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const session = await getSession();
+	const user: UserProfile | undefined = session?.user;
+	if (!user) {
+		redirect('/api/auth/login');
+	}
 	return (
 		<html lang="en">
 			<UserProvider>
