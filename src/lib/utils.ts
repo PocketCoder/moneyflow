@@ -48,3 +48,8 @@ export const currencyFormatter = (value: number | string) => {
 	value = parseFloat(value.toString());
 	return formatter.format(value);
 };
+export function getDiffPercent(balances: BalanceData[]): number | string {
+	const diff = balances[balances.length - 1].amount - balances[0].amount;
+	let diffPercent = ((diff / balances[0].amount) * 100).toFixed(0);
+	return (diffPercent = Number.isNaN(diffPercent) || diffPercent === 'Infinity' ? 'N/A' : diffPercent);
+}

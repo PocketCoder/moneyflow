@@ -9,6 +9,7 @@ import {Card} from '@/components/Tremor/Card';
 import HistoryTable from '@/components/HistoryTable';
 import BalanceChart from '@/components/BalanceChart';
 import {formatter} from '@/lib/utils';
+import {formatBalances, formatter, getAccount, getBalances, getDiffPercent, getUserID} from '@/lib/utils';
 
 export default async function AccountPage({params}: {params: Promise<{id: string}>}) {
 	const id = (await params).id;
@@ -28,8 +29,7 @@ export default async function AccountPage({params}: {params: Promise<{id: string
 		}));
 
 	const diff = formattedBalances[formattedBalances.length - 1].amount - formattedBalances[0].amount;
-	let diffPercent = ((diff / formattedBalances[0].amount) * 100).toFixed(0);
-	diffPercent = Number.isNaN(diffPercent) || diffPercent === 'Infinity' ? 'N/A' : diffPercent;
+	const diffPercent = getDiffPercent(formattedBalances);
 	return (
 		<>
 			<header className="flex gap-1">
