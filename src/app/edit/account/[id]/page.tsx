@@ -47,7 +47,7 @@ export default async function EditAccountPage({params}: {params: Promise<{id: st
 				await sql`UPDATE balances SET amount=${balance_amount}, date=${balance_date} WHERE id=${balance_id}`;
 			}
 		});
-		revalidatePath(`/edit/account/${id}`);
+		revalidatePath(`/accounts/${id}`);
 		// TODO: (Historic?) Net Worth update(?)
 	}
 	return (
