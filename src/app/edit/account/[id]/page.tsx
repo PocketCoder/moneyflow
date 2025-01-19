@@ -1,4 +1,4 @@
-import type {AccountData, BalanceData} from '@/lib/types';
+import type {BalanceData} from '@/lib/types';
 import {bankLogos} from '@/lib/bankLogos';
 import Link from 'next/link';
 import Image from 'next/image';
