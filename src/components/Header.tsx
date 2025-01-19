@@ -16,7 +16,7 @@ export default async function Header() {
 			<div className="flex gap-4">
 				{user ? (
 					<>
-						<Link href="/user">
+						<Link href="/settings">
 							<Button variant="secondary">User</Button>
 						</Link>
 						<Link href="/api/auth/logout">
