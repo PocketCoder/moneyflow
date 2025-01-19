@@ -10,21 +10,17 @@ import {Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRoot, Tabl
 import {Input} from '@/components/Tremor/Input';
 import {Button} from '@/components/Tremor/Button';
 import {revalidatePath} from 'next/cache';
+import {getSession} from '@auth0/nextjs-auth0';
 import DeleteButtonAndDialog from '@/components/DeleteButtonAndDialog';
+import {formatBalances, getAccount, getBalances, getUserID} from '@/lib/utils';
 
 export default async function EditAccountPage({params}: {params: Promise<{id: string}>}) {
 	const id = (await params).id;
-	const accountResult = await sql`SELECT * FROM accounts WHERE owner=${process.env.USERID} AND id=${id}`;
-	const balancesResult = await sql`SELECT * FROM balances WHERE account = ${id}`;
-	const account = accountResult.rows[0] as AccountData;
-	const balances = balancesResult.rows as BalanceData[];
-	const formattedBalances: BalanceData[] = balances
-		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-		.map((balance) => ({
-			...balance,
-			date: new Date(balance.date).toISOString().split('T')[0],
-			amount: balance.amount ? parseFloat(balance.amount) || 0 : 0
-		}));
+	const session = await getSession();
+	const userID = await getUserID(session!);
+	const account = await getAccount(id, userID);
+	const balances = await getBalances(id);
+	const formattedBalances = formatBalances(balances);
 
 	async function deleteAccountAndBalances() {
 		'use server';
