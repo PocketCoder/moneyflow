@@ -34,7 +34,7 @@ export default async function RootLayout({
 	return (
 		<html lang="en">
 			<UserProvider>
-				<body className={`${comfortaa.variable} antialiased`}>
+				<body className={`${comfortaa.variable} h-screen w-screen antialiased`}>
 					<Header />
 					<main className="mb-20 mt-14 h-full w-full p-4">{children}</main>
 					<NavBar />

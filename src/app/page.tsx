@@ -11,8 +11,8 @@ export default async function Home() {
 	const balances = await getBalances(netWorthAccount.id);
 	const formattedBalances: BalanceData[] = formatBalances(balances);
 	return (
-		<main>
-			<Card className="h-60 w-full md:h-[350px] md:w-2/3">
+		<main className="grid-container h-full min-h-full w-full">
+			<Card className="col-span-2 row-span-3 row-start-2 flex items-center justify-center">
 				<BalanceChart data={formattedBalances} type={netWorthAccount.type} />
 			</Card>
 		</main>
