@@ -47,6 +47,10 @@
 	"pnpm": {
 		"overrides": {
 			"react-is": "$react"
-		}
+		},
+		"onlyBuiltDependencies": [
+			"bufferutil",
+			"sharp"
+		]
 	}
 }

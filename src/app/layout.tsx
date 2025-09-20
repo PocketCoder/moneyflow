@@ -7,6 +7,8 @@ import './globals.css';
 
 import NavBar from '@/components/NavBar';
 import Header from '@/components/Header';
+import {Suspense} from 'react';
+import Loading from '@/app/loading';
 
 const comfortaa = Comfortaa({
 	variable: '--font-Comfortaa-sans',
@@ -36,7 +38,9 @@ export default async function RootLayout({
 			<UserProvider>
 				<body className={`${comfortaa.variable} h-screen w-screen antialiased`}>
 					<Header />
-					<main className="mb-20 mt-14 h-full w-full p-4">{children}</main>
+					<Suspense fallback={<Loading />}>
+						<main className="mb-20 mt-14 h-full w-full p-4">{children}</main>
+					</Suspense>
 					<NavBar />
 				</body>
 			</UserProvider>
