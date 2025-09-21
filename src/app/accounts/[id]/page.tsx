@@ -7,7 +7,6 @@ import {Card} from '@/components/Tremor/Card';
 import HistoryTable from '@/components/HistoryTable';
 import BalanceChart from '@/components/BalanceChart';
 import {formatBalances, formatter, getAccount, getBalances, getDiffPercent, getUserID} from '@/lib/utils';
-import {getSession} from '@auth0/nextjs-auth0';
 
 export default async function AccountPage({params}: {params: Promise<{id: string}>}) {
 	const id = (await params).id;

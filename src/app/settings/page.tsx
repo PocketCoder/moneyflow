@@ -12,7 +12,7 @@ export default async function Settings() {
 		<main className="flex flex-col gap-4">
 			<Card className="flex items-center justify-between">
 				<h2 className="text-lg font-bold">Name</h2>
-				<div className="w-90 flex gap-4">
+				<div className="flex w-90 gap-4">
 					<Input placeholder="Name" className="w-80" defaultValue={userData.name} />
 					<Button variant="primary">Save</Button>
 				</div>

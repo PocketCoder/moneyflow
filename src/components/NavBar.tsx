@@ -16,7 +16,7 @@ import {Button} from '@/components/Tremor/Button';
 export default function NavBar() {
 	const path = usePathname();
 	return (
-		<nav className="h-18 fixed bottom-0 w-screen bg-teal-500 px-4 py-2 text-white">
+		<nav className="fixed bottom-0 h-18 w-screen bg-teal-500 px-4 py-2 text-white">
 			<ul className="flex h-full w-full justify-evenly">
 				<li className="transition duration-200 ease-in-out hover:text-blue-700">
 					<Link href={'/'}>

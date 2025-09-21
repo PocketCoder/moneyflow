@@ -24,7 +24,7 @@ export default async function Account({account}: {account: AccountData}) {
 		<Link href={`/accounts/${account.id}`}>
 			<Card
 				className={clsx(
-					'md:w-90 flex h-40 w-full items-center justify-between gap-4 p-4 transition-transform hover:scale-[101%]',
+					'flex h-40 w-full items-center justify-between gap-4 p-4 transition-transform hover:scale-[101%] md:w-90',
 					{
 						'opacity-70': account.tags.includes('inactive'),
 						'border-t-4 border-red-500': account.type === 'Debt',
