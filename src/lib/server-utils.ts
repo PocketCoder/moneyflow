@@ -6,11 +6,9 @@ import {Account, BalanceData} from './types';
 import {Session} from 'next-auth';
 import {revalidatePath} from 'next/cache';
 
-export async function saveNewAccountAndBalance(
-	data: FormData
-): Promise<{success: boolean; error?: string; account_name?: string}> {
+export async function saveNewAccountAndBalance(data: FormData): Promise<{success: boolean; account_name?: string}> {
 	const session = await auth();
-	if (!session) return {success: false, error: 'Not logged in'};
+	if (!session) throw new Error('Not logged in');
 
 	const account_name = data.get('account_name') as string;
 	const bank = data.get('bank') as string;
@@ -31,20 +29,29 @@ export async function saveNewAccountAndBalance(
 			`;
 		const accountRow = account[0] as Account;
 		const accountID = accountRow.id;
-		await sql`
-				INSERT INTO balances (account, date, amount)
-				VALUES (
-						${accountID},
-						${date},
-						${balance}
-				)
-		`;
+		await saveBalance(accountID, date, balance);
 		revalidatePath('/accounts');
 		revalidatePath('/');
 		return {success: true, account_name};
 	} catch (e) {
 		console.error(e);
-		return {success: false, error: 'Failed to create account.'};
+		throw new Error('Failed to create account.');
+	}
+}
+
+async function saveBalance(accountID: string, date: string, balance: string): Promise<{success: boolean}> {
+	try {
+		await sql`
+		INSERT INTO balances (account, date, amount)
+		VALUES (
+			${accountID},
+			${date},
+			${balance}
+		)`;
+		return {success: true};
+	} catch (e) {
+		console.error(e);
+		throw new Error('Failed to save balance.');
 	}
 }
 
