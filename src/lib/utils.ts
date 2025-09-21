@@ -1,11 +1,6 @@
-// Tremor Raw cx [v0.0.0]
-
-import {Session} from '@auth0/nextjs-auth0';
-import {UserProfile} from '@auth0/nextjs-auth0/client';
-import {sql} from '@vercel/postgres';
 import clsx, {type ClassValue} from 'clsx';
 import {twMerge} from 'tailwind-merge';
-import {AccountData, BalanceData} from './types';
+import {BalanceData} from './types';
 
 export function cx(...args: ClassValue[]) {
 	return twMerge(clsx(...args));
@@ -52,32 +47,6 @@ export const currencyFormatter = (value: number | string) => {
 	value = parseFloat(value.toString());
 	return formatter.format(value);
 };
-
-export async function getUserID(session: Session): Promise<number> {
-	const user: UserProfile | undefined = session?.user;
-	const auth0id = user!.sub!.split('|')[1];
-	const userDB = await sql`SELECT * FROM users WHERE auth0id = ${auth0id}`;
-	const userID = userDB.rows[0].id;
-	return userID;
-}
-
-export async function getNetWorthAccount(userID: number): Promise<AccountData> {
-	const accountResult = await sql`SELECT * FROM accounts WHERE owner=${userID} AND name='Net Worth'`;
-	const account = accountResult.rows[0] as AccountData;
-	return account;
-}
-
-export async function getAccount(accountID: string, userID: string | number): Promise<AccountData> {
-	const accountResult = await sql`SELECT * FROM accounts WHERE owner=${userID} AND id=${accountID}`;
-	const account = accountResult.rows[0] as AccountData;
-	return account;
-}
-
-export async function getBalances(accountID: string): Promise<BalanceData[]> {
-	const balancesResult = await sql`SELECT amount, date FROM balances WHERE account = ${accountID}`;
-	const balances = balancesResult.rows as BalanceData[];
-	return balances;
-}
 
 export function formatBalances(balances: BalanceData[]): BalanceData[] {
 	return balances
