@@ -6,6 +6,7 @@ import {Input} from '@/components/Tremor/Input';
 import {Button} from '@/components/Tremor/Button';
 import {SelectNative} from '@/components/Tremor/native-select';
 import {saveNewAccountAndBalance} from '@/lib/server-utils';
+import {Card} from '@/components/Tremor/Card';
 
 const banks = [
 	{value: 'barclays', label: 'Barclays', icon: '/bank-logos/barclays.svg'},
@@ -32,7 +33,7 @@ export default async function Welcome() {
 			{!user ? (
 				<SignIn />
 			) : (
-				<>
+				<Card>
 					<h2>Add your first account</h2>
 					<Form action={saveNewAccountAndBalance} className="w-2xl">
 						<Label htmlFor="account_name">Account Name</Label>
@@ -61,7 +62,7 @@ export default async function Welcome() {
 							Submit
 						</Button>
 					</Form>
-				</>
+				</Card>
 			)}
 		</section>
 	);

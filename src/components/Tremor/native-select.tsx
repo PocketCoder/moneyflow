@@ -23,7 +23,7 @@ const selectNativeStyles = tv({
 		'disabled:pointer-events-none',
 		'disabled:bg-gray-100 disabled:text-gray-400',
 		// focus
-		focusInput,
+		focusInput
 		// invalid (optional)
 		// "aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-200 aria-[invalid=true]:border-red-500 invalid:ring-2 invalid:ring-red-200 invalid:border-red-500"
 	],
