@@ -8,6 +8,7 @@ import {SelectNative} from './Tremor/native-select';
 import {toast} from 'sonner';
 import {banks, types} from '@/lib/data';
 import {FormEvent, useRef, useState} from 'react';
+import {redirect} from 'next/navigation';
 
 export default function WelcomeForm() {
 	const formRef = useRef<HTMLFormElement>(null);
@@ -35,6 +36,7 @@ export default function WelcomeForm() {
 				}
 			});
 		});
+		redirect('/');
 	}
 
 	function remove(index: number): void {
@@ -89,11 +91,11 @@ export default function WelcomeForm() {
 				<div className="flex max-h-screen flex-col items-center justify-center overflow-y-scroll">
 					{accounts?.map((account, i) => (
 						<Card key={i} className="flex w-sm flex-col">
-							<span className="font-bold">{account.get('account_name')}</span>
-							<span className="">{account.get('bank')}</span>
-							<span className="">{account.get('type')}</span>
-							<span className="">{account.get('date')}</span>
-							<span className="">{account.get('balance')}</span>
+							<span className="font-bold">{String(account.get('account_name'))}</span>
+							<span className="">{String(account.get('bank'))}</span>
+							<span className="">{String(account.get('type'))}</span>
+							<span className="">{String(account.get('date'))}</span>
+							<span className="">{String(account.get('balance'))}</span>{' '}
 							<Button variant="destructive" onClick={() => remove(i)}>
 								Remove
 							</Button>
