@@ -32,7 +32,7 @@ export default async function RootLayout({
 				<Header />
 				<Suspense fallback={<Loading />}>
 					<main className="mt-14 mb-20 flex-grow overflow-y-auto p-4">{children}</main>
-					<Toaster />
+					<Toaster richColors />
 				</Suspense>
 				<NavBar />
 			</body>
