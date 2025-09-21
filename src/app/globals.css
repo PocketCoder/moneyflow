@@ -1,14 +1,6 @@
 @import 'tailwindcss';
 
-:root {
-	--background: #ffffff;
-	--foreground: #171717;
-}
-
-body {
-	color: var(--foreground);
-	background: var(--background);
-}
+@import 'tw-animate-css';
 
 .grid-container {
 	display: grid;

@@ -80,5 +80,5 @@ module.exports = {
 			drawerSlideRightAndFade: 'drawerSlideRightAndFade 150ms ease-in'
 		}
 	},
-	plugins: [require('@tailwindcss/forms')]
+	plugins: [require('@tailwindcss/forms'), require('tailwindcss-animate')]
 };

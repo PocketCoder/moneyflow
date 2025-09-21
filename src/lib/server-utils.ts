@@ -4,10 +4,14 @@ import {auth} from '@/auth';
 import {sql} from '@/lib/db';
 import {Account, BalanceData} from './types';
 import {Session} from 'next-auth';
+import {revalidatePath} from 'next/cache';
 
-export async function saveNewAccountAndBalance(data: FormData) {
+export async function saveNewAccountAndBalance(
+	data: FormData
+): Promise<{success: boolean; error?: string; account_name?: string}> {
 	const session = await auth();
-	if (!session) throw new Error('Not logged in');
+	if (!session) return {success: false, error: 'Not logged in'};
+
 	const account_name = data.get('account_name') as string;
 	const bank = data.get('bank') as string;
 	const type = data.get('type') as string;
@@ -16,27 +20,31 @@ export async function saveNewAccountAndBalance(data: FormData) {
 
 	try {
 		const account = await sql`
-        INSERT INTO accounts (owner, name, type, parent)
-        VALUES (
-        (SELECT id FROM users WHERE email = ${session.user?.email}),
-        ${account_name},
-        ${type},
-        ${bank}
-        )
-        RETURNING *
-        `;
+			INSERT INTO accounts (owner, name, type, parent)
+			VALUES (
+			(SELECT id FROM users WHERE email = ${session.user?.email}),
+			${account_name},
+			${type},
+			${bank}
+			)
+			RETURNING *
+			`;
 		const accountRow = account[0] as Account;
 		const accountID = accountRow.id;
 		await sql`
-            INSERT INTO balances (account, date, amount)
-            VALUES (
-                ${accountID},
-                ${date},
-                ${balance}
-            )
-        `;
+				INSERT INTO balances (account, date, amount)
+				VALUES (
+						${accountID},
+						${date},
+						${balance}
+				)
+		`;
+		revalidatePath('/accounts');
+		revalidatePath('/');
+		return {success: true, account_name};
 	} catch (e) {
-		console.log(e);
+		console.error(e);
+		return {success: false, error: 'Failed to create account.'};
 	}
 }
 

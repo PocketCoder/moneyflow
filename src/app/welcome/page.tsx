@@ -1,12 +1,11 @@
-import {auth} from '@/auth';
-import Form from 'next/form';
-import {SignIn} from '@/components/auth/signin-button';
-import {Label} from '@/components/Tremor/Label';
-import {Input} from '@/components/Tremor/Input';
-import {Button} from '@/components/Tremor/Button';
-import {SelectNative} from '@/components/Tremor/native-select';
+'use client';
 import {saveNewAccountAndBalance} from '@/lib/server-utils';
+import {Button} from '@/components/Tremor/Button';
 import {Card} from '@/components/Tremor/Card';
+import {Input} from '@/components/Tremor/Input';
+import {Label} from '@/components/Tremor/Label';
+import {SelectNative} from '@/components/Tremor/native-select';
+import {toast, Toaster} from 'sonner';
 
 const banks = [
 	{value: 'barclays', label: 'Barclays', icon: '/bank-logos/barclays.svg'},
@@ -25,45 +24,53 @@ const banks = [
 
 const types = ['ISA', 'Current Account', 'Debt', 'Pension'];
 
-export default async function Welcome() {
-	const user = await auth();
+export default function Welcome() {
+	async function action(data: FormData) {
+		toast.promise(saveNewAccountAndBalance(data), {
+			loading: 'Saving...',
+			success: (data) => {
+				return `${data.account_name} has been added.`;
+			},
+			error: (data) => {
+				return `Error: ${data.error}`;
+			}
+		});
+	}
+
 	return (
 		<section>
+			<Toaster />
 			<h1>Welcome!</h1>
-			{!user ? (
-				<SignIn />
-			) : (
-				<Card>
-					<h2>Add your first account</h2>
-					<Form action={saveNewAccountAndBalance} className="w-2xl">
-						<Label htmlFor="account_name">Account Name</Label>
-						<Input type="text" name="account_name" />
-						<Label htmlFor="bank">Select Bank</Label>
-						<SelectNative name="bank">
-							{banks.map((bank) => (
-								<option key={bank.value} value={bank.value}>
-									{bank.label}
-								</option>
-							))}
-						</SelectNative>
-						<Label htmlFor="type">Choose Type</Label>
-						<SelectNative name="type">
-							{types.map((type) => (
-								<option key={type} value={type}>
-									{type}
-								</option>
-							))}
-						</SelectNative>
-						<Label htmlFor="date">Choose date</Label>
-						<Input type="date" name="date" defaultValue={new Date().toISOString().split('T')[0]} className="mb-2" />
-						<Label htmlFor="balance">Balance</Label>
-						<Input type="number" name="balance" defaultValue="0" className="mb-2" />
-						<Button type="submit" variant="primary">
-							Submit
-						</Button>
-					</Form>
-				</Card>
-			)}
+			<Card className="mx-auto max-w-xl">
+				<h2 className="text-center text-xl font-bold">Add your first account</h2>
+				<form action={action}>
+					<Label htmlFor="account_name">Account Name</Label>
+					<Input type="text" name="account_name" />
+					<Label htmlFor="bank">Select Bank</Label>
+					<SelectNative name="bank">
+						{banks.map((bank) => (
+							<option key={bank.value} value={bank.value}>
+								{bank.label}
+							</option>
+						))}
+					</SelectNative>
+					<Label htmlFor="type">Choose Type</Label>
+					<SelectNative name="type">
+						{types.map((type) => (
+							<option key={type} value={type}>
+								{type}
+							</option>
+						))}
+					</SelectNative>
+					<Label htmlFor="date">Choose date</Label>
+					<Input type="date" name="date" defaultValue={new Date().toISOString().split('T')[0]} className="mb-2" />
+					<Label htmlFor="balance">Balance</Label>
+					<Input type="number" name="balance" defaultValue="0" className="mb-2" />
+					<Button type="submit" variant="primary">
+						Submit
+					</Button>
+				</form>
+			</Card>
 		</section>
 	);
 }
