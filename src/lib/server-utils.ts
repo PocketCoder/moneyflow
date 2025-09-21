@@ -5,6 +5,7 @@ import {sql} from '@/lib/db';
 import {Account, BalanceData} from './types';
 import {Session} from 'next-auth';
 import {revalidatePath} from 'next/cache';
+import {redirect} from 'next/navigation';
 
 export async function saveNewAccountAndBalance(data: FormData): Promise<{success: boolean; account_name?: string}> {
 	const session = await auth();
@@ -62,9 +63,13 @@ export async function getUserID(session: Session): Promise<number> {
 	return userID;
 }
 
-export async function getNetWorthAccount(userID: number): Promise<Account> {
-	const accountResult = await sql`SELECT * FROM accounts WHERE owner=${userID} AND name='Net Worth'`;
-	const account = accountResult.rows[0] as Account;
+export async function getNetWorthAccount(): Promise<Account> {
+	const session = await auth();
+	if (!session) throw new Error('Not logged in');
+	const accountResult =
+		await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND name = 'Net Worth'`;
+	if (accountResult.length === 0) redirect('/welcome');
+	const account = accountResult[0] as Account;
 	return account;
 }
 
