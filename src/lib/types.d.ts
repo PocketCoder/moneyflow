@@ -1,9 +1,9 @@
 // Common base types
 type UUID = string;
 type DateTime = string; // ISO string format
-type Decimal = string | float; // Decimal as string for precision
+type Decimal = string | number; // Decimal as string for precision
 
-enum AccountType {
+export enum AccountType {
 	Savings = 'Savings',
 	ISA = 'ISA',
 	CurrentAccount = 'Current Account',
@@ -22,7 +22,7 @@ export interface UserData {
 	preferences: Preferences;
 }
 
-export interface AccountData {
+export interface Account {
 	id: UUID;
 	owner: UUID; // UserData.id
 	name: string;
