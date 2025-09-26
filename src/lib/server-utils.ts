@@ -140,12 +140,12 @@ export async function getNetWorthAccount(): Promise<Account> {
 
 export async function getAccount(accountID: string, userID: string | number): Promise<Account> {
 	const accountResult = await sql`SELECT * FROM accounts WHERE owner=${userID} AND id=${accountID}`;
-	const account = accountResult.rows[0] as Account;
+	const account = accountResult[0] as Account;
 	return account;
 }
 
 export async function getBalances(accountID: string): Promise<BalanceData[]> {
 	const balancesResult = await sql`SELECT amount, date FROM balances WHERE account = ${accountID}`;
-	const balances = balancesResult.rows as BalanceData[];
+	const balances = balancesResult as BalanceData[];
 	return balances;
 }

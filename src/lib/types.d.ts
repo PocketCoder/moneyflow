@@ -1,7 +1,6 @@
 // Common base types
 type UUID = string;
 type DateTime = string; // ISO string format
-type Decimal = string | number; // Decimal as string for precision
 
 export enum AccountType {
 	Savings = 'Savings',
@@ -35,5 +34,5 @@ export interface BalanceData {
 	id: UUID;
 	account: UUID; // AccountData.id
 	date: DateTime;
-	amount: Decimal;
+	amount: number;
 }

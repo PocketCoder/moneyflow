@@ -1,16 +1,21 @@
 import type {BalanceData} from '@/lib/types';
 import {Card} from '@/components/Tremor/Card';
 import BalanceChart from '@/components/BalanceChart';
-import {getSession} from '@auth0/nextjs-auth0';
-import {currencyFormatter, formatBalances, getBalances, getNetWorthAccount, getUserID} from '@/lib/utils';
+import {currencyFormatter, formatBalances} from '@/lib/utils';
+import {getBalances} from '@/lib/server-utils';
+import {getNetWorthAccount} from '@/lib/server-utils';
+import {auth} from '@/auth';
+import {redirect} from 'next/navigation';
 
-//import {sql} from '@vercel/postgres';
 //import {PieChart, Pie, Legend, Tooltip, ResponsiveContainer} from 'recharts';
 
 export default async function Home() {
-	const session = await getSession();
-	const userID = await getUserID(session!);
-	const netWorthAccount = await getNetWorthAccount(userID);
+	const session = await auth();
+	if (!session) {
+		redirect('/welcome');
+	}
+
+	const netWorthAccount = await getNetWorthAccount();
 	const balances = await getBalances(netWorthAccount.id);
 	const formattedBalances: BalanceData[] = formatBalances(balances);
 
