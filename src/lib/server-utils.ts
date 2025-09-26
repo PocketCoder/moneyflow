@@ -4,7 +4,6 @@ import {auth} from '@/auth';
 import {sql} from '@/lib/db';
 import {Account, BalanceData} from './types';
 import {revalidatePath} from 'next/cache';
-import {redirect} from 'next/navigation';
 import {Session} from 'next-auth';
 
 export async function saveNewAccountAndBalance(data: FormData): Promise<{success: boolean; account_name?: string}> {
@@ -41,7 +40,7 @@ export async function saveNewAccountAndBalance(data: FormData): Promise<{success
 	}
 }
 
-async function checkNetWorthRowExistsandCreate(session: Session): Promise<void> {
+export async function checkNetWorthRowExistsandCreate(session: Session): Promise<void> {
 	try {
 		const result = await sql`
 			SELECT EXISTS(
@@ -103,7 +102,10 @@ export async function calculateNetWorth() {
 	}
 }
 
-async function saveBalance(accountID: string, date: string, balance: string): Promise<{success: boolean}> {
+export async function saveBalance(accountID: string, date: string, balance: string): Promise<{success: boolean}> {
+	if (!accountID || !date || !balance) {
+		throw new Error('Missing parameters.');
+	}
 	try {
 		await sql`
 		INSERT INTO balances (account, date, amount)
