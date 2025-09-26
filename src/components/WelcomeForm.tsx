@@ -1,5 +1,5 @@
 'use client';
-import {saveNewAccountAndBalance} from '@/lib/server-utils';
+import {calculateNetWorth, saveNewAccountAndBalance} from '@/lib/server-utils';
 import {Label} from './Tremor/Label';
 import {Button} from './Tremor/Button';
 import {Card} from './Tremor/Card';
@@ -35,6 +35,15 @@ export default function WelcomeForm() {
 					return `Error: ${data.error}`;
 				}
 			});
+		});
+		toast.promise(calculateNetWorth, {
+			loading: 'Calculating net worth...',
+			success: () => {
+				return `Success! Redirecting...`;
+			},
+			error: (data) => {
+				return `Error: ${data.error}.`;
+			}
 		});
 		redirect('/');
 	}
