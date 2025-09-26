@@ -26,7 +26,7 @@ export const focusInput = [
 
 export const hasErrorInput = ['ring-2', 'ring-red-500'];
 
-const formatter = new Intl.NumberFormat('en-GB', {
+export const formatter = new Intl.NumberFormat('en-GB', {
 	style: 'currency',
 	currency: 'GBP',
 	trailingZeroDisplay: 'stripIfInteger'
@@ -34,6 +34,9 @@ const formatter = new Intl.NumberFormat('en-GB', {
 
 export function currencyFormatter(value: number | string) {
 	value = parseFloat(value.toString());
+	if (Number.isNaN(value)) {
+		throw new Error('Not a number');
+	}
 	return formatter.format(value);
 }
 
@@ -48,4 +51,13 @@ export function formatBalances(balances: BalanceData[]): BalanceData[] {
 			}).format(new Date(balance.date)),
 			amount: balance.amount || 0
 		}));
+}
+
+export function getDiffPercent(balances: BalanceData[]): number | string {
+	if (balances.length === 0) return 'N/A';
+	if (balances[0].amount === 0) return 'N/A'; // If the initial amount is 0, percentage difference is not applicable
+
+	const diff = balances[balances.length - 1].amount - balances[0].amount;
+	let diffPercent = ((diff / balances[0].amount) * 100).toFixed(0);
+	return (diffPercent = Number.isNaN(Number(diffPercent)) || diffPercent === 'Infinity' ? 'N/A' : diffPercent);
 }
