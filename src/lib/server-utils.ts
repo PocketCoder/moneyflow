@@ -140,10 +140,17 @@ export async function getNetWorthAccount(): Promise<Account> {
 	return account;
 }
 
-export async function getAccount(accountID: string, userID: string | number): Promise<Account> {
-	const accountResult = await sql`SELECT * FROM accounts WHERE owner=${userID} AND id=${accountID}`;
-	const account = accountResult[0] as Account;
-	return account;
+export async function getAccount(accountID: string): Promise<Account> {
+	try {
+		const session = await auth();
+		if (!session) throw new Error('Not logged in');
+		const accountResult =
+			await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND id=${accountID}`;
+		const account = accountResult[0] as Account;
+		return account;
+	} catch (e) {
+		throw new Error(`Error: ${e}`);
+	}
 }
 
 export async function getBalances(accountID: string): Promise<BalanceData[]> {

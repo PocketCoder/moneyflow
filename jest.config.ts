@@ -24,7 +24,7 @@ const config: Config = {
 	// clearMocks: false,
 
 	// Indicates whether the coverage information should be collected while executing the test
-	collectCoverage: true,
+	// collectCoverage: true,
 
 	// An array of glob patterns indicating a set of files for which coverage information should be collected
 	// collectCoverageFrom: undefined,
@@ -153,7 +153,10 @@ const config: Config = {
 	// snapshotSerializers: [],
 
 	// The test environment that will be used for testing
-	testEnvironment: 'node'
+	testEnvironment: 'jest-environment-jsdom',
+
+	// The glob patterns Jest uses to detect test files
+	testMatch: ['**/__tests__/**/*.?([mc])[jt]s?(x)', '**/?(*.)+(spec|test).?([mc])[jt]s?(x)']
 
 	// Options that will be passed to the testEnvironment
 	// testEnvironmentOptions: {},
