@@ -1,10 +1,10 @@
-import type {AccountData} from '@/lib/types';
-import {sql} from '@vercel/postgres';
+import type {Account as AccountData} from '@/lib/types';
 import Account from '@/components/Account';
+import {getAllAccounts} from '@/lib/server-utils';
 
 export default async function Accounts() {
-	const {rows}: {rows: AccountData[]} = await sql`SELECT * FROM accounts WHERE owner=${process.env.USERID}`;
-	const groupedAccounts = rows.reduce((groups: Record<string, AccountData[]>, account) => {
+	const allAccounts = await getAllAccounts();
+	const groupedAccounts = allAccounts.reduce((groups: Record<string, AccountData[]>, account) => {
 		const bank = account.parent || 'Other';
 		if (!groups[bank]) {
 			groups[bank] = [];

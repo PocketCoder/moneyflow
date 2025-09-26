@@ -6,14 +6,12 @@ import {PencilIcon} from '@heroicons/react/24/outline';
 import {Card} from '@/components/Tremor/Card';
 import HistoryTable from '@/components/HistoryTable';
 import BalanceChart from '@/components/BalanceChart';
-import {formatBalances, formatter, getAccount, getBalances, getDiffPercent, getUserID} from '@/lib/utils';
-import {getSession} from '@auth0/nextjs-auth0';
+import {formatBalances, formatter, getDiffPercent} from '@/lib/utils';
+import {getAccount, getBalances} from '@/lib/server-utils';
 
 export default async function AccountPage({params}: {params: Promise<{id: string}>}) {
 	const id = (await params).id;
-	const session = await getSession();
-	const userID = await getUserID(session!);
-	const account = await getAccount(id, userID);
+	const account = await getAccount(id);
 	const balances = await getBalances(id);
 	const formattedBalances = formatBalances(balances);
 	const diff = formattedBalances[formattedBalances.length - 1].amount - formattedBalances[0].amount;
