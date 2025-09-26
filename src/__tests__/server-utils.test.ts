@@ -124,8 +124,11 @@ describe('saveBalance', () => {
 	});
 
 	it('throws error if missing values', async () => {
+		// @ts-expect-error
 		await expect(saveBalance('123', '200')).rejects.toThrow('Missing parameters.');
+		// @ts-expect-error
 		await expect(saveBalance('123')).rejects.toThrow('Missing parameters.');
+		// @ts-expect-error
 		await expect(saveBalance()).rejects.toThrow('Missing parameters.');
 		expect(sql).toHaveBeenCalledTimes(0);
 	});
