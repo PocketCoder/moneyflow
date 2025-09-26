@@ -13,7 +13,15 @@
 		"test:watch": "jest --watch"
 	},
 	"lint-staged": {
-		"*.{js,jsx,ts,tsx,json,css,scss,md}": "prettier --write"
+		"*.{js,jsx,ts,tsx}": [
+			"prettier --write",
+			"jest --findRelatedTests"
+		],
+		"*.{test,spec}.{js,jsx,ts,tsx}": [
+			"prettier --write",
+			"jest"
+		],
+		"*.{json,css,scss,md}": "prettier --write"
 	},
 	"dependencies": {
 		"@heroicons/react": "^2.2.0",
