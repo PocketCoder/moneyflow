@@ -1,4 +1,10 @@
-import {saveNewAccountAndBalance, checkNetWorthRowExistsandCreate, saveBalance, getAccount} from '@/lib/server-utils';
+import {
+	saveNewAccountAndBalance,
+	checkNetWorthRowExistsandCreate,
+	saveBalance,
+	getAccount,
+	calculateNetWorth
+} from '@/lib/server-utils';
 import {auth} from '@/auth';
 import {sql} from '@/lib/db';
 import {revalidatePath} from 'next/cache';
@@ -16,6 +22,8 @@ jest.mock('@/lib/db', () => ({
 jest.mock('next/cache', () => ({
 	revalidatePath: jest.fn()
 }));
+
+// Remove the module-level mock to avoid breaking other tests
 
 const mockedAuth = jest.mocked(auth);
 const mockedSql = jest.mocked(sql);
@@ -183,5 +191,67 @@ describe('getAccount', () => {
 		(mockedSql as jest.Mock).mockRejectedValue(dbError);
 		await expect(getAccount('123')).rejects.toThrow('Error: Error: DB Error');
 		expect(mockedSql).toHaveBeenCalledWith(expect.any(Array), 'test@moneyflow.dev', '123');
+	});
+});
+
+describe('calculateNetWorth', () => {
+	afterEach(() => {
+		jest.clearAllMocks();
+	});
+
+	it('throws an error if not logged in', async () => {
+		(mockedAuth as jest.Mock).mockResolvedValue(null);
+		await expect(calculateNetWorth()).rejects.toThrow('Not logged in');
+	});
+
+	it('should correctly calculate net worth from data over several time frames', async () => {
+		(mockedAuth as jest.Mock).mockResolvedValue({user: {email: 'test@moneyflow.dev'}} as any);
+
+		const mockDates = [{date: '2025-08-25'}, {date: '2025-09-25'}];
+
+		// Mock all SQL calls in the correct order:
+		// 1. calculateNetWorth: get dates
+		// 2. calculateNetWorth: get balances for first date (2025-08-25)
+		// 3. getNetWorthAccount: checkNetWorthRowExistsandCreate (first call)
+		// 4. getNetWorthAccount: get net worth account (first call)
+		// 5. calculateNetWorth: insert balance for first date
+		// 6. calculateNetWorth: get balances for second date (2025-09-25)
+		// 7. getNetWorthAccount: checkNetWorthRowExistsandCreate (second call)
+		// 8. getNetWorthAccount: get net worth account (second call)
+		// 9. calculateNetWorth: insert balance for second date
+		(mockedSql as jest.Mock)
+			.mockResolvedValueOnce(mockDates) // 1. get dates
+			.mockResolvedValueOnce([{amount: '200'}, {amount: '100'}]) // 2. balances for first date
+			.mockResolvedValueOnce([{row_exists: true}]) // 3. checkNetWorthRowExistsandCreate (first call)
+			.mockResolvedValueOnce([{id: '123', name: 'Net Worth'}]) // 4. get net worth account (first call)
+			.mockResolvedValueOnce([]) // 5. insert balance for first date
+			.mockResolvedValueOnce([{amount: '20'}, {amount: '150'}]) // 6. balances for second date
+			.mockResolvedValueOnce([{row_exists: true}]) // 7. checkNetWorthRowExistsandCreate (second call)
+			.mockResolvedValueOnce([{id: '123', name: 'Net Worth'}]) // 8. get net worth account (second call)
+			.mockResolvedValueOnce([]); // 9. insert balance for second date
+
+		await calculateNetWorth();
+
+		expect(mockedSql).toHaveBeenCalledTimes(9);
+		expect(mockedSql).toHaveBeenNthCalledWith(5, expect.any(Array), '123', '2025-08-25', 300);
+		expect(mockedSql).toHaveBeenNthCalledWith(9, expect.any(Array), '123', '2025-09-25', 170);
+	});
+
+	it('should throw an error if the database query fails', async () => {
+		jest.spyOn(console, 'error').mockImplementation(() => {});
+		(mockedAuth as jest.Mock).mockResolvedValue({user: {email: 'test@moneyflow.dev'}} as any);
+		(mockedSql as jest.Mock).mockRejectedValue(new Error('DB Error'));
+
+		await expect(calculateNetWorth()).rejects.toThrow('Failed to calculate net worth');
+	});
+
+	it('should not run if there is no balance history', async () => {
+		(mockedAuth as jest.Mock).mockResolvedValue({user: {email: 'test@moneyflow.dev'}} as any);
+		(mockedSql as jest.Mock).mockResolvedValueOnce([]); // Return no dates
+
+		await calculateNetWorth();
+
+		// Should only be called once to get the dates
+		expect(mockedSql).toHaveBeenCalledTimes(1);
 	});
 });
