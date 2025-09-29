@@ -63,7 +63,7 @@ export async function checkNetWorthRowExistsandCreate(session: Session): Promise
 	}
 }
 
-export async function calculateNetWorth() {
+export async function calculateNetWorth(): Promise<void> {
 	const session = await auth();
 	if (!session) throw new Error('Not logged in');
 

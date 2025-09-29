@@ -1,15 +1,14 @@
-import type {AccountData, BalanceData} from '@/lib/types';
+import type {Account as AccountData, BalanceData} from '@/lib/types';
 import {bankLogos} from '@/lib/bankLogos';
 import clsx from 'clsx';
 import Link from 'next/link';
 import Image from 'next/image';
-import {sql} from '@vercel/postgres';
+import {sql} from '@/lib/db';
 import {Card} from '@/components/Tremor/Card';
 import BalanceSpark from '@/components/BalanceSpark';
 
 export default async function Account({account}: {account: AccountData}) {
-	const balancesResult = await sql`SELECT * FROM balances WHERE account = ${account.id}`;
-	const balances = balancesResult.rows as BalanceData[];
+	const balances = (await sql`SELECT * FROM balances WHERE account = ${account.id}`) as BalanceData[];
 	const formattedBalances: BalanceData[] = balances
 		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 		.map((balance) => ({

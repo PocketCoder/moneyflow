@@ -2,7 +2,7 @@ import type {BalanceData} from '@/lib/types';
 import {bankLogos} from '@/lib/bankLogos';
 import Link from 'next/link';
 import Image from 'next/image';
-import {sql} from '@vercel/postgres';
+import {sql} from '@/lib/db';
 import {ChevronLeftIcon} from '@heroicons/react/24/outline';
 import {CheckIcon} from '@heroicons/react/24/outline';
 import {Card} from '@/components/Tremor/Card';
@@ -10,15 +10,13 @@ import {Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRoot, Tabl
 import {Input} from '@/components/Tremor/Input';
 import {Button} from '@/components/Tremor/Button';
 import {revalidatePath} from 'next/cache';
-import {getSession} from '@auth0/nextjs-auth0';
 import DeleteButtonAndDialog from '@/components/DeleteButtonAndDialog';
-import {formatBalances, getAccount, getBalances, getUserID} from '@/lib/utils';
+import {formatBalances} from '@/lib/utils';
+import {getAccount, getBalances} from '@/lib/server-utils';
 
 export default async function EditAccountPage({params}: {params: Promise<{id: string}>}) {
 	const id = (await params).id;
-	const session = await getSession();
-	const userID = await getUserID(session!);
-	const account = await getAccount(id, userID);
+	const account = await getAccount(id);
 	const balances = await getBalances(id);
 	const formattedBalances = formatBalances(balances);
 
