@@ -1,9 +1,14 @@
-import type {AccountData} from '@/lib/types';
-import {sql} from '@vercel/postgres';
+import type {Account as AccountData} from '@/lib/types';
+import {sql} from '@/lib/db';
 import Account from '@/components/Account';
+import {auth} from '@/auth';
+import {redirect} from 'next/navigation';
 
 export default async function Accounts() {
-	const {rows}: {rows: AccountData[]} = await sql`SELECT * FROM accounts WHERE owner=${process.env.USERID}`;
+	const session = await auth();
+	if (!session) redirect('/welcome');
+	const rows =
+		(await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email})`) as AccountData[];
 	const groupedAccounts = rows.reduce((groups: Record<string, AccountData[]>, account) => {
 		const bank = account.parent || 'Other';
 		if (!groups[bank]) {

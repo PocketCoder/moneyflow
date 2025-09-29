@@ -136,11 +136,11 @@ describe('saveBalance', () => {
 	});
 
 	it('throws error if missing any value', async () => {
-		// @ts-expect-error
+		// @ts-expect-error Testing missing parameters
 		await expect(saveBalance('123', '200')).rejects.toThrow('Missing parameters.');
-		// @ts-expect-error
+		// @ts-expect-error Testing missing parameters
 		await expect(saveBalance('123')).rejects.toThrow('Missing parameters.');
-		// @ts-expect-error
+		// @ts-expect-error Testing missing parameters
 		await expect(saveBalance()).rejects.toThrow('Missing parameters.');
 		expect(sql).toHaveBeenCalledTimes(0);
 	});

@@ -15,7 +15,7 @@ export default function WelcomeForm() {
 	const [accounts, setAccounts] = useState<FormData[] | null>(null);
 
 	async function saveAll() {
-		let allToSave: FormData[] = [];
+		const allToSave: FormData[] = [];
 		if (formRef.current) {
 			const currentData = new FormData(formRef.current);
 			allToSave.push(currentData);
