@@ -61,3 +61,21 @@ export function getDiffPercent(balances: BalanceData[]): number | string {
 	let diffPercent = ((diff / balances[0].amount) * 100).toFixed(0);
 	return (diffPercent = Number.isNaN(Number(diffPercent)) || diffPercent === 'Infinity' ? 'N/A' : diffPercent);
 }
+
+export function getFinancialYearRange(today: Date = new Date()): {start: string; end: string} {
+	const year = today.getFullYear();
+	const fyStart = new Date(year, 3, 6);
+	let start: Date;
+	let end: Date;
+
+	if (today >= fyStart) {
+		start = fyStart;
+		end = new Date(year + 1, 3, 5);
+	} else {
+		start = new Date(year - 1, 3, 6);
+		end = new Date(year, 3, 5);
+	}
+
+	const format = (d: Date) => d.toISOString().split('T')[0];
+	return {start: format(start), end: format(end)};
+}

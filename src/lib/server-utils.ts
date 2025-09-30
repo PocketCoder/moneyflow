@@ -5,6 +5,7 @@ import {sql} from '@/lib/db';
 import {Account, BalanceData} from './types';
 import {revalidatePath} from 'next/cache';
 import {Session} from 'next-auth';
+import {getFinancialYearRange} from './utils';
 
 export async function saveNewAccountAndBalance(data: FormData): Promise<{success: boolean; account_name?: string}> {
 	/* Used on Welcome ONLY */
@@ -198,6 +199,48 @@ export async function percentChangeAllTime(): Promise<number> {
 				FROM balances
 				WHERE account = a.id
 			)
+		`;
+		const balances = result[0] as {earliest_balance: string; latest_balance: string};
+		const earliest = parseFloat(balances.earliest_balance);
+		const latest = parseFloat(balances.latest_balance);
+		const change = ((latest - earliest) / Math.abs(earliest)) * 100;
+		const formatted = change.toPrecision(2);
+		return parseFloat(formatted);
+	} catch (e) {
+		throw new Error(`Error: ${e}`);
+	}
+}
+
+export async function percentChangeFY(): Promise<number> {
+	const {start, end} = getFinancialYearRange();
+	try {
+		const session = await auth();
+		if (!session) throw new Error('Not logged in');
+		const result = await sql`
+			SELECT 
+				b1.amount AS earliest_balance, 
+				b2.amount AS latest_balance
+			FROM balances b1
+			JOIN accounts a 
+				ON b1.account = a.id
+			JOIN (
+				SELECT account, MAX(date) AS max_date
+				FROM balances
+				WHERE date BETWEEN ${start} AND ${end}
+				GROUP BY account
+			) b_latest 
+				ON b1.account = b_latest.account
+			JOIN balances b2 
+				ON b2.account = b_latest.account 
+			AND b2.date = b_latest.max_date
+			WHERE a.name = 'Net Worth'
+			AND a.owner = (SELECT id FROM users WHERE email = ${session.user?.email})
+			AND b1.date = (
+				SELECT MIN(date)
+				FROM balances
+				WHERE account = a.id
+				AND date BETWEEN ${start} AND ${end}
+			);
 		`;
 		const balances = result[0] as {earliest_balance: string; latest_balance: string};
 		const earliest = parseFloat(balances.earliest_balance);
