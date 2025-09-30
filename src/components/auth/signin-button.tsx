@@ -1,13 +1,16 @@
 import {signIn} from '@/auth';
+import {Button} from '../ui/button';
 
 export function SignIn() {
 	return (
 		<form
 			action={async () => {
 				'use server';
-				await signIn();
+				await signIn('github', {redirectTo: '/'});
 			}}>
-			<button type="submit">Sign in</button>
+			<Button className="cursor-pointer" type="submit" variant={'default'}>
+				Sign in / Sign Up
+			</Button>
 		</form>
 	);
 }

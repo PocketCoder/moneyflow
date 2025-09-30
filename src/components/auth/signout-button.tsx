@@ -1,4 +1,5 @@
 import {signOut} from '@/auth';
+import {Button} from '../ui/button';
 
 export function SignOut() {
 	return (
@@ -7,7 +8,9 @@ export function SignOut() {
 				'use server';
 				await signOut();
 			}}>
-			<button type="submit">Sign Out</button>
+			<Button className="cursor-pointer" type="submit" variant="secondary">
+				Sign Out
+			</Button>
 		</form>
 	);
 }
