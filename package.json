@@ -15,7 +15,7 @@
 	"lint-staged": {
 		"*.{js,jsx,ts,tsx}": [
 			"prettier --write",
-			"jest --findRelatedTests"
+			"jest --findRelatedTests --passWithNoTests"
 		],
 		"*.{test,spec}.{js,jsx,ts,tsx}": [
 			"prettier --write",
