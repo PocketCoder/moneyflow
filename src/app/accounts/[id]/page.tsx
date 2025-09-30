@@ -19,18 +19,11 @@ export default async function AccountPage({params}: {params: Promise<{id: string
 	return (
 		<>
 			<header className="flex gap-1">
-				<div className="flex h-full flex-col gap-1">
-					<Link href={`/edit/account/${id}`}>
-						<Card className="flex h-12 w-12 items-center gap-1 p-1 transition-all hover:bg-blue-600 hover:text-white">
-							<PencilIcon className="mx-auto h-8" />
-						</Card>
-					</Link>
-					<Link href={'/accounts/'}>
-						<Card className="flex h-20 w-12 items-center gap-1 p-1 transition-all hover:bg-blue-600 hover:text-white">
-							<ChevronLeftIcon className="mx-auto h-10" />
-						</Card>
-					</Link>
-				</div>
+				<Link href={'/accounts/'}>
+					<Card className="flex h-full w-12 items-center gap-1 p-1 transition-all hover:bg-blue-600 hover:text-white">
+						<ChevronLeftIcon className="mx-auto h-10" />
+					</Card>
+				</Link>
 				<Card className="flex items-center justify-between">
 					<div className="flex flex-col items-start">
 						<h1 className="text-2xl font-bold">{account.name}</h1>
