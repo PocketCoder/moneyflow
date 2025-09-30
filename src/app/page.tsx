@@ -2,7 +2,7 @@ import type {BalanceData} from '@/lib/types';
 import {Card} from '@/components/Tremor/Card';
 import BalanceChart from '@/components/BalanceChart';
 import {currencyFormatter, formatBalances} from '@/lib/utils';
-import {getBalances, isNewUser} from '@/lib/server-utils';
+import {getBalances, isNewUser, percentChangeAllTime} from '@/lib/server-utils';
 import {getNetWorthAccount} from '@/lib/server-utils';
 import {auth} from '@/auth';
 import {redirect} from 'next/navigation';
@@ -18,6 +18,8 @@ export default async function Home() {
 	const netWorthAccount = await getNetWorthAccount();
 	const balances = await getBalances(netWorthAccount.id);
 	const formattedBalances: BalanceData[] = formatBalances(balances);
+
+	const percChangeAllTime = await percentChangeAllTime();
 
 	/*
 	TODO: For the Pie Chart. When Recharts supports React 19.
@@ -62,10 +64,10 @@ export default async function Home() {
 			</Card>
 			<Card className="col-span-1 col-start-2 row-span-1 row-start-1 flex flex-col justify-evenly">
 				<h2 className="text-2xl font-bold">Test %</h2>
-				<span className="text-sm text-gray-500">% Change this year</span>
+				<span className="text-sm text-gray-500">% Change this FY</span>
 			</Card>
 			<Card className="col-span-1 col-start-3 row-span-1 row-start-1 flex flex-col justify-evenly">
-				<h2 className="text-2xl font-bold">Test %</h2>
+				<h2 className="text-2xl font-bold">{percChangeAllTime}%</h2>
 				<span className="text-sm text-gray-500">% Change all time</span>
 			</Card>
 		</main>
