@@ -158,3 +158,15 @@ export async function getBalances(accountID: string): Promise<BalanceData[]> {
 	const balances = balancesResult as BalanceData[];
 	return balances;
 }
+
+export async function isNewUser(): Promise<boolean> {
+	try {
+		const session = await auth();
+		if (!session) throw new Error('Not logged in');
+		const accounts =
+			(await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email})`) as Account[];
+		return accounts.length === 0;
+	} catch (e) {
+		throw new Error(`Error: ${e}`);
+	}
+}

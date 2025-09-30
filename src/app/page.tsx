@@ -2,7 +2,7 @@ import type {BalanceData} from '@/lib/types';
 import {Card} from '@/components/Tremor/Card';
 import BalanceChart from '@/components/BalanceChart';
 import {currencyFormatter, formatBalances} from '@/lib/utils';
-import {getBalances} from '@/lib/server-utils';
+import {getBalances, isNewUser} from '@/lib/server-utils';
 import {getNetWorthAccount} from '@/lib/server-utils';
 import {auth} from '@/auth';
 import {redirect} from 'next/navigation';
@@ -11,7 +11,7 @@ import {redirect} from 'next/navigation';
 
 export default async function Home() {
 	const session = await auth();
-	if (!session) {
+	if (!session || (await isNewUser())) {
 		redirect('/welcome');
 	}
 
