@@ -16,12 +16,12 @@ export default async function AccountUpdateCard({account}: {account: AccountData
 				month: 'short',
 				year: 'numeric'
 			}).format(new Date(balance.date)),
-			amount: parseFloat(balance.amount)
+			amount: balance.amount
 		}));
 	return (
 		<Card className="flex h-[300px] min-w-[300px] flex-col items-start justify-evenly">
 			{bankLogos[account.parent.toUpperCase()] ? (
-				<Image src={`${bankLogos[account.parent.toUpperCase()]}`} alt={account.parent} width={60} height={20} />
+				<Image src={`${bankLogos[account.parent.toUpperCase()]}`} alt={account.parent} width={80} height={30} />
 			) : (
 				<span className="text-md text-gray-800">{account.parent}</span>
 			)}
@@ -40,6 +40,7 @@ export default async function AccountUpdateCard({account}: {account: AccountData
 			<Input
 				className="mt-2"
 				type="number"
+				step="any"
 				name={`amount-${account.id}`}
 				defaultValue={formattedBalances.length > 0 ? formattedBalances[formattedBalances.length - 1].amount : 0}
 				placeholder="Enter new amount"

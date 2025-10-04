@@ -6,6 +6,7 @@ import {Account, BalanceData} from './types';
 import {revalidatePath} from 'next/cache';
 import {Session} from 'next-auth';
 import {getFinancialYearRange} from './utils';
+import {redirect} from 'next/navigation';
 
 export async function saveNewAccountAndBalance(data: FormData): Promise<{success: boolean; account_name?: string}> {
 	/* Used on Welcome ONLY */
@@ -250,5 +251,57 @@ export async function percentChangeFY(): Promise<number> {
 		return parseFloat(formatted);
 	} catch (e) {
 		throw new Error(`Error: ${e}`);
+	}
+}
+
+export async function updateBalances(formData: FormData) {
+	'use server';
+	const session = await auth();
+	const date = new Date(formData.get('date') as string);
+
+	try {
+		const balanceEntries: Partial<BalanceData>[] = Array.from(formData.entries())
+			.filter(([key]) => key.startsWith('amount-'))
+			.map(([key, value]) => ({
+				account: key.replace('amount-', ''),
+				amount: parseFloat(value.toString()),
+				date: date.toDateString()
+			}))
+			.filter((balance) => balance.amount);
+
+		if (balanceEntries.length === 0) {
+			throw new Error('No balance values provided');
+		}
+
+		let netWorthTotal: number = 0;
+
+		for (const b of balanceEntries) {
+			netWorthTotal += b.amount!;
+			await sql`
+				INSERT INTO balances (account, amount, date)
+				VALUES (${b.account}, ${b.amount}, ${b.date})
+				ON CONFLICT (account, date) DO UPDATE SET amount = ${b.amount};
+			`;
+		}
+
+		// Asssume first date is fine as they're all for the same date anyway.
+		await sql`
+				INSERT INTO balances (account, amount, date)
+				VALUES (
+				(SELECT id FROM accounts WHERE name = 'Net Worth' AND owner = (SELECT id FROM users WHERE email = ${session!.user?.email})),
+				${netWorthTotal},
+				${balanceEntries[0].date}
+				)
+				ON CONFLICT (account, date) DO UPDATE SET amount = ${netWorthTotal};
+			`;
+
+		redirect('/');
+	} catch (error) {
+		if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+			throw error;
+		}
+
+		console.error('Error updating balances:', error);
+		throw new Error('Failed to update balances');
 	}
 }

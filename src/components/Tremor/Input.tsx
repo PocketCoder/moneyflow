@@ -48,7 +48,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement>, Varian
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-	({className, inputClassName, hasError, enableStepper = true, type, ...props}: InputProps, forwardedRef) => {
+	({className, inputClassName, hasError, enableStepper = false, type, ...props}: InputProps, forwardedRef) => {
 		const [typeState, setTypeState] = React.useState(type);
 
 		const isPassword = type === 'password';
