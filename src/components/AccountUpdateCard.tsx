@@ -21,7 +21,7 @@ export default async function AccountUpdateCard({account}: {account: AccountData
 	return (
 		<Card className="flex h-[300px] min-w-[300px] flex-col items-start justify-evenly">
 			{bankLogos[account.parent.toUpperCase()] ? (
-				<Image src={`${bankLogos[account.parent.toUpperCase()]}`} alt={account.parent} width={80} height={30} />
+				<Image src={bankLogos[account.parent.toUpperCase()]} alt={account.parent} width={80} height={30} />
 			) : (
 				<span className="text-md text-gray-800">{account.parent}</span>
 			)}
