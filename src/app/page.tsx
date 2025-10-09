@@ -2,12 +2,12 @@ import type {BalanceData} from '@/lib/types';
 import {Card} from '@/components/Tremor/Card';
 import BalanceChart from '@/components/BalanceChart';
 import {currencyFormatter, formatBalances} from '@/lib/utils';
-import {getBalances, isNewUser, percentChangeAllTime, percentChangeFY} from '@/lib/server-utils';
+import {DistPieChartData, getBalances, isNewUser, changeAllTime, percentChangeFY, MoM, YoY} from '@/lib/server-utils';
 import {getNetWorthAccount} from '@/lib/server-utils';
 import {auth} from '@/auth';
 import {redirect} from 'next/navigation';
-
-//import {PieChart, Pie, Legend, Tooltip, ResponsiveContainer} from 'recharts';
+import DistPie from '@/components/DistPie';
+import {ChartBar} from '@/components/BarChart';
 
 export default async function Home() {
 	const session = await auth();
@@ -19,57 +19,58 @@ export default async function Home() {
 	const balances = await getBalances(netWorthAccount.id);
 	const formattedBalances: BalanceData[] = formatBalances(balances);
 
-	const percChangeAllTime = await percentChangeAllTime();
-	const percentChangeThisFY = await percentChangeFY();
+	const {percChangeAT, absChangeAT} = await changeAllTime();
+	const {percChangeFY, absChangeFY} = await percentChangeFY();
+	const {percMoM, absMoM} = await MoM();
+	const {percYoY, absYoY} = await YoY();
 
-	/*
-	TODO: For the Pie Chart. When Recharts supports React 19.
+	const PieData = await DistPieChartData();
 
-	const allAccounts = await sql`SELECT * FROM accounts WHERE owner=${userID}`;
-	const allAccountsData = allAccounts.rows as AccountData[];
-	const data: {
-		account: string;
-		balance: number;
-	}[] = [];
-
-	for (const account of allAccountsData) {
-		const balances = await getBalances(account.id);
-		const formattedBalances = formatBalances(balances);
-		if (formattedBalances.length > 0 && formattedBalances[formattedBalances.length - 1].date.includes('2024')) {
-			console.log(account.name, formattedBalances[formattedBalances.length - 1].amount);
-			data.push({account: account.name, balance: formattedBalances[formattedBalances.length - 1].amount});
-		}
-	}
-*/
 	return (
 		<main className="grid-container h-full min-h-full w-full">
-			<Card className="col-span-2 row-span-3 row-start-2 flex items-center justify-center">
+			<Card className="col-span-4 col-start-1 row-span-3 row-start-2 flex items-center justify-center">
 				<BalanceChart data={formattedBalances} type={netWorthAccount.type} />
 			</Card>
-			<Card className="col-span-1 col-start-3 row-span-3 row-start-2 flex items-center justify-center">
-				<code>Piechart goes here</code>
-				{/*
-				<ResponsiveContainer width="100%" height="100%">
-					<PieChart width={400} height={400}>
-						<Pie dataKey="balance" data={data} cx="50%" cy="50%" outerRadius={80} fill="#8884d8" label />
-						<Tooltip />
-						<Legend />
-					</PieChart>
-				</ResponsiveContainer>*/}
+			<Card className="col-span-2 col-start-5 row-span-3 row-start-2 flex items-center justify-center">
+				<ChartBar data={PieData} />
 			</Card>
 			<Card className="col-span-1 col-start-1 row-span-1 row-start-1 flex flex-col justify-evenly">
 				<h2 className="text-2xl font-bold">
 					{currencyFormatter(formattedBalances[formattedBalances.length - 1].amount)}
 				</h2>
-				<span className="text-sm text-gray-500">Current Net Worth</span>
+				<span className="text-sm whitespace-nowrap text-gray-500">Current Net Worth</span>
 			</Card>
 			<Card className="col-span-1 col-start-2 row-span-1 row-start-1 flex flex-col justify-evenly">
-				<h2 className="text-2xl font-bold">{percentChangeThisFY}%</h2>
-				<span className="text-sm text-gray-500">% Change this FY</span>
+				<div className="flex gap-3">
+					<h2 className="text-2xl font-bold">{percChangeFY}%</h2>
+					<span className="text-2xl font-bold">|</span>
+					<h2 className="text-2xl font-bold">{currencyFormatter(absChangeFY)}</h2>
+				</div>
+				<span className="text-sm whitespace-nowrap text-gray-500">Change this FY</span>
 			</Card>
 			<Card className="col-span-1 col-start-3 row-span-1 row-start-1 flex flex-col justify-evenly">
-				<h2 className="text-2xl font-bold">{percChangeAllTime}%</h2>
-				<span className="text-sm text-gray-500">% Change all time</span>
+				<div className="flex gap-3">
+					<h2 className="text-2xl font-bold">{percChangeAT}%</h2>
+					<span className="text-2xl font-bold">|</span>
+					<h2 className="text-2xl font-bold">{currencyFormatter(absChangeAT)}</h2>
+				</div>
+				<span className="text-sm whitespace-nowrap text-gray-500">Change all time</span>
+			</Card>
+			<Card className="col-span-1 col-start-4 row-span-1 row-start-1 flex flex-col justify-evenly">
+				<div className="flex gap-3">
+					<h2 className="text-2xl font-bold">{percMoM}%</h2>
+					<span className="text-2xl font-bold">|</span>
+					<h2 className="text-2xl font-bold">{currencyFormatter(absMoM)}</h2>
+				</div>
+				<span className="text-sm whitespace-nowrap text-gray-500">Change from M-o-M</span>
+			</Card>
+			<Card className="col-span-1 col-start-5 row-span-1 row-start-1 flex flex-col justify-evenly">
+				<div className="flex gap-3">
+					<h2 className="text-2xl font-bold">{percYoY}%</h2>
+					<span className="text-2xl font-bold">|</span>
+					<h2 className="text-2xl font-bold">{currencyFormatter(absYoY)}</h2>
+				</div>
+				<span className="text-sm whitespace-nowrap text-gray-500">Change from Y-o-Y</span>
 			</Card>
 		</main>
 	);

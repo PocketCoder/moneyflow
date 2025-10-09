@@ -5,7 +5,7 @@ import {sql} from '@/lib/db';
 import {Account, BalanceData} from './types';
 import {revalidatePath} from 'next/cache';
 import {Session} from 'next-auth';
-import {getFinancialYearRange} from './utils';
+import {formatBalances, getFinancialYearRange} from './utils';
 import {redirect} from 'next/navigation';
 
 export async function saveNewAccountAndBalance(data: FormData): Promise<{success: boolean; account_name?: string}> {
@@ -173,7 +173,7 @@ export async function isNewUser(): Promise<boolean> {
 	}
 }
 
-export async function percentChangeAllTime(): Promise<number> {
+export async function changeAllTime(): Promise<{percChangeAT: number; absChangeAT: number}> {
 	try {
 		const session = await auth();
 		if (!session) throw new Error('Not logged in');
@@ -205,14 +205,15 @@ export async function percentChangeAllTime(): Promise<number> {
 		const earliest = parseFloat(balances.earliest_balance);
 		const latest = parseFloat(balances.latest_balance);
 		const change = ((latest - earliest) / Math.abs(earliest)) * 100;
-		const formatted = change.toPrecision(2);
-		return parseFloat(formatted);
+		const formatted = parseFloat(change.toPrecision(2));
+		const absChange = latest - earliest;
+		return {percChangeAT: formatted, absChangeAT: parseFloat(absChange.toFixed(2))};
 	} catch (e) {
 		throw new Error(`Error: ${e}`);
 	}
 }
 
-export async function percentChangeFY(): Promise<number> {
+export async function percentChangeFY(): Promise<{percChangeFY: number; absChangeFY: number}> {
 	const {start, end} = getFinancialYearRange();
 	try {
 		const session = await auth();
@@ -248,14 +249,14 @@ export async function percentChangeFY(): Promise<number> {
 		const latest = parseFloat(balances.latest_balance);
 		const change = ((latest - earliest) / Math.abs(earliest)) * 100;
 		const formatted = change.toPrecision(2);
-		return parseFloat(formatted);
+		const absChange = latest - earliest;
+		return {percChangeFY: parseFloat(formatted), absChangeFY: parseFloat(absChange.toFixed(2))};
 	} catch (e) {
 		throw new Error(`Error: ${e}`);
 	}
 }
 
 export async function updateBalances(formData: FormData) {
-	'use server';
 	const session = await auth();
 	const date = new Date(formData.get('date') as string);
 
@@ -303,5 +304,87 @@ export async function updateBalances(formData: FormData) {
 
 		console.error('Error updating balances:', error);
 		throw new Error('Failed to update balances');
+	}
+}
+
+export async function DistPieChartData(): Promise<{account: string; balance: number}[]> {
+	const session = await auth();
+	const allAccounts =
+		(await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session!.user?.email})`) as Account[];
+	const data: {
+		account: string;
+		balance: number;
+	}[] = [];
+
+	for (const account of allAccounts) {
+		const balances = await getBalances(account.id);
+		const formattedBalances = formatBalances(balances);
+		if (formattedBalances.length > 0) {
+			data.push({account: account.name, balance: formattedBalances[formattedBalances.length - 1].amount});
+		}
+	}
+	return data;
+}
+
+export async function MoM(): Promise<{percMoM: number; absMoM: number}> {
+	try {
+		const session = await auth();
+		if (!session) throw new Error('Not logged in');
+		const accountResult =
+			await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND name = 'Net Worth'`;
+		const account = accountResult[0] as Account;
+		const balResult = await sql`SELECT amount FROM balances WHERE account = ${account.id} ORDER BY date DESC LIMIT 2`;
+
+		if (balResult.length < 2) {
+			return {percMoM: 0, absMoM: 0};
+		}
+
+		const latest = parseFloat(balResult[0].amount);
+		const earliest = parseFloat(balResult[1].amount);
+		const change = ((latest - earliest) / Math.abs(earliest)) * 100;
+		const formatted = change.toPrecision(2);
+		const absChange = latest - earliest;
+		return {percMoM: parseFloat(formatted), absMoM: parseFloat(absChange.toFixed(2))};
+	} catch (e) {
+		throw new Error(`Error: ${e}`);
+	}
+}
+
+export async function YoY(): Promise<{percYoY: number; absYoY: number}> {
+	try {
+		const session = await auth();
+		if (!session) throw new Error('Not logged in');
+		const accountResult =
+			await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND name = 'Net Worth'`;
+		const account = accountResult[0] as Account;
+
+		const latestResult =
+			await sql`SELECT amount, date FROM balances WHERE account = ${account.id} ORDER BY date DESC LIMIT 1`;
+
+		if (latestResult.length === 0) {
+			return {percYoY: 0, absYoY: 0};
+		}
+
+		const latestAmount = parseFloat(latestResult[0].amount);
+		const latestDate = new Date(latestResult[0].date);
+
+		const priorYearDate = new Date(latestDate);
+		priorYearDate.setFullYear(priorYearDate.getFullYear() - 1);
+
+		const earliestResult =
+			await sql`SELECT amount FROM balances WHERE account = ${account.id} AND date <= ${priorYearDate.toISOString().split('T')[0]} ORDER BY date DESC LIMIT 1`;
+
+		if (earliestResult.length === 0) {
+			return {percYoY: 0, absYoY: 0};
+		}
+
+		const earliestAmount = parseFloat(earliestResult[0].amount);
+
+		const change = ((latestAmount - earliestAmount) / Math.abs(earliestAmount)) * 100;
+		const formatted = change.toPrecision(2);
+		const absChange = latestAmount - earliestAmount;
+		return {percYoY: parseFloat(formatted), absYoY: parseFloat(absChange.toFixed(2))};
+	} catch (e) {
+		throw new Error(`Error: ${e}`);
 	}
 }
