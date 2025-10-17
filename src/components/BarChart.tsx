@@ -28,7 +28,7 @@ export function ChartBar({data}: {data: {account: string; balance: number}[]}) {
 				<CartesianGrid vertical={false} />
 				<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel hideIndicator />} />
 				<Bar dataKey="balance">
-					<LabelList position="bottom" dataKey="account" fill="#000" fillOpacity={1} />
+					<LabelList position="top" dataKey="account" fill="#000" fillOpacity={1} />
 					{filteredData.map((item) => (
 						<Cell key={item.account} fill={item.balance > 0 ? 'var(--chart-2)' : 'var(--chart-1)'} />
 					))}
