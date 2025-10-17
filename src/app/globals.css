@@ -6,20 +6,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-.grid-container {
-	display: grid;
-	grid-template-columns: repeat(6, 1fr);
-	grid-template-rows: repeat(5, 1fr);
-	gap: 10px 10px;
-	grid-auto-flow: row;
-	grid-template-areas:
-		'. . . . . .'
-		'. . . . . .'
-		'. . . . . .'
-		'. . . . . .'
-		'. . . . . .';
-}
-
 @theme inline {
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);

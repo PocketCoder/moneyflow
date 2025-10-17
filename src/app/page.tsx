@@ -1,3 +1,4 @@
+import {StatCard} from '@/components/StatCard';
 import type {BalanceData} from '@/lib/types';
 import {Card} from '@/components/Tremor/Card';
 import BalanceChart from '@/components/BalanceChart';
@@ -6,7 +7,6 @@ import {DistPieChartData, getBalances, isNewUser, changeAllTime, percentChangeFY
 import {getNetWorthAccount} from '@/lib/server-utils';
 import {auth} from '@/auth';
 import {redirect} from 'next/navigation';
-import DistPie from '@/components/DistPie';
 import {ChartBar} from '@/components/BarChart';
 
 export default async function Home() {
@@ -19,58 +19,46 @@ export default async function Home() {
 	const balances = await getBalances(netWorthAccount.id);
 	const formattedBalances: BalanceData[] = formatBalances(balances);
 
-	const {percChangeAT, absChangeAT} = await changeAllTime();
-	const {percChangeFY, absChangeFY} = await percentChangeFY();
-	const {percMoM, absMoM} = await MoM();
-	const {percYoY, absYoY} = await YoY();
-
-	const PieData = await DistPieChartData();
+	const [{percChangeAT, absChangeAT}, {percChangeFY, absChangeFY}, {percMoM, absMoM}, {percYoY, absYoY}, PieData] =
+		await Promise.all([changeAllTime(), percentChangeFY(), MoM(), YoY(), DistPieChartData()]);
 
 	return (
-		<main className="grid-container h-full min-h-full w-full">
-			<Card className="col-span-4 col-start-1 row-span-3 row-start-2 flex items-center justify-center">
-				<BalanceChart data={formattedBalances} type={netWorthAccount.type} />
-			</Card>
-			<Card className="col-span-2 col-start-5 row-span-3 row-start-2 flex items-center justify-center">
-				<ChartBar data={PieData} />
-			</Card>
-			<Card className="col-span-1 col-start-1 row-span-1 row-start-1 flex flex-col justify-evenly">
+		<main className="grid h-full min-h-full w-full grid-cols-6 gap-4">
+			<Card className="col-span-1 flex flex-col justify-evenly whitespace-nowrap lg:col-start-1 lg:row-start-1">
 				<h2 className="text-2xl font-bold">
 					{currencyFormatter(formattedBalances[formattedBalances.length - 1].amount)}
 				</h2>
-				<span className="text-sm whitespace-nowrap text-gray-500">Current Net Worth</span>
+				<span className="text-sm text-gray-500">Current Net Worth</span>
 			</Card>
-			<Card className="col-span-1 col-start-2 row-span-1 row-start-1 flex flex-col justify-evenly">
-				<div className="flex gap-3">
-					<h2 className="text-2xl font-bold">{percChangeFY}%</h2>
-					<span className="text-2xl font-bold">|</span>
-					<h2 className="text-2xl font-bold">{currencyFormatter(absChangeFY)}</h2>
-				</div>
-				<span className="text-sm whitespace-nowrap text-gray-500">Change this FY</span>
+			<StatCard
+				title="Change this FY"
+				value={`${percChangeFY}%`}
+				change={absChangeFY}
+				changeFormatted={currencyFormatter(absChangeFY)}
+			/>
+			<StatCard
+				title="Change all time"
+				value={`${percChangeAT}%`}
+				change={absChangeAT}
+				changeFormatted={currencyFormatter(absChangeAT)}
+			/>
+			<StatCard
+				title="Change from M-o-M"
+				value={`${percMoM}%`}
+				change={absMoM}
+				changeFormatted={currencyFormatter(absMoM)}
+			/>
+			<StatCard
+				title="Change from Y-o-Y"
+				value={`${percYoY}%`}
+				change={percYoY}
+				changeFormatted={currencyFormatter(absYoY)}
+			/>
+			<Card className="flex items-center justify-center md:col-span-2 lg:col-span-4 lg:col-start-1 lg:row-span-3 lg:row-start-2">
+				<BalanceChart data={formattedBalances} type={netWorthAccount.type} />
 			</Card>
-			<Card className="col-span-1 col-start-3 row-span-1 row-start-1 flex flex-col justify-evenly">
-				<div className="flex gap-3">
-					<h2 className="text-2xl font-bold">{percChangeAT}%</h2>
-					<span className="text-2xl font-bold">|</span>
-					<h2 className="text-2xl font-bold">{currencyFormatter(absChangeAT)}</h2>
-				</div>
-				<span className="text-sm whitespace-nowrap text-gray-500">Change all time</span>
-			</Card>
-			<Card className="col-span-1 col-start-4 row-span-1 row-start-1 flex flex-col justify-evenly">
-				<div className="flex gap-3">
-					<h2 className="text-2xl font-bold">{percMoM}%</h2>
-					<span className="text-2xl font-bold">|</span>
-					<h2 className="text-2xl font-bold">{currencyFormatter(absMoM)}</h2>
-				</div>
-				<span className="text-sm whitespace-nowrap text-gray-500">Change from M-o-M</span>
-			</Card>
-			<Card className="col-span-1 col-start-5 row-span-1 row-start-1 flex flex-col justify-evenly">
-				<div className="flex gap-3">
-					<h2 className="text-2xl font-bold">{percYoY}%</h2>
-					<span className="text-2xl font-bold">|</span>
-					<h2 className="text-2xl font-bold">{currencyFormatter(absYoY)}</h2>
-				</div>
-				<span className="text-sm whitespace-nowrap text-gray-500">Change from Y-o-Y</span>
+			<Card className="flex items-center justify-center md:col-span-2 lg:col-span-2 lg:col-start-5 lg:row-span-3 lg:row-start-2">
+				<ChartBar data={PieData} />
 			</Card>
 		</main>
 	);
