@@ -33,6 +33,7 @@ export async function saveNewAccountAndBalance(data: FormData): Promise<{success
 		const accountRow = account[0] as Account;
 		const accountID = accountRow.id;
 		await saveBalance(accountID, date, balance);
+		await calculateNetWorth([{date}]);
 		revalidatePath('/accounts');
 		revalidatePath('/');
 		return {success: true, account_name};
@@ -65,18 +66,23 @@ export async function checkNetWorthRowExistsandCreate(session: Session): Promise
 	}
 }
 
-export async function calculateNetWorth(): Promise<void> {
+export async function calculateNetWorth(dates?: {date: string}[]): Promise<void> {
 	const session = await auth();
 	if (!session) throw new Error('Not logged in');
 
 	try {
-		const dates = (await sql`
-			SELECT DISTINCT b.date
-			FROM balances b
-			JOIN accounts a ON b.account = a.id
-			WHERE a.owner = (SELECT id FROM users WHERE email = ${session.user?.email})
-		`) as {date: string}[];
+		if (!dates) {
+			dates = (await sql`
+				SELECT DISTINCT b.date
+				FROM balances b
+				JOIN accounts a ON b.account = a.id
+				WHERE a.owner = (SELECT id FROM users WHERE email = ${session.user?.email})
+			`) as {date: string}[];
+		}
 
+		if (dates.length === 0) return;
+
+		const netWorthAccount = await getNetWorthAccount();
 		for (const uniqueDate of dates) {
 			const balances = (await sql`
 			SELECT amount
@@ -91,13 +97,14 @@ export async function calculateNetWorth(): Promise<void> {
 				total += parseFloat(balance.amount);
 			}
 
-			const netWorthAccount = await getNetWorthAccount();
-
 			await sql`
 			INSERT INTO balances (account, date, amount)
-			VALUES (${netWorthAccount.id}, ${uniqueDate.date}, ${total})
-			`;
+							VALUES (${netWorthAccount.id}, ${uniqueDate.date}, ${total})
+							ON CONFLICT (account, date) DO UPDATE SET amount = ${total}
+						`;
 		}
+		revalidatePath('/');
+		revalidatePath('/accounts');
 	} catch (e) {
 		console.error(e);
 		throw new Error('Failed to calculate net worth');
@@ -201,6 +208,7 @@ export async function changeAllTime(): Promise<{percChangeAT: number; absChangeA
 				WHERE account = a.id
 			)
 		`;
+		if (!result[0]) return {percChangeAT: 0, absChangeAT: 0};
 		const balances = result[0] as {earliest_balance: string; latest_balance: string};
 		const earliest = parseFloat(balances.earliest_balance);
 		const latest = parseFloat(balances.latest_balance);
@@ -244,6 +252,7 @@ export async function percentChangeFY(): Promise<{percChangeFY: number; absChang
 				AND date BETWEEN ${start} AND ${end}
 			);
 		`;
+		if (!result[0]) return {percChangeFY: 0, absChangeFY: 0};
 		const balances = result[0] as {earliest_balance: string; latest_balance: string};
 		const earliest = parseFloat(balances.earliest_balance);
 		const latest = parseFloat(balances.latest_balance);
@@ -258,57 +267,44 @@ export async function percentChangeFY(): Promise<{percChangeFY: number; absChang
 
 export async function updateBalances(formData: FormData) {
 	const session = await auth();
+	if (!session) throw new Error('User not logged in');
+
 	const date = new Date(formData.get('date') as string);
 
+	const balanceEntries: Partial<BalanceData>[] = Array.from(formData.entries())
+		.filter(([key]) => key.startsWith('amount-'))
+		.map(([key, value]) => ({
+			account: key.replace('amount-', ''),
+			amount: parseFloat(value.toString()),
+			date: date.toDateString()
+		}))
+		.filter((balance) => balance.amount);
+
+	if (balanceEntries.length === 0) {
+		throw new Error('No balance values provided');
+	}
+
 	try {
-		const balanceEntries: Partial<BalanceData>[] = Array.from(formData.entries())
-			.filter(([key]) => key.startsWith('amount-'))
-			.map(([key, value]) => ({
-				account: key.replace('amount-', ''),
-				amount: parseFloat(value.toString()),
-				date: date.toDateString()
-			}))
-			.filter((balance) => balance.amount);
-
-		if (balanceEntries.length === 0) {
-			throw new Error('No balance values provided');
-		}
-
-		let netWorthTotal: number = 0;
-
 		for (const b of balanceEntries) {
-			netWorthTotal += b.amount!;
 			await sql`
-				INSERT INTO balances (account, amount, date)
-				VALUES (${b.account}, ${b.amount}, ${b.date})
-				ON CONFLICT (account, date) DO UPDATE SET amount = ${b.amount};
-			`;
+			INSERT INTO balances (account, amount, date)
+			VALUES (${b.account}, ${b.amount}, ${b.date})
+			ON CONFLICT (account, date) DO UPDATE SET amount = ${b.amount};
+		`;
 		}
 
-		// Asssume first date is fine as they're all for the same date anyway.
-		await sql`
-				INSERT INTO balances (account, amount, date)
-				VALUES (
-				(SELECT id FROM accounts WHERE name = 'Net Worth' AND owner = (SELECT id FROM users WHERE email = ${session!.user?.email})),
-				${netWorthTotal},
-				${balanceEntries[0].date}
-				)
-				ON CONFLICT (account, date) DO UPDATE SET amount = ${netWorthTotal};
-			`;
-
-		redirect('/');
-	} catch (error) {
-		if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
-			throw error;
-		}
-
-		console.error('Error updating balances:', error);
+		await calculateNetWorth([{date: date.toDateString()}]);
+	} catch (e) {
+		console.error(e);
 		throw new Error('Failed to update balances');
 	}
+
+	redirect('/');
 }
 
 export async function DistPieChartData(): Promise<{account: string; balance: number}[]> {
 	const session = await auth();
+	if (!session) throw new Error('Not logged in');
 	const allAccounts =
 		(await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session!.user?.email})`) as Account[];
 	const data: {
