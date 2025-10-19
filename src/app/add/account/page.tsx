@@ -39,9 +39,9 @@ export default function AddAccount() {
 	}, [state]);
 
 	return (
-		<section>
-			<h1>Add Account</h1>
-			<Card className="m-2 h-fit w-md p-4">
+		<section className="flex h-full flex-col justify-center gap-5">
+			<h1 className="mb-2 scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">Add Account</h1>
+			<Card className="mx-auto h-fit w-md p-4">
 				<form action={formAction} className="flex flex-col gap-2">
 					<Select name="bank">
 						<SelectTrigger>
@@ -55,7 +55,7 @@ export default function AddAccount() {
 							))}
 						</SelectContent>
 					</Select>
-					<Input type="text" name="account_name" placeholder="Accounnt Name" />
+					<Input type="text" name="account_name" placeholder="Account Name" />
 					<Select name="type">
 						<SelectTrigger>
 							<SelectValue placeholder="Type" />
