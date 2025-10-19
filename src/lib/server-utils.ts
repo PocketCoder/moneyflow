@@ -8,8 +8,36 @@ import {Session} from 'next-auth';
 import {formatBalances, getFinancialYearRange} from './utils';
 import {redirect} from 'next/navigation';
 
+export async function saveNewAccount(
+	prevState: {success: boolean; account_name?: string; error?: string},
+	data: FormData
+): Promise<{success: boolean; account_name?: string; error?: string}> {
+	const session = await auth();
+	if (!session) return {success: false, error: 'Not logged in'};
+
+	const account_name = data.get('account_name') as string;
+	const bank = data.get('bank') as string;
+	const type = data.get('type') as string;
+
+	try {
+		const account = await sql`
+			INSERT INTO accounts (owner, name, type, parent)
+			VALUES (
+			(SELECT id FROM users WHERE email = ${session.user?.email}),
+			${account_name},
+			${type},
+			${bank}
+			)`;
+		revalidatePath('/accounts');
+		revalidatePath('/');
+		return {success: true, account_name};
+	} catch (e) {
+		console.error(e);
+		return {success: false, error: 'Failed to create account.'};
+	}
+}
+
 export async function saveNewAccountAndBalance(data: FormData): Promise<{success: boolean; account_name?: string}> {
-	/* Used on Welcome ONLY */
 	const session = await auth();
 	if (!session) throw new Error('Not logged in');
 
