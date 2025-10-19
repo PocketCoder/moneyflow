@@ -1,4 +1,5 @@
 import {
+	saveNewAccount,
 	saveNewAccountAndBalance,
 	checkNetWorthRowExistsandCreate,
 	saveBalance,
@@ -37,6 +38,65 @@ jest.mock('next/cache', () => ({
 const mockedAuth = jest.mocked(auth);
 const mockedSql = jest.mocked(sql);
 const mockedRevalidatePath = jest.mocked(revalidatePath);
+
+describe('saveNewAccount', () => {
+	afterEach(() => {
+		jest.clearAllMocks();
+	});
+
+	it('returns an error if not logged in', async () => {
+		(mockedAuth as jest.Mock).mockResolvedValue(null);
+
+		const data = new FormData();
+		data.set('account_name', 'Test Account');
+		data.set('bank', 'Test Bank');
+		data.set('type', 'Checking');
+
+		const prevState = {success: false};
+
+		const result = await saveNewAccount(prevState, data);
+		expect(result).toEqual({success: false, error: 'Not logged in'});
+	});
+
+	it('creates a new account successfully', async () => {
+		(mockedAuth as jest.Mock).mockResolvedValue({
+			user: {email: 'test@moneyflow.dev'}
+		} as any);
+
+		mockedSql.mockResolvedValueOnce([]); // accounts insert
+
+		const data = new FormData();
+		data.set('account_name', 'Test Account');
+		data.set('bank', 'Test Bank');
+		data.set('type', 'Savings');
+
+		const prevState = {success: false};
+
+		const result = await saveNewAccount(prevState, data);
+
+		expect(result).toEqual({success: true, account_name: 'Test Account'});
+		expect(mockedSql).toHaveBeenCalledTimes(1);
+		expect(mockedRevalidatePath).toHaveBeenCalledWith('/accounts');
+		expect(mockedRevalidatePath).toHaveBeenCalledWith('/');
+	});
+
+	it('returns an error if account creation fails', async () => {
+		jest.spyOn(console, 'error').mockImplementation(() => {});
+		(mockedAuth as jest.Mock).mockResolvedValue({user: {email: 'test@moneyflow.dev'}} as any);
+
+		mockedSql.mockRejectedValueOnce(new Error('DB down'));
+
+		const data = new FormData();
+		data.set('account_name', 'Test Account');
+		data.set('bank', 'Test Bank');
+		data.set('type', 'Savings');
+
+		const prevState = {success: false};
+
+		const result = await saveNewAccount(prevState, data);
+		expect(result).toEqual({success: false, error: 'Failed to create account.'});
+	});
+});
 
 describe('saveNewAccountAndBalance', () => {
 	afterEach(() => {
