@@ -3,7 +3,7 @@ import {sql} from '@/lib/db';
 import {Card} from '@/components/Tremor/Card';
 import {Input} from '@/components/Tremor/Input';
 import {Button} from '@/components/Tremor/Button';
-import {calculateNetWorth} from '@/lib/server-utils';
+import {recalculateNetWorthAction} from '@/lib/server-utils';
 import {auth} from '@/auth';
 import {redirect} from 'next/navigation';
 
@@ -30,7 +30,7 @@ export default async function Settings() {
 					</p>
 				</div>
 				{/* TODO: Add in sonner */}
-				<form action={calculateNetWorth}>
+				<form action={recalculateNetWorthAction}>
 					<Button variant="secondary">Recalculate</Button>
 				</form>
 			</Card>
