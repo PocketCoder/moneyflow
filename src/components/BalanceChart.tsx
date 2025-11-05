@@ -1,6 +1,5 @@
 'use client';
-
-import {AccountData, BalanceData} from '@/lib/types';
+import {Account as AccountData, BalanceData} from '@/lib/types';
 import {ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip} from 'recharts';
 import {currencyFormatter} from '@/lib/utils';
 

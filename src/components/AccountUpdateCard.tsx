@@ -1,14 +1,13 @@
-import {AccountData, BalanceData} from '@/lib/types';
+import {Account as AccountData, BalanceData} from '@/lib/types';
 import Image from 'next/image';
-import {sql} from '@vercel/postgres';
+import {sql} from '@/lib/db';
 import {bankLogos} from '@/lib/bankLogos';
 import {Card} from '@/components/Tremor/Card';
 import {Input} from '@/components/Tremor/Input';
 import BalanceSpark from '@/components/BalanceSpark';
 
 export default async function AccountUpdateCard({account}: {account: AccountData}) {
-	const balancesResult = await sql`SELECT * FROM balances WHERE account = ${account.id}`;
-	const balances = balancesResult.rows as BalanceData[];
+	const balances = (await sql`SELECT * FROM balances WHERE account = ${account.id}`) as BalanceData[];
 	const formattedBalances: BalanceData[] = balances
 		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 		.map((balance) => ({
@@ -17,12 +16,12 @@ export default async function AccountUpdateCard({account}: {account: AccountData
 				month: 'short',
 				year: 'numeric'
 			}).format(new Date(balance.date)),
-			amount: parseFloat(balance.amount)
+			amount: balance.amount
 		}));
 	return (
 		<Card className="flex h-[300px] min-w-[300px] flex-col items-start justify-evenly">
 			{bankLogos[account.parent.toUpperCase()] ? (
-				<Image src={`${bankLogos[account.parent.toUpperCase()]}`} alt={account.parent} width={60} height={20} />
+				<Image src={bankLogos[account.parent.toUpperCase()]} alt={account.parent} width={80} height={30} />
 			) : (
 				<span className="text-md text-gray-800">{account.parent}</span>
 			)}
@@ -41,6 +40,7 @@ export default async function AccountUpdateCard({account}: {account: AccountData
 			<Input
 				className="mt-2"
 				type="number"
+				step="any"
 				name={`amount-${account.id}`}
 				defaultValue={formattedBalances.length > 0 ? formattedBalances[formattedBalances.length - 1].amount : 0}
 				placeholder="Enter new amount"

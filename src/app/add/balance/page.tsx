@@ -1,56 +1,28 @@
-import type {AccountData, BalanceData} from '@/lib/types';
-import {revalidatePath} from 'next/cache';
-import {sql} from '@vercel/postgres';
+import type {Account as AccountData, BalanceData} from '@/lib/types';
+import {sql} from '@/lib/db';
 import {Input} from '@/components/Tremor/Input';
 import AccountUpdateCard from '@/components/AccountUpdateCard';
 import {Button} from '@/components/Tremor/Button';
-
-async function updateBalances(formData: FormData) {
-	'use server';
-
-	const date = new Date(formData.get('date') as string);
-	//const accounts = JSON.parse(formData.get('accounts') as string) as AccountData[];
-
-	try {
-		const balanceEntries: Partial<BalanceData>[] = Array.from(formData.entries())
-			.filter(([key]) => key.startsWith('amount-'))
-			.map(([key, value]) => ({
-				account: key.replace('amount-', ''),
-				amount: value,
-				date: date.toDateString()
-			}))
-			.filter((balance) => balance.amount); // Only include non-empty values
-
-		if (balanceEntries.length === 0) {
-			throw new Error('No balance values provided');
-		}
-		// FIXME: Add exclusion constraint
-		for (const b of balanceEntries) {
-			await sql`
-				INSERT INTO balances (account, amount, date)
-				VALUES (${b.account}, ${b.amount}, ${b.date})
-				ON CONFLICT (account, date) DO UPDATE SET amount = ${b.amount};
-			`;
-		}
-
-		revalidatePath('/accounts');
-	} catch (error) {
-		console.error('Error updating balances:', error);
-		throw new Error('Failed to update balances');
-	}
-}
+import {auth} from '@/auth';
+import React from 'react';
+import {updateBalances} from '@/lib/server-utils';
 
 export default async function AddBalance() {
-	const {rows}: {rows: AccountData[]} = await sql`SELECT * FROM accounts WHERE owner=${process.env.USERID}`;
+	const session = await auth();
+	const rows =
+		(await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session!.user?.email})`) as AccountData[];
 	return (
 		<form action={updateBalances}>
 			<section>
-				<h1 className="mb-2 text-center text-lg font-bold">Update Balances</h1>
+				<h1 className="mb-2 scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
+					Update Balances
+				</h1>
 				<Input type="date" name="date" defaultValue={new Date().toISOString().split('T')[0]} className="mb-2" />
 				<div className="flex h-full w-full flex-nowrap gap-8 overflow-x-scroll">
-					{rows.map((account, i) => (
-						<AccountUpdateCard key={i} account={account} />
-					))}
+					{rows.map((account, i) => {
+						if (account.name == 'Net Worth') return <React.Fragment key={i}></React.Fragment>;
+						return <AccountUpdateCard key={account.id} account={account} />;
+					})}
 				</div>
 				<Button type="submit" className="mt-4">
 					Save All

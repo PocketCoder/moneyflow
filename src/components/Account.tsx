@@ -1,14 +1,15 @@
-import type {Account, BalanceData} from '@/lib/types';
+import type {Account as AccountData, BalanceData} from '@/lib/types';
 import {bankLogos} from '@/lib/bankLogos';
 import clsx from 'clsx';
 import Link from 'next/link';
 import Image from 'next/image';
+import {sql} from '@/lib/db';
 import {Card} from '@/components/Tremor/Card';
 import BalanceSpark from '@/components/BalanceSpark';
 import {getBalances} from '@/lib/server-utils';
 
-export default async function Account({account}: {account: Account}) {
-	const balances: BalanceData[] = await getBalances(account.id);
+export default async function Account({account}: {account: AccountData}) {
+	const balances = (await sql`SELECT * FROM balances WHERE account = ${account.id}`) as BalanceData[];
 	const formattedBalances: BalanceData[] = balances
 		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 		.map((balance) => ({
@@ -23,7 +24,7 @@ export default async function Account({account}: {account: Account}) {
 		<Link href={`/accounts/${account.id}`}>
 			<Card
 				className={clsx(
-					'md:w-90 flex h-40 w-full items-center justify-between gap-4 p-4 transition-transform hover:scale-[101%]',
+					'flex h-40 w-full items-center justify-between gap-4 p-4 transition-transform hover:scale-[101%] md:w-90',
 					{
 						'opacity-70': account.tags.includes('inactive'),
 						'border-t-4 border-red-500': account.type === 'Debt',
