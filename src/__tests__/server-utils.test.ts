@@ -19,7 +19,7 @@ import {auth} from '@/auth';
 import {sql} from '@/lib/db';
 import {revalidatePath} from 'next/cache';
 import {Session} from 'next-auth';
-import {Account, BalanceData} from '@/lib/types';
+import {Account, AccountType} from '@/lib/types';
 
 jest.mock('@/auth', () => ({
 	auth: jest.fn()
@@ -235,7 +235,7 @@ describe('getAccount', () => {
 			owner: 'abc',
 			name: 'Test Account',
 			parent: 'Test Bank',
-			type: 'Savings',
+			type: AccountType.Savings,
 			tags: ['test']
 		};
 
@@ -343,7 +343,7 @@ describe('getNetWorthAccount', () => {
 			id: '456',
 			owner: '123',
 			name: 'Net Worth',
-			type: 'Net Worth',
+			type: AccountType.NetWorth,
 			parent: 'Net Worth',
 			tags: ['test']
 		};
@@ -367,7 +367,7 @@ describe('getNetWorthAccount', () => {
 			id: '456',
 			owner: '123',
 			name: 'Net Worth',
-			type: 'Net Worth',
+			type: AccountType.NetWorth,
 			parent: 'Net Worth',
 			tags: ['test']
 		};

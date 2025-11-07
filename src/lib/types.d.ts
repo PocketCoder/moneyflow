@@ -7,7 +7,8 @@ export enum AccountType {
 	ISA = 'ISA',
 	CurrentAccount = 'Current Account',
 	Debt = 'Debt',
-	Pension = 'Pension'
+	Pension = 'Pension',
+	NetWorth = 'Net Worth'
 }
 
 interface Preferences {
