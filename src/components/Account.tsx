@@ -48,7 +48,7 @@ export default async function Account({account}: {account: AccountData}) {
 						))}
 					</div>
 				</div>
-				<BalanceSpark data={formattedBalances} type={account.type} width={150} height={'50%'} />
+				<BalanceSpark data={formattedBalances} type={account.type} width={150} height={50} />
 			</Card>
 		</Link>
 	);
