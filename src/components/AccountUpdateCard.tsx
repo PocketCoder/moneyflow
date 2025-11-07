@@ -26,7 +26,7 @@ export default async function AccountUpdateCard({account}: {account: AccountData
 				<span className="text-md text-gray-800">{account.parent}</span>
 			)}
 			<h3 className="text-lg font-bold">{account.name}</h3>
-			<BalanceSpark data={formattedBalances} type={account.type} width={'100%'} height={'33%'} />
+			<BalanceSpark data={formattedBalances} type={account.type} width={200} height={75} />
 			{formattedBalances.length > 0 && (
 				<div className="my-2 flex flex-col items-start justify-start gap-1">
 					<span className="text-sm text-gray-700">
