@@ -26,7 +26,10 @@ export function ChartBar({data}: {data: {account: string; balance: number}[]}) {
 			<BarChart accessibilityLayer data={filteredData}>
 				<YAxis hide domain={[minBalance * 1.2, maxBalance * 1.2]} />
 				<CartesianGrid vertical={false} />
-				<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel hideIndicator />} />
+				<ChartTooltip
+					cursor={false}
+					content={({payload}) => <ChartTooltipContent payload={payload} hideLabel hideIndicator />}
+				/>
 				<Bar dataKey="balance">
 					<LabelList position="top" dataKey="account" fill="#000" fillOpacity={1} />
 					{filteredData.map((item) => (

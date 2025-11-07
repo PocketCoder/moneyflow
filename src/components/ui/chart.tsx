@@ -92,34 +92,40 @@ const ChartTooltip = RechartsPrimitive.Tooltip;
 
 const ChartTooltipContent = React.forwardRef<
 	HTMLDivElement,
-	React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-		React.ComponentProps<'div'> & {
-			hideLabel?: boolean;
-			hideIndicator?: boolean;
-			indicator?: 'line' | 'dot' | 'dashed';
-			nameKey?: string;
-			labelKey?: string;
-		}
+	React.ComponentProps<'div'> & {
+		payload?: any[];
+		label?: any;
+		active?: boolean;
+		formatter?: any;
+		labelFormatter?: any;
+		itemStyle?: any;
+		labelStyle?: any;
+		wrapperStyle?: any;
+		contentStyle?: any;
+		hideLabel?: boolean;
+		hideIndicator?: boolean;
+		indicator?: 'line' | 'dot' | 'dashed';
+		nameKey?: string;
+		labelKey?: string;
+		labelClassName?: string;
+	}
 >(
 	(
 		{
-			active,
-			payload,
 			className,
 			indicator = 'dot',
 			hideLabel = false,
 			hideIndicator = false,
-			label,
-			labelFormatter,
-			labelClassName,
-			formatter,
 			color,
 			nameKey,
-			labelKey
+			labelKey,
+			labelClassName,
+			...props
 		},
 		ref
 	) => {
 		const {config} = useChart();
+		const {payload, active, label, formatter, labelFormatter} = props;
 
 		const tooltipLabel = React.useMemo(() => {
 			if (hideLabel || !payload?.length) {
@@ -165,7 +171,7 @@ const ChartTooltipContent = React.forwardRef<
 						.map((item, index) => {
 							const key = `${nameKey || item.name || item.dataKey || 'value'}`;
 							const itemConfig = getPayloadConfigFromPayload(config, item, key);
-							const indicatorColor = color || item.payload.fill || item.color;
+							const indicatorColor = color || item.color;
 
 							return (
 								<div
@@ -175,7 +181,7 @@ const ChartTooltipContent = React.forwardRef<
 										indicator === 'dot' && 'items-center'
 									)}>
 									{formatter && item?.value !== undefined && item.name ? (
-										formatter(item.value, item.name, item, index, item.payload)
+										formatter(item.value, item.name, item, index, item.payload ?? item)
 									) : (
 										<>
 											{itemConfig?.icon ? (
@@ -229,11 +235,12 @@ const ChartLegend = RechartsPrimitive.Legend;
 
 const ChartLegendContent = React.forwardRef<
 	HTMLDivElement,
-	React.ComponentProps<'div'> &
-		Pick<RechartsPrimitive.LegendProps, 'payload' | 'verticalAlign'> & {
-			hideIcon?: boolean;
-			nameKey?: string;
-		}
+	React.ComponentProps<'div'> & {
+		payload?: any[];
+		verticalAlign?: 'top' | 'middle' | 'bottom';
+		hideIcon?: boolean;
+		nameKey?: string;
+	}
 >(({className, hideIcon = false, payload, verticalAlign = 'bottom', nameKey}, ref) => {
 	const {config} = useChart();
 
@@ -275,26 +282,17 @@ const ChartLegendContent = React.forwardRef<
 ChartLegendContent.displayName = 'ChartLegend';
 
 // Helper to extract item config from a payload.
-function getPayloadConfigFromPayload(config: ChartConfig, payload: unknown, key: string) {
+function getPayloadConfigFromPayload(config: ChartConfig, payload: any, key: string) {
 	if (typeof payload !== 'object' || payload === null) {
 		return undefined;
 	}
 
-	const payloadPayload =
-		'payload' in payload && typeof payload.payload === 'object' && payload.payload !== null
-			? payload.payload
-			: undefined;
+	const payloadPayload = 'payload' in payload ? payload.payload : payload;
 
 	let configLabelKey: string = key;
 
-	if (key in payload && typeof payload[key as keyof typeof payload] === 'string') {
-		configLabelKey = payload[key as keyof typeof payload] as string;
-	} else if (
-		payloadPayload &&
-		key in payloadPayload &&
-		typeof payloadPayload[key as keyof typeof payloadPayload] === 'string'
-	) {
-		configLabelKey = payloadPayload[key as keyof typeof payloadPayload] as string;
+	if (key in payloadPayload && typeof payloadPayload[key] === 'string') {
+		configLabelKey = payloadPayload[key] as string;
 	}
 
 	return configLabelKey in config ? config[configLabelKey] : config[key as keyof typeof config];

@@ -22,7 +22,7 @@ export default function DistPie({data}: {data: {account: string; balance: number
 	return (
 		<ChartContainer config={chartConfig} className="block h-[250px] w-[250px]">
 			<PieChart>
-				<ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+				<ChartTooltip cursor={false} content={({payload}) => <ChartTooltipContent payload={payload} hideLabel />} />
 				<Pie data={data} dataKey="balance" nameKey="account" />
 			</PieChart>
 		</ChartContainer>
