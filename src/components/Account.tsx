@@ -18,7 +18,7 @@ export default async function Account({account}: {account: AccountData}) {
 				month: 'short',
 				year: 'numeric'
 			}).format(new Date(balance.date)),
-			amount: parseFloat(balance.amount)
+			amount: parseFloat(balance.amount as any)
 		}));
 	return (
 		<Link href={`/accounts/${account.id}`}>
