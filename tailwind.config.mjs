@@ -1,5 +1,8 @@
+import forms from '@tailwindcss/forms';
+import animate from 'tailwindcss-animate';
+
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
 	content: [
 		'./src/app/**/*.{js,ts,jsx,tsx,mdx}',
 		'./src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -80,5 +83,5 @@ module.exports = {
 			drawerSlideRightAndFade: 'drawerSlideRightAndFade 150ms ease-in'
 		}
 	},
-	plugins: [require('@tailwindcss/forms'), require('tailwindcss-animate')]
+	plugins: [forms, animate]
 };
