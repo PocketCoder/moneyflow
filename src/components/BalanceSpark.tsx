@@ -1,7 +1,7 @@
 'use client';
 
 import {AreaChart, Area, ResponsiveContainer} from 'recharts';
-import {AccountData, BalanceData} from '@/lib/types';
+import {Account as AccountData, BalanceData} from '@/lib/types';
 
 export default function BalanceSpark({
 	data,
