@@ -11,8 +11,8 @@ export default function BalanceSpark({
 }: {
 	data: BalanceData[];
 	type: Partial<AccountData>['type'];
-	width: string | number;
-	height: string | number;
+	width: number;
+	height: number;
 }) {
 	const colour = type === 'Debt' ? '#b91c1c' : '#14b8a6';
 	return (
