@@ -1,5 +1,6 @@
 import type {Metadata} from 'next';
 import {SpeedInsights} from '@vercel/speed-insights/next';
+import {Analytics} from '@vercel/analytics/next';
 import {Comfortaa} from 'next/font/google';
 import './globals.css';
 
@@ -37,6 +38,7 @@ export default async function RootLayout({
 				</Suspense>
 				<NavBar />
 				<SpeedInsights />
+				<Analytics />
 			</body>
 		</html>
 	);
