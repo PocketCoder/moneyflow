@@ -1,5 +1,5 @@
 import {auth} from '@/auth';
-import {SignIn} from '@/components/auth/signin-button';
+import {SignIn} from '@/components/auth/signin-form';
 import WelcomeForm from '@/components/WelcomeForm';
 
 export default async function Welcome() {

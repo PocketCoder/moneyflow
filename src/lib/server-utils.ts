@@ -21,7 +21,7 @@ export async function saveNewAccount(
 
 	try {
 		const account = await sql`
-			INSERT INTO accounts (owner, name, type, parent)
+			INSERT INTO bank_accounts (owner, name, type, parent)
 			VALUES (
 			(SELECT id FROM users WHERE email = ${session.user?.email}),
 			${account_name},
@@ -49,7 +49,7 @@ export async function saveNewAccountAndBalance(data: FormData): Promise<{success
 
 	try {
 		const account = await sql`
-			INSERT INTO accounts (owner, name, type, parent)
+			INSERT INTO bank_accounts (owner, name, type, parent)
 			VALUES (
 			(SELECT id FROM users WHERE email = ${session.user?.email}),
 			${account_name},
@@ -76,7 +76,7 @@ export async function checkNetWorthRowExistsandCreate(session: Session): Promise
 		const result = await sql`
 			SELECT EXISTS(
 				SELECT 1 
-				FROM accounts 
+				FROM bank_accounts 
 				WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email})
 				AND name = 'Net Worth'
 			) AS row_exists;
@@ -84,7 +84,7 @@ export async function checkNetWorthRowExistsandCreate(session: Session): Promise
 
 		if (!result[0].row_exists) {
 			await sql`
-		INSERT INTO accounts (owner, name, type, parent, tags)
+		INSERT INTO bank_accounts (owner, name, type, parent, tags)
 		VALUES ((SELECT id FROM users WHERE email = ${session.user?.email}), 'Net Worth', 'Net Worth', 'Net Worth', ARRAY['nw'])
 		`;
 		}
@@ -108,7 +108,7 @@ export async function calculateNetWorth(dates?: {date: string}[]): Promise<void>
 			dates = (await sql`
 				SELECT DISTINCT b.date
 				FROM balances b
-				JOIN accounts a ON b.account = a.id
+				JOIN bank_accounts a ON b.account = a.id
 				WHERE a.owner = (SELECT id FROM users WHERE email = ${session.user?.email})
 			`) as {date: string}[];
 		}
@@ -120,7 +120,7 @@ export async function calculateNetWorth(dates?: {date: string}[]): Promise<void>
 			const balances = (await sql`
 			SELECT amount
 			FROM balances b
-			JOIN accounts a ON b.account = a.id
+			JOIN bank_accounts a ON b.account = a.id
 			WHERE a.owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND b.date = ${uniqueDate.date}
 			`) as {amount: string}[];
 
@@ -177,7 +177,7 @@ export async function getNetWorthAccount(): Promise<Account> {
 	if (!session) throw new Error('Not logged in');
 	await checkNetWorthRowExistsandCreate(session);
 	const accountResult =
-		await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND name = 'Net Worth'`;
+		await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND name = 'Net Worth'`;
 	const account = accountResult[0] as Account;
 	return account;
 }
@@ -187,7 +187,7 @@ export async function getAccount(accountID: string): Promise<Account> {
 		const session = await auth();
 		if (!session) throw new Error('Not logged in');
 		const accountResult =
-			await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND id=${accountID}`;
+			await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND id=${accountID}`;
 		const account = accountResult[0] as Account;
 		return account;
 	} catch (e) {
@@ -206,7 +206,7 @@ export async function isNewUser(): Promise<boolean> {
 		const session = await auth();
 		if (!session) throw new Error('Not logged in');
 		const accounts =
-			(await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email})`) as Account[];
+			(await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email})`) as Account[];
 		return accounts.length === 0;
 	} catch (e) {
 		throw new Error(`Error: ${e}`);
@@ -222,7 +222,7 @@ export async function changeAllTime(): Promise<{percChangeAT: number; absChangeA
 				b1.amount AS earliest_balance, 
 				b2.amount AS latest_balance
 			FROM balances b1
-			JOIN accounts a 
+			JOIN bank_accounts a 
 				ON b1.account = a.id
 			JOIN (
 				SELECT account, MAX(date) AS max_date
@@ -264,7 +264,7 @@ export async function percentChangeFY(): Promise<{percChangeFY: number; absChang
 				b1.amount AS earliest_balance, 
 				b2.amount AS latest_balance
 			FROM balances b1
-			JOIN accounts a 
+			JOIN bank_accounts a 
 				ON b1.account = a.id
 			JOIN (
 				SELECT account, MAX(date) AS max_date
@@ -339,7 +339,7 @@ export async function DistPieChartData(): Promise<{account: string; balance: num
 	const session = await auth();
 	if (!session) throw new Error('Not logged in');
 	const allAccounts =
-		(await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session!.user?.email})`) as Account[];
+		(await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session!.user?.email})`) as Account[];
 	const data: {
 		account: string;
 		balance: number;
@@ -360,7 +360,7 @@ export async function MoM(): Promise<{percMoM: number; absMoM: number}> {
 		const session = await auth();
 		if (!session) throw new Error('Not logged in');
 		const accountResult =
-			await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND name = 'Net Worth'`;
+			await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND name = 'Net Worth'`;
 		const account = accountResult[0] as Account;
 		const balResult = await sql`SELECT amount FROM balances WHERE account = ${account.id} ORDER BY date DESC LIMIT 2`;
 
@@ -384,7 +384,7 @@ export async function YoY(): Promise<{percYoY: number; absYoY: number}> {
 		const session = await auth();
 		if (!session) throw new Error('Not logged in');
 		const accountResult =
-			await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND name = 'Net Worth'`;
+			await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND name = 'Net Worth'`;
 		const account = accountResult[0] as Account;
 
 		const latestResult =

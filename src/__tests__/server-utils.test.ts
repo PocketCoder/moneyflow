@@ -176,7 +176,7 @@ describe('checkNetWorthRowExistsandCreate', () => {
 		(sql as unknown as jest.Mock).mockResolvedValueOnce([]);
 		await checkNetWorthRowExistsandCreate(session);
 		expect(sql).toHaveBeenCalledTimes(2);
-		expect((sql as unknown as jest.Mock).mock.calls[1][0].toString()).toContain('INSERT INTO accounts');
+		expect((sql as unknown as jest.Mock).mock.calls[1][0].toString()).toContain('INSERT INTO bank_accounts');
 	});
 
 	it('throws an error if SQL fails', async () => {
