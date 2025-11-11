@@ -3,7 +3,6 @@ import {Badge} from '@/components/ui/badge';
 import {TrendingUpIcon} from '@/components/ui/icons/lucide-trending-up';
 import {TrendingDownIcon} from '@/components/ui/icons/lucide-trending-down';
 import clsx from 'clsx';
-import {currencyFormatter} from '@/lib/utils';
 
 interface StatCardProps {
 	title: string;

@@ -108,7 +108,7 @@ export async function calculateNetWorth(dates?: {date: string}[]): Promise<void>
 			dates = (await sql`
 				SELECT DISTINCT b.date
 				FROM balances b
-				JOIN bank_accounts a ON b.account = a.id
+				JOIN bank_accounts a ON b.bank_account = a.id
 				WHERE a.owner = (SELECT id FROM users WHERE email = ${session.user?.email})
 			`) as {date: string}[];
 		}
@@ -120,7 +120,7 @@ export async function calculateNetWorth(dates?: {date: string}[]): Promise<void>
 			const balances = (await sql`
 			SELECT amount
 			FROM balances b
-			JOIN bank_accounts a ON b.account = a.id
+			JOIN bank_accounts a ON b.bank_account = a.id
 			WHERE a.owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND b.date = ${uniqueDate.date}
 			`) as {amount: string}[];
 
@@ -131,9 +131,9 @@ export async function calculateNetWorth(dates?: {date: string}[]): Promise<void>
 			}
 
 			await sql`
-			INSERT INTO balances (account, date, amount)
+			INSERT INTO balances (bank_account, date, amount)
 							VALUES (${netWorthAccount.id}, ${uniqueDate.date}, ${total})
-							ON CONFLICT (account, date) DO UPDATE SET amount = ${total}
+							ON CONFLICT (bank_account, date) DO UPDATE SET amount = ${total}
 						`;
 		}
 		revalidatePath('/');
@@ -150,7 +150,7 @@ export async function saveBalance(accountID: string, date: string, balance: stri
 	}
 	try {
 		await sql`
-		INSERT INTO balances (account, date, amount)
+		INSERT INTO balances (bank_account, date, amount)
 		VALUES (
 			${accountID},
 			${date},
@@ -196,7 +196,7 @@ export async function getAccount(accountID: string): Promise<Account> {
 }
 
 export async function getBalances(accountID: string): Promise<BalanceData[]> {
-	const balancesResult = await sql`SELECT amount, date FROM balances WHERE account = ${accountID}`;
+	const balancesResult = await sql`SELECT amount, date FROM balances WHERE bank_account = ${accountID}`;
 	const balances = balancesResult as BalanceData[];
 	return balances;
 }
@@ -223,22 +223,22 @@ export async function changeAllTime(): Promise<{percChangeAT: number; absChangeA
 				b2.amount AS latest_balance
 			FROM balances b1
 			JOIN bank_accounts a 
-				ON b1.account = a.id
+				ON b1.bank_account = a.id
 			JOIN (
-				SELECT account, MAX(date) AS max_date
+				SELECT bank_account, MAX(date) AS max_date
 				FROM balances
-				GROUP BY account
+				GROUP BY bank_account
 			) b_latest 
-				ON b1.account = b_latest.account
+				ON b1.bank_account = b_latest.bank_account
 			JOIN balances b2 
-				ON b2.account = b_latest.account 
+				ON b2.bank_account = b_latest.bank_account 
 			AND b2.date = b_latest.max_date
 			WHERE a.name = 'Net Worth'
 			AND a.owner = (SELECT id FROM users WHERE email = ${session.user?.email})
 			AND b1.date = (
 				SELECT MIN(date)
 				FROM balances
-				WHERE account = a.id
+				WHERE bank_account = a.id
 			)
 		`;
 		if (!result[0]) return {percChangeAT: 0, absChangeAT: 0};
@@ -265,23 +265,23 @@ export async function percentChangeFY(): Promise<{percChangeFY: number; absChang
 				b2.amount AS latest_balance
 			FROM balances b1
 			JOIN bank_accounts a 
-				ON b1.account = a.id
+				ON b1.bank_account = a.id
 			JOIN (
-				SELECT account, MAX(date) AS max_date
+				SELECT bank_account, MAX(date) AS max_date
 				FROM balances
 				WHERE date BETWEEN ${start} AND ${end}
-				GROUP BY account
+				GROUP BY bank_account
 			) b_latest 
-				ON b1.account = b_latest.account
+				ON b1.bank_account = b_latest.bank_account
 			JOIN balances b2 
-				ON b2.account = b_latest.account 
+				ON b2.bank_account = b_latest.bank_account 
 			AND b2.date = b_latest.max_date
 			WHERE a.name = 'Net Worth'
 			AND a.owner = (SELECT id FROM users WHERE email = ${session.user?.email})
 			AND b1.date = (
 				SELECT MIN(date)
 				FROM balances
-				WHERE account = a.id
+				WHERE bank_account = a.id
 				AND date BETWEEN ${start} AND ${end}
 			);
 		`;
@@ -320,9 +320,9 @@ export async function updateBalances(formData: FormData) {
 	try {
 		for (const b of balanceEntries) {
 			await sql`
-			INSERT INTO balances (account, amount, date)
+			INSERT INTO balances (bank_account, amount, date)
 			VALUES (${b.account}, ${b.amount}, ${b.date})
-			ON CONFLICT (account, date) DO UPDATE SET amount = ${b.amount};
+			ON CONFLICT (bank_account, date) DO UPDATE SET amount = ${b.amount};
 		`;
 		}
 
@@ -362,7 +362,8 @@ export async function MoM(): Promise<{percMoM: number; absMoM: number}> {
 		const accountResult =
 			await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND name = 'Net Worth'`;
 		const account = accountResult[0] as Account;
-		const balResult = await sql`SELECT amount FROM balances WHERE account = ${account.id} ORDER BY date DESC LIMIT 2`;
+		const balResult =
+			await sql`SELECT amount FROM balances WHERE bank_account = ${account.id} ORDER BY date DESC LIMIT 2`;
 
 		if (balResult.length < 2) {
 			return {percMoM: 0, absMoM: 0};
@@ -388,7 +389,7 @@ export async function YoY(): Promise<{percYoY: number; absYoY: number}> {
 		const account = accountResult[0] as Account;
 
 		const latestResult =
-			await sql`SELECT amount, date FROM balances WHERE account = ${account.id} ORDER BY date DESC LIMIT 1`;
+			await sql`SELECT amount, date FROM balances WHERE bank_account = ${account.id} ORDER BY date DESC LIMIT 1`;
 
 		if (latestResult.length === 0) {
 			return {percYoY: 0, absYoY: 0};
@@ -401,7 +402,7 @@ export async function YoY(): Promise<{percYoY: number; absYoY: number}> {
 		priorYearDate.setFullYear(priorYearDate.getFullYear() - 1);
 
 		const earliestResult =
-			await sql`SELECT amount FROM balances WHERE account = ${account.id} AND date <= ${priorYearDate.toISOString().split('T')[0]} ORDER BY date DESC LIMIT 1`;
+			await sql`SELECT amount FROM balances WHERE bank_account = ${account.id} AND date <= ${priorYearDate.toISOString().split('T')[0]} ORDER BY date DESC LIMIT 1`;
 
 		if (earliestResult.length === 0) {
 			return {percYoY: 0, absYoY: 0};

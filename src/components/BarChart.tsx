@@ -32,8 +32,8 @@ export function ChartBar({data}: {data: {account: string; balance: number}[]}) {
 				/>
 				<Bar dataKey="balance">
 					<LabelList position="top" dataKey="account" fill="#000" fillOpacity={1} />
-					{filteredData.map((item) => (
-						<Cell key={item.account} fill={item.balance > 0 ? 'var(--chart-2)' : 'var(--chart-1)'} />
+					{filteredData.map((item, i) => (
+						<Cell key={i + item.account} fill={item.balance > 0 ? 'var(--chart-2)' : 'var(--chart-1)'} />
 					))}
 				</Bar>
 			</BarChart>

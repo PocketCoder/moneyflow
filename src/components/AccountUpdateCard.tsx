@@ -7,7 +7,7 @@ import {Input} from '@/components/Tremor/Input';
 import BalanceSpark from '@/components/BalanceSpark';
 
 export default async function AccountUpdateCard({account}: {account: AccountData}) {
-	const balances = (await sql`SELECT * FROM balances WHERE account = ${account.id}`) as BalanceData[];
+	const balances = (await sql`SELECT * FROM balances WHERE bank_account = ${account.id}`) as BalanceData[];
 	const formattedBalances: BalanceData[] = balances
 		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 		.map((balance) => ({

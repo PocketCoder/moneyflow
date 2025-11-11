@@ -6,10 +6,9 @@ import Image from 'next/image';
 import {sql} from '@/lib/db';
 import {Card} from '@/components/Tremor/Card';
 import BalanceSpark from '@/components/BalanceSpark';
-import {getBalances} from '@/lib/server-utils';
 
 export default async function Account({account}: {account: AccountData}) {
-	const balances = (await sql`SELECT * FROM balances WHERE account = ${account.id}`) as BalanceData[];
+	const balances = (await sql`SELECT * FROM balances WHERE bank_account = ${account.id}`) as BalanceData[];
 	const formattedBalances: BalanceData[] = balances
 		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 		.map((balance) => ({

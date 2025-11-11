@@ -2,7 +2,6 @@ import {bankLogos} from '@/lib/bankLogos';
 import Link from 'next/link';
 import Image from 'next/image';
 import {ChevronLeftIcon} from '@heroicons/react/24/outline';
-import {PencilIcon} from '@heroicons/react/24/outline';
 import {Card} from '@/components/Tremor/Card';
 import HistoryTable from '@/components/HistoryTable';
 import BalanceChart from '@/components/BalanceChart';
