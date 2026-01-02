@@ -14,6 +14,10 @@ describe('currencyFormatter', () => {
 		expect(currencyFormatter(100.0)).toBe('£100');
 	});
 
+	it('returns empty string for undefined', () => {
+		expect(currencyFormatter(undefined)).toBe('');
+	});
+
 	it('handles NAN', () => {
 		expect(() => currencyFormatter(NaN)).toThrow(new Error('Not a number'));
 		expect(() => currencyFormatter('abc')).toThrow(new Error('Not a number'));

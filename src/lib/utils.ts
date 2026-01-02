@@ -32,12 +32,15 @@ export const formatter = new Intl.NumberFormat('en-GB', {
 	trailingZeroDisplay: 'stripIfInteger'
 });
 
-export function currencyFormatter(value: number | string) {
-	value = parseFloat(value.toString());
-	if (Number.isNaN(value)) {
+export function currencyFormatter(value: number | string | undefined) {
+	if (value === undefined) {
+		return '';
+	}
+	const numericValue = parseFloat(value.toString());
+	if (Number.isNaN(numericValue)) {
 		throw new Error('Not a number');
 	}
-	return formatter.format(value);
+	return formatter.format(numericValue);
 }
 
 export function formatBalances(balances: BalanceData[]): BalanceData[] {
