@@ -13,4 +13,52 @@ export const banks = [
 	{value: 'ybs', label: 'YBS', icon: '/bank-logos/ybs.svg'}
 ];
 
-export const types = ['ISA', 'Current Account', 'Debt', 'Pension'];
+export const types = [
+	// Everyday banking
+	'Current Account',
+	'Packaged Current Account',
+	'Basic Bank Account',
+	'Student Bank Account',
+	'Joint Account',
+	'Business Bank Account',
+	'Pot',
+
+	// Savings structures
+	'Savings Account',
+	'Easy Access Savings Account',
+	'Regular Saver',
+	'Fixed Rate Bond',
+	'Notice Account',
+	'Passbook Savings Account',
+	'Children’s Savings Account',
+
+	// ISAs (tax-free wrappers)
+	'Cash ISA',
+	'Stocks and Shares ISA',
+	'Innovative Finance ISA',
+	'Lifetime ISA',
+	'Junior ISA',
+
+	// Investments
+	'General Investment Account',
+	//'Investment Trust Account',
+	//'Unit Trust / OEIC Account',
+	//'Structured Investment Account',
+
+	// Retirement / decumulation
+	'Personal Pension',
+	'Workplace Pension',
+	'Self-Invested Personal Pension (SIPP)',
+	//'Income Drawdown Account',
+	//'Investment-Linked Annuity',
+
+	// Insurance-based financial accounts
+	//'Cash Value Insurance Contract',
+	//'Annuity Contract',
+
+	// Specialist / organisational
+	///'Client Account',
+	//'Charity Account',
+	'Foreign Currency Account',
+	'Multi-Currency Account'
+];
