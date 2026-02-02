@@ -10,7 +10,7 @@ import {updateBalances} from '@/lib/server-utils';
 export default async function AddBalance() {
 	const session = await auth();
 	const rows =
-		(await sql`SELECT * FROM accounts WHERE owner = (SELECT id FROM users WHERE email = ${session!.user?.email})`) as AccountData[];
+		(await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session!.user?.email})`) as AccountData[];
 	return (
 		<form action={updateBalances}>
 			<section>
