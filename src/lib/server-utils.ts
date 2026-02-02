@@ -116,12 +116,13 @@ export async function calculateNetWorth(dates?: {date: string}[]): Promise<void>
 		if (dates.length === 0) return;
 
 		const netWorthAccount = await getNetWorthAccount();
+
 		for (const uniqueDate of dates) {
 			const balances = (await sql`
 			SELECT amount
 			FROM balances b
 			JOIN bank_accounts a ON b.bank_account = a.id
-			WHERE a.owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND b.date = ${uniqueDate.date}
+			WHERE a.owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND b.date = ${uniqueDate.date} AND a.name <> 'Net Worth'
 			`) as {amount: string}[];
 
 			let total: number = 0;
