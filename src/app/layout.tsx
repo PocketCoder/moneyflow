@@ -33,7 +33,7 @@ export default async function RootLayout({
 			<body className={`${comfortaa.variable} flex h-screen w-screen flex-col antialiased`}>
 				<Header />
 				<Suspense fallback={<Loading />}>
-					<main className="mt-14 mb-20 flex-grow overflow-y-auto p-4">{children}</main>
+					<main className="mt-14 mb-20 grow overflow-y-auto p-4">{children}</main>
 					<Toaster richColors />
 				</Suspense>
 				<NavBar />
