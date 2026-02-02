@@ -10,7 +10,8 @@ export const banks = [
 	{value: 'santander', label: 'Santander', icon: '/bank-logos/santander.svg'},
 	{value: 'scottish_widows', label: 'Scottish Widows', icon: '/bank-logos/scottish_widows.svg'},
 	{value: 'vanguard', label: 'Vanguard', icon: '/bank-logos/vanguard.svg'},
-	{value: 'ybs', label: 'YBS', icon: '/bank-logos/ybs.svg'}
+	{value: 'ybs', label: 'YBS', icon: '/bank-logos/ybs.svg'},
+	{value: 'trading_212', label: 'Trading 212', icon: '/bank-logos/t212-black.svg'}
 ];
 
 export const types = [

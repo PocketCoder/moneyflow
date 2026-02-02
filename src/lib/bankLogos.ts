@@ -1,8 +1,6 @@
 export const bankLogos: Record<string, string> = {
-	'GOV.UK': '/bank-logos/gov_uk.png',
 	GOV_UK: '/bank-logos/gov_uk.png',
-	'GOV.UK_ICON': '/bank-logos/gov_uk_small.svg',
-	'UNIVERSAL CREDIT': '/bank-logos/gov_uk.png',
+	GOV_UK_SMALL: '/bank-logos/gov_uk_small.svg',
 	LLOYDS: '/bank-logos/lloyds.svg',
 	PLUM: '/bank-logos/plum.svg',
 	'SCOTTISH WIDOWS': '/bank-logos/scottish_widows.svg',
@@ -16,5 +14,6 @@ export const bankLogos: Record<string, string> = {
 	BARCLAYS_SMALL: '/bank-logos/barclays_small.svg',
 	BARCLAYS: '/bank-logos/barclays.svg',
 	SANTANDER: '/bank-logos/santander.svg',
-	MONZO_SMALL: '/bank-logos/monzo_small.png'
+	MONZO_SMALL: '/bank-logos/monzo_small.png',
+	TRADING_212: '/bank-logos/t212-black.svg'
 };
