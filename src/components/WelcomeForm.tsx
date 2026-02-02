@@ -16,17 +16,13 @@ export default function WelcomeForm() {
 
 	async function saveAll() {
 		const allToSave: FormData[] = [];
-		if (formRef.current![0].value !== '') {
-			const currentData = new FormData();
-			currentData.append('account_name', formRef.current![0].value);
-			currentData.append('bank', formRef.current![1].value);
-			currentData.append('type', formRef.current![2].value);
-			currentData.append('date', formRef.current![3].value);
-			currentData.append('balance', formRef.current![4].value);
-			allToSave.push(currentData);
+		if (formRef.current) {
+			const currentData = new FormData(formRef.current);
+			if (currentData.get('account_name')) {
+				allToSave.push(currentData);
+			}
 		}
 		if (!accounts && allToSave.length == 0) {
-			console.log(allToSave.length);
 			toast.error('No accounts to save.');
 			return;
 		}
