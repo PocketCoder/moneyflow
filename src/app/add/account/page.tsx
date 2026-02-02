@@ -6,8 +6,8 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {saveNewAccount} from '@/lib/server-utils';
 import {banks, types} from '@/lib/data';
 import {Button} from '@/components/ui/button';
-import {useFormState, useFormStatus} from 'react-dom';
-import {useEffect} from 'react';
+import {useFormStatus} from 'react-dom';
+import {useActionState, useEffect} from 'react';
 import {toast} from 'sonner';
 import {redirect} from 'next/navigation';
 
@@ -27,7 +27,7 @@ function SubmitButton() {
 }
 
 export default function AddAccount() {
-	const [state, formAction] = useFormState(saveNewAccount, initialState);
+	const [state, formAction] = useActionState(saveNewAccount, initialState);
 
 	useEffect(() => {
 		if (state.success) {
