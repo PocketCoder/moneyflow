@@ -16,15 +16,22 @@ export default function WelcomeForm() {
 
 	async function saveAll() {
 		const allToSave: FormData[] = [];
-		if (formRef.current) {
-			const currentData = new FormData(formRef.current);
+		if (formRef.current![0].value !== '') {
+			const currentData = new FormData();
+			currentData.append('account_name', formRef.current![0].value);
+			currentData.append('bank', formRef.current![1].value);
+			currentData.append('type', formRef.current![2].value);
+			currentData.append('date', formRef.current![3].value);
+			currentData.append('balance', formRef.current![4].value);
 			allToSave.push(currentData);
 		}
-		if (!accounts) {
+		if (!accounts && allToSave.length == 0) {
+			console.log(allToSave.length);
 			toast.error('No accounts to save.');
 			return;
 		}
-		allToSave.push(...accounts);
+
+		if (accounts) allToSave.push(...accounts);
 		allToSave.map((account) => {
 			toast.promise(saveNewAccountAndBalance(account), {
 				loading: 'Saving...',
@@ -60,60 +67,60 @@ export default function WelcomeForm() {
 	}
 
 	return (
-		<div className="flex justify-around">
-			<Card className="max-w-lg">
-				<h2 className="text-center text-xl font-bold">Add your first account</h2>
-				<form ref={formRef} onSubmit={addAnother}>
-					<Label htmlFor="account_name">Account Name</Label>
-					<Input type="text" name="account_name" />
-					<Label htmlFor="bank">Select Bank</Label>
-					<SelectNative name="bank">
-						{banks.map((bank) => (
-							<option key={bank.value} value={bank.value}>
-								{bank.label}
-							</option>
-						))}
-					</SelectNative>
-					<Label htmlFor="type">Choose Type</Label>
-					<SelectNative name="type">
-						{types.map((type) => (
-							<option key={type} value={type}>
-								{type}
-							</option>
-						))}
-					</SelectNative>
-					<Label htmlFor="date">Choose date</Label>
-					<Input type="date" name="date" defaultValue={new Date().toISOString().split('T')[0]} className="mb-2" />
-					<Label htmlFor="balance">Balance</Label>
-					<Input type="number" name="balance" defaultValue="0" className="mb-2" />
-					<div className="flex justify-between">
+		<>
+			<div className="flex justify-around">
+				<Card className="max-w-lg">
+					<h2 className="text-center text-xl font-bold">Add your first account</h2>
+					<form ref={formRef} onSubmit={addAnother}>
+						<Label htmlFor="account_name">Account Name</Label>
+						<Input type="text" name="account_name" />
+						<Label htmlFor="bank">Select Bank</Label>
+						<SelectNative name="bank">
+							{banks.map((bank) => (
+								<option key={bank.value} value={bank.value}>
+									{bank.label}
+								</option>
+							))}
+						</SelectNative>
+						<Label htmlFor="type">Choose Type</Label>
+						<SelectNative name="type">
+							{types.map((type) => (
+								<option key={type} value={type}>
+									{type}
+								</option>
+							))}
+						</SelectNative>
+						<Label htmlFor="date">Choose date</Label>
+						<Input type="date" name="date" defaultValue={new Date().toISOString().split('T')[0]} className="mb-2" />
+						<Label htmlFor="balance">Balance</Label>
+						<Input type="number" name="balance" defaultValue="0" className="mb-2" />
 						<Button variant="secondary" type="submit">
-							Add another
+							Add
 						</Button>
-						<Button variant="primary" onClick={saveAll}>
-							Submit
-						</Button>
+					</form>
+				</Card>
+				{accounts?.length !== 0 ? (
+					<div className="flex max-h-screen flex-col items-center justify-center overflow-y-scroll">
+						{accounts?.map((account, i) => (
+							<Card key={i} className="flex w-sm flex-col">
+								<span className="font-bold">{String(account.get('account_name'))}</span>
+								<span className="">{String(account.get('bank'))}</span>
+								<span className="">{String(account.get('type'))}</span>
+								<span className="">{String(account.get('date'))}</span>
+								<span className="">{String(account.get('balance'))}</span>{' '}
+								<Button variant="destructive" onClick={() => remove(i)}>
+									Remove
+								</Button>
+							</Card>
+						))}
 					</div>
-				</form>
-			</Card>
-			{accounts?.length !== 0 ? (
-				<div className="flex max-h-screen flex-col items-center justify-center overflow-y-scroll">
-					{accounts?.map((account, i) => (
-						<Card key={i} className="flex w-sm flex-col">
-							<span className="font-bold">{String(account.get('account_name'))}</span>
-							<span className="">{String(account.get('bank'))}</span>
-							<span className="">{String(account.get('type'))}</span>
-							<span className="">{String(account.get('date'))}</span>
-							<span className="">{String(account.get('balance'))}</span>{' '}
-							<Button variant="destructive" onClick={() => remove(i)}>
-								Remove
-							</Button>
-						</Card>
-					))}
-				</div>
-			) : (
-				<></>
-			)}
-		</div>
+				) : (
+					<></>
+				)}
+			</div>
+			<Button variant="primary" onClick={saveAll}>
+				Submit
+			</Button>
+		</>
 	);
 }
