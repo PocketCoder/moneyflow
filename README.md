@@ -1,5 +1,4 @@
-<img src="public/logo.png" width="128">
-
+<img src="public/VANTAGE.png" width="128">
 # Moneyflow
 
 > An app to track your net worth and finances.

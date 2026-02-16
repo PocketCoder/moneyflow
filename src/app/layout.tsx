@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 	title: 'Moneyflow',
 	description: 'Simple money tracker.',
 	icons: {
-		icon: '/logo.png'
+		icon: '/favicon.ico'
 	}
 };
 
