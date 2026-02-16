@@ -5,15 +5,24 @@ import {sql} from '@/lib/db';
 import {Account, BalanceData} from './types';
 import {revalidatePath} from 'next/cache';
 import {Session} from 'next-auth';
-import {formatBalances, getFinancialYearRange} from './utils';
+import {getFinancialYearRange} from './utils';
 import {redirect} from 'next/navigation';
+import {cache} from 'react';
+
+export const getCachedUser = cache(async () => {
+	const session = await auth();
+	if (!session?.user?.email) return null;
+
+	const result = await sql`SELECT id FROM users WHERE email = ${session.user.email}`;
+	return result[0];
+});
 
 export async function saveNewAccount(
 	prevState: {success: boolean; account_name?: string; error?: string},
 	data: FormData
 ): Promise<{success: boolean; account_name?: string; error?: string}> {
-	const session = await auth();
-	if (!session) return {success: false, error: 'Not logged in'};
+	const user = await getCachedUser();
+	if (!user) throw new Error('Unauthorized');
 
 	const account_name = data.get('account_name') as string;
 	const bank = data.get('bank') as string;
@@ -23,7 +32,7 @@ export async function saveNewAccount(
 		const account = await sql`
 			INSERT INTO bank_accounts (owner, name, type, parent)
 			VALUES (
-			(SELECT id FROM users WHERE email = ${session.user?.email}),
+			${user.id},
 			${account_name},
 			${type},
 			${bank}
@@ -38,8 +47,8 @@ export async function saveNewAccount(
 }
 
 export async function saveNewAccountAndBalance(data: FormData): Promise<{success: boolean; account_name?: string}> {
-	const session = await auth();
-	if (!session) throw new Error('Not logged in');
+	const user = await getCachedUser();
+	if (!user) throw new Error('Unauthorized');
 
 	const account_name = data.get('account_name') as string;
 	const bank = data.get('bank') as string;
@@ -51,7 +60,7 @@ export async function saveNewAccountAndBalance(data: FormData): Promise<{success
 		const account = await sql`
 			INSERT INTO bank_accounts (owner, name, type, parent)
 			VALUES (
-			(SELECT id FROM users WHERE email = ${session.user?.email}),
+			${user.id},
 			${account_name},
 			${type},
 			${bank}
@@ -71,13 +80,13 @@ export async function saveNewAccountAndBalance(data: FormData): Promise<{success
 	}
 }
 
-export async function checkNetWorthRowExistsandCreate(session: Session): Promise<void> {
+export async function checkNetWorthRowExistsandCreate(userID: string): Promise<void> {
 	try {
 		const result = await sql`
 			SELECT EXISTS(
 				SELECT 1 
 				FROM bank_accounts 
-				WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email})
+				WHERE owner = ${userID}
 				AND name = 'Net Worth'
 			) AS row_exists;
 			`;
@@ -85,7 +94,7 @@ export async function checkNetWorthRowExistsandCreate(session: Session): Promise
 		if (!result || result.length === 0 || !result[0].row_exists) {
 			await sql`
 		INSERT INTO bank_accounts (owner, name, type, parent, tags)
-		VALUES ((SELECT id FROM users WHERE email = ${session.user?.email}), 'Net Worth', 'Net Worth', 'Net Worth', ARRAY['nw'])
+		VALUES (${userID}, 'Net Worth', 'Net Worth', 'Net Worth', ARRAY['nw'])
 		`;
 		}
 	} catch (e) {
@@ -100,11 +109,11 @@ export async function recalculateNetWorthAction() {
 }
 
 export async function calculateNetWorth(dates?: string[]): Promise<void> {
-	const session = await auth();
-	if (!session) throw new Error('Not logged in');
+	const user = await getCachedUser();
+	if (!user) throw new Error('Unauthorized');
 
 	// Ensure the Net Worth account exists first
-	await checkNetWorthRowExistsandCreate(session);
+	await checkNetWorthRowExistsandCreate(user.id);
 
 	try {
 		await sql`
@@ -118,7 +127,7 @@ export async function calculateNetWorth(dates?: string[]): Promise<void> {
 		JOIN users u ON a.owner = u.id
 		JOIN bank_accounts nw ON nw.owner = u.id AND nw.name = 'Net Worth'
 		WHERE 
-			u.email = ${session.user?.email}
+			u.id = ${user.id}
 			AND a.name <> 'Net Worth'
 			AND (${dates}::date[] IS NULL OR b.date = ANY(${dates}::date[]))
 		GROUP BY b.date, nw.id
@@ -152,31 +161,22 @@ export async function saveBalance(accountID: string, date: string, balance: stri
 	}
 }
 
-/*
-export async function getUserID(session: Session): Promise<number> {
-	const userEmail = session?.user?.email;
-	const userDB = await sql`SELECT * FROM users WHERE email = ${userEmail}`;
-	const userID = userDB.rows[0].id;
-	return userID;
-}
-*/
-
 export async function getNetWorthAccount(): Promise<Account> {
-	const session = await auth();
-	if (!session) throw new Error('Not logged in');
-	await checkNetWorthRowExistsandCreate(session);
-	const accountResult =
-		await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND name = 'Net Worth'`;
+	const user = await getCachedUser();
+	if (!user) throw new Error('Unauthorized');
+
+	await checkNetWorthRowExistsandCreate(user.id);
+
+	const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} AND name = 'Net Worth'`;
 	const account = accountResult[0] as Account;
 	return account;
 }
 
 export async function getAccount(accountID: string): Promise<Account> {
 	try {
-		const session = await auth();
-		if (!session) throw new Error('Not logged in');
-		const accountResult =
-			await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND id=${accountID}`;
+		const user = await getCachedUser();
+		if (!user) throw new Error('Unauthorized');
+		const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} AND id=${accountID}`;
 		const account = accountResult[0] as Account;
 		return account;
 	} catch (e) {
@@ -192,10 +192,9 @@ export async function getBalances(accountID: string): Promise<BalanceData[]> {
 
 export async function isNewUser(): Promise<boolean> {
 	try {
-		const session = await auth();
-		if (!session) throw new Error('Not logged in');
-		const accounts =
-			(await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email})`) as Account[];
+		const user = await getCachedUser();
+		if (!user) throw new Error('Unauthorized');
+		const accounts = (await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id}`) as Account[];
 		return accounts.length === 0;
 	} catch (e) {
 		throw new Error(`Error: ${e}`);
@@ -204,8 +203,8 @@ export async function isNewUser(): Promise<boolean> {
 
 export async function changeAllTime(): Promise<{percChangeAT: number; absChangeAT: number}> {
 	try {
-		const session = await auth();
-		if (!session) throw new Error('Not logged in');
+		const user = await getCachedUser();
+		if (!user) throw new Error('Unauthorized');
 		const result = await sql`
 			SELECT 
 				b1.amount AS earliest_balance, 
@@ -223,7 +222,7 @@ export async function changeAllTime(): Promise<{percChangeAT: number; absChangeA
 				ON b2.bank_account = b_latest.bank_account 
 			AND b2.date = b_latest.max_date
 			WHERE a.name = 'Net Worth'
-			AND a.owner = (SELECT id FROM users WHERE email = ${session.user?.email})
+			AND a.owner = ${user.id}
 			AND b1.date = (
 				SELECT MIN(date)
 				FROM balances
@@ -246,8 +245,8 @@ export async function changeAllTime(): Promise<{percChangeAT: number; absChangeA
 export async function percentChangeFY(): Promise<{percChangeFY: number; absChangeFY: number}> {
 	const {start, end} = getFinancialYearRange();
 	try {
-		const session = await auth();
-		if (!session) throw new Error('Not logged in');
+		const user = await getCachedUser();
+		if (!user) throw new Error('Unauthorized');
 		const result = await sql`
 			SELECT 
 				b1.amount AS earliest_balance, 
@@ -266,7 +265,7 @@ export async function percentChangeFY(): Promise<{percChangeFY: number; absChang
 				ON b2.bank_account = b_latest.bank_account 
 			AND b2.date = b_latest.max_date
 			WHERE a.name = 'Net Worth'
-			AND a.owner = (SELECT id FROM users WHERE email = ${session.user?.email})
+			AND a.owner = ${user.id}
 			AND b1.date = (
 				SELECT MIN(date)
 				FROM balances
@@ -288,9 +287,6 @@ export async function percentChangeFY(): Promise<{percChangeFY: number; absChang
 }
 
 export async function updateBalances(formData: FormData) {
-	const session = await auth();
-	if (!session) throw new Error('User not logged in');
-
 	const dateStr = formData.get('date') as string;
 	const date = new Date(dateStr);
 	const isoDate = date.toISOString().split('T')[0];
@@ -328,8 +324,8 @@ export async function updateBalances(formData: FormData) {
 }
 
 export async function DistPieChartData(): Promise<{account: string; balance: number}[]> {
-	const session = await auth();
-	if (!session) throw new Error('Not logged in');
+	const user = await getCachedUser();
+	if (!user) throw new Error('Unauthorized');
 
 	try {
 		const result = await sql`
@@ -338,7 +334,7 @@ export async function DistPieChartData(): Promise<{account: string; balance: num
 				b.amount as balance
 			FROM bank_accounts a
 			LEFT JOIN balances b ON a.id = b.bank_account
-			WHERE a.owner = (SELECT id FROM users WHERE email = ${session.user?.email})
+			WHERE a.owner = ${user.id}
 			AND a.name <> 'Net Worth'
 			ORDER BY a.id, b.date DESC
 		`;
@@ -355,10 +351,9 @@ export async function DistPieChartData(): Promise<{account: string; balance: num
 
 export async function MoM(): Promise<{percMoM: number; absMoM: number}> {
 	try {
-		const session = await auth();
-		if (!session) throw new Error('Not logged in');
-		const accountResult =
-			await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND name = 'Net Worth'`;
+		const user = await getCachedUser(); // Uses cache if already called
+		if (!user) throw new Error('Unauthorized');
+		const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} AND name = 'Net Worth'`;
 		const account = accountResult[0] as Account;
 		const balResult =
 			await sql`SELECT amount FROM balances WHERE bank_account = ${account.id} ORDER BY date DESC LIMIT 2`;
@@ -380,10 +375,9 @@ export async function MoM(): Promise<{percMoM: number; absMoM: number}> {
 
 export async function YoY(): Promise<{percYoY: number; absYoY: number}> {
 	try {
-		const session = await auth();
-		if (!session) throw new Error('Not logged in');
-		const accountResult =
-			await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND name = 'Net Worth'`;
+		const user = await getCachedUser(); // Uses cache if already called
+		if (!user) throw new Error('Unauthorized');
+		const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} AND name = 'Net Worth'`;
 		const account = accountResult[0] as Account;
 
 		const latestResult =
