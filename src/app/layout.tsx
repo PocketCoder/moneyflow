@@ -16,8 +16,8 @@ const comfortaa = Comfortaa({
 });
 
 export const metadata: Metadata = {
-	title: 'Moneyflow',
-	description: 'Simple money tracker.',
+	title: 'Vantage',
+	description: 'Simple money overview.',
 	icons: {
 		icon: '/favicon.ico'
 	}
