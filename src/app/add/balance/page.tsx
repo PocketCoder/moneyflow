@@ -3,14 +3,15 @@ import {sql} from '@/lib/db';
 import {Input} from '@/components/Tremor/Input';
 import AccountUpdateCard from '@/components/AccountUpdateCard';
 import {Button} from '@/components/Tremor/Button';
-import {auth} from '@/auth';
 import React from 'react';
-import {updateBalances} from '@/lib/server-utils';
+import {getCachedUser, updateBalances} from '@/lib/server-utils';
+import {redirect} from 'next/navigation';
 
 export default async function AddBalance() {
-	const session = await auth();
+	const user = await getCachedUser();
+	if (!user) redirect('/welcome');
 	const rows =
-		(await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session!.user?.email})`) as AccountData[];
+		(await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} ORDER BY parent ASC, name ASC`) as AccountData[];
 	return (
 		<form action={updateBalances}>
 			<section>

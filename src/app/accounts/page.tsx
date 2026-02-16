@@ -1,14 +1,14 @@
 import type {Account as AccountData} from '@/lib/types';
 import {sql} from '@/lib/db';
 import Account from '@/components/Account';
-import {auth} from '@/auth';
 import {redirect} from 'next/navigation';
+import {getCachedUser} from '@/lib/server-utils';
 
 export default async function Accounts() {
-	const session = await auth();
-	if (!session) redirect('/welcome');
+	const user = await getCachedUser();
+	if (!user) redirect('/welcome');
 	const rows =
-		(await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session.user?.email})`) as AccountData[];
+		(await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} ORDER BY parent ASC, name ASC`) as AccountData[];
 	const groupedAccounts = rows.reduce((groups: Record<string, AccountData[]>, account) => {
 		const bank = account.parent || 'Other';
 		if (!groups[bank]) {
@@ -17,12 +17,10 @@ export default async function Accounts() {
 		groups[bank].push(account);
 		return groups;
 	}, {});
-	const ordered = Object.keys(groupedAccounts)
-		.sort()
-		.reduce((obj: Record<string, AccountData[]>, key) => {
-			obj[key] = groupedAccounts[key];
-			return obj;
-		}, {});
+	const ordered = Object.keys(groupedAccounts).reduce((obj: Record<string, AccountData[]>, key) => {
+		obj[key] = groupedAccounts[key];
+		return obj;
+	}, {});
 	return (
 		<section className="mt-2 flex flex-wrap gap-4">
 			{Object.entries(ordered).map(([bank, accounts]) =>

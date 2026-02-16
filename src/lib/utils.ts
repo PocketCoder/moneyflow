@@ -44,16 +44,14 @@ export function currencyFormatter(value: number | string | undefined) {
 }
 
 export function formatBalances(balances: BalanceData[]): BalanceData[] {
-	return balances
-		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-		.map((balance) => ({
-			...balance,
-			date: new Intl.DateTimeFormat('en-GB', {
-				month: 'short',
-				year: 'numeric'
-			}).format(new Date(balance.date)),
-			amount: balance.amount || 0
-		}));
+	return balances.map((balance) => ({
+		...balance,
+		date: new Intl.DateTimeFormat('en-GB', {
+			month: 'short',
+			year: 'numeric'
+		}).format(new Date(balance.date)),
+		amount: balance.amount || 0
+	}));
 }
 
 export function getDiffPercent(balances: BalanceData[]): number | string {

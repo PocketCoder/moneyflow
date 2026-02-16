@@ -188,7 +188,8 @@ export const getAccount = unstable_cache(
 
 export const getBalances = unstable_cache(
 	async (accountID: string): Promise<BalanceData[]> => {
-		const balancesResult = await sql`SELECT amount, date FROM balances WHERE bank_account = ${accountID}`;
+		const balancesResult =
+			await sql`SELECT amount, date FROM balances WHERE bank_account = ${accountID} ORDER BY date ASC`;
 		return balancesResult as BalanceData[];
 	},
 	['balances-list'],
