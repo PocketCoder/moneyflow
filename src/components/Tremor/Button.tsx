@@ -22,25 +22,25 @@ const buttonVariants = tv({
 				// border
 				'border-transparent',
 				// text color
-				'text-white',
+				'text-primary-foreground',
 				// background color
-				'bg-blue-500',
+				'bg-primary',
 				// hover color
-				'hover:bg-blue-600',
+				'hover:bg-primary/90',
 				// disabled
-				'disabled:bg-blue-300 disabled:text-white'
+				'disabled:bg-primary/50 disabled:text-primary-foreground'
 			],
 			secondary: [
 				// border
-				'border-gray-300',
+				'border-border',
 				// text color
-				'text-gray-900',
+				'text-foreground',
 				// background color
-				'bg-white',
+				'bg-secondary',
 				//hover color
-				'hover:bg-gray-50',
+				'hover:bg-secondary/80',
 				// disabled
-				'disabled:text-gray-400'
+				'disabled:text-muted-foreground'
 			],
 			light: [
 				// base
@@ -48,13 +48,13 @@ const buttonVariants = tv({
 				// border
 				'border-transparent',
 				// text color
-				'text-gray-900',
+				'text-muted-foreground',
 				// background color
-				'bg-gray-200',
+				'bg-muted',
 				// hover color
-				'hover:bg-gray-300/70',
+				'hover:bg-muted/80',
 				// disabled
-				'disabled:bg-gray-100 disabled:text-gray-400'
+				'disabled:bg-muted/50 disabled:text-muted-foreground'
 			],
 			ghost: [
 				// base
@@ -62,23 +62,23 @@ const buttonVariants = tv({
 				// border
 				'border-transparent',
 				// text color
-				'text-gray-900',
+				'text-foreground',
 				// hover color
-				'bg-transparent hover:bg-gray-100',
+				'bg-transparent hover:bg-accent hover:text-accent-foreground',
 				// disabled
-				'disabled:text-gray-400'
+				'disabled:text-muted-foreground'
 			],
 			destructive: [
 				// text color
-				'text-white',
+				'text-destructive-foreground',
 				// border
 				'border-transparent',
 				// background color
-				'bg-red-600',
+				'bg-destructive',
 				// hover color
-				'hover:bg-red-700',
+				'hover:bg-destructive/90',
 				// disabled
-				'disabled:bg-red-300 disabled:text-white'
+				'disabled:bg-destructive/50 disabled:text-destructive-foreground'
 			]
 		}
 	},

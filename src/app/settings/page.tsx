@@ -25,7 +25,7 @@ export default async function Settings() {
 			<Card className="flex items-center justify-between">
 				<div className="flex flex-col gap-2">
 					<h2 className="text-lg font-bold">Recalculate Net Worth</h2>
-					<p className="text-sm text-gray-500">
+					<p className="text-muted-foreground text-sm">
 						This will recalculate your net worth based on your current balances. This may take a few seconds.
 					</p>
 				</div>

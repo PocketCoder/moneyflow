@@ -23,16 +23,16 @@ export default async function AccountUpdateCard({account}: {account: AccountData
 			{bankLogos[account.parent.toUpperCase()] ? (
 				<Image src={bankLogos[account.parent.toUpperCase()]} alt={account.parent} width={80} height={30} />
 			) : (
-				<span className="text-md text-gray-800">{account.parent}</span>
+				<span className="text-md text-foreground">{account.parent}</span>
 			)}
 			<h3 className="text-lg font-bold">{account.name}</h3>
 			<BalanceSpark data={formattedBalances} type={account.type} width={200} height={75} />
 			{formattedBalances.length > 0 && (
 				<div className="my-2 flex flex-col items-start justify-start gap-1">
-					<span className="text-sm text-gray-700">
+					<span className="text-muted-foreground text-sm">
 						Last Balance: £{formattedBalances[formattedBalances.length - 1].amount}
 					</span>
-					<span className="text-xs text-gray-500">
+					<span className="text-muted-foreground text-xs">
 						Updated on: {formattedBalances[formattedBalances.length - 1].date}
 					</span>
 				</div>

@@ -18,15 +18,15 @@ export function StatCard({title, value, change, changeFormatted}: StatCardProps)
 			<Badge
 				variant={'secondary'}
 				className={clsx({
-					'w-fit gap-1 text-white': true,
-					'bg-green-500': change > 0,
-					'bg-red-500': change < 0,
-					'bg-black': change === 0
+					'text-primary-foreground w-fit gap-1': true,
+					'bg-primary': change > 0,
+					'bg-destructive': change < 0,
+					'bg-foreground': change === 0
 				})}>
 				{changeFormatted}
 				{change > 0 ? <TrendingUpIcon /> : <TrendingDownIcon />}
 			</Badge>
-			<span className="text-sm text-gray-500">{title}</span>
+			<span className="text-muted-foreground text-sm">{title}</span>
 		</Card>
 	);
 }

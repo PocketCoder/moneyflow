@@ -11,7 +11,7 @@ export default function DistPie({data}: {data: {account: string; balance: number
 			if (account === 'Net Worth') return acc;
 			acc[account] = {
 				label: account,
-				color: `hsl(var(--chart-${i + 1}))`
+				color: `var(--chart-${(i % 5) + 1})`
 			};
 			return acc;
 		}, {})

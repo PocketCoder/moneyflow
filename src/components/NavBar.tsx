@@ -16,35 +16,35 @@ import {Button} from '@/components/Tremor/Button';
 export default function NavBar() {
 	const path = usePathname();
 	return (
-		<nav className="fixed bottom-0 h-18 w-screen bg-teal-500 px-4 py-2 text-white">
+		<nav className="border-border bg-primary text-primary-foreground fixed bottom-0 h-18 w-screen border-t px-4 py-2">
 			<ul className="flex h-full w-full justify-evenly">
-				<li className="transition duration-200 ease-in-out hover:text-blue-700">
+				<li className="hover:text-accent transition duration-200 ease-in-out">
 					<Link href={'/'}>
 						<Squares2X2Icon
 							className={clsx('w-10 stroke-1 hover:stroke-[1.5px]', {
-								'stroke-[1.5px] text-blue-700': path === '/',
-								'stroke-1 text-white': path !== '/'
+								'text-accent stroke-[1.5px]': path === '/',
+								'text-primary-foreground/70 stroke-1': path !== '/'
 							})}
 						/>
 					</Link>
 				</li>
-				<li className="transition duration-200 ease-in-out hover:text-blue-700">
+				<li className="hover:text-accent transition duration-200 ease-in-out">
 					<Link href={'/accounts'}>
 						<QueueListIcon
 							className={clsx('w-10 stroke-1 hover:stroke-[1.5px]', {
-								'stroke-[1.5px] text-blue-700': path.includes('/accounts'),
-								'stroke-1 text-white': !path.includes('/accounts')
+								'text-accent stroke-[1.5px]': path.includes('/accounts'),
+								'text-primary-foreground/70 stroke-1': !path.includes('/accounts')
 							})}
 						/>
 					</Link>
 				</li>
-				<li className="transition duration-200 ease-in-out hover:text-blue-700">
+				<li className="hover:text-accent transition duration-200 ease-in-out">
 					<Popover>
 						<PopoverTrigger asChild>
 							<PlusIcon
 								className={clsx('w-10 cursor-pointer stroke-2 hover:stroke-[1.5px]', {
-									'stroke-[1.5px] text-blue-700': path.includes('/add'),
-									'stroke-1 text-white': !path.includes('/add')
+									'text-accent stroke-[1.5px]': path.includes('/add'),
+									'text-primary-foreground/70 stroke-1': !path.includes('/add')
 								})}
 							/>
 						</PopoverTrigger>
@@ -60,12 +60,12 @@ export default function NavBar() {
 						</PopoverContent>
 					</Popover>
 				</li>
-				<li className="transition duration-200 ease-in-out hover:text-blue-700">
+				<li className="hover:text-accent transition duration-200 ease-in-out">
 					<Link href={'/settings'}>
 						<AdjustmentsVerticalIcon
 							className={clsx('w-10 stroke-1 hover:stroke-[1.5px]', {
-								'stroke-[1.5px] text-blue-700': path.includes('/settings'),
-								'stroke-1 text-white': !path.includes('/settings')
+								'text-accent stroke-[1.5px]': path.includes('/settings'),
+								'text-primary-foreground/70 stroke-1': !path.includes('/settings')
 							})}
 						/>
 					</Link>

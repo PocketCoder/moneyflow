@@ -11,7 +11,7 @@ export function ChartBar({data}: {data: {account: string; balance: number}[]}) {
 		...filteredData.reduce<ChartConfig>((acc, {account}, i) => {
 			acc[account] = {
 				label: account,
-				color: `hsl(var(--chart-${i + 1}))`
+				color: `var(--chart-${(i % 5) + 1})`
 			};
 			return acc;
 		}, {})
@@ -31,9 +31,12 @@ export function ChartBar({data}: {data: {account: string; balance: number}[]}) {
 					content={({payload}) => <ChartTooltipContent payload={payload} hideLabel hideIndicator />}
 				/>
 				<Bar dataKey="balance">
-					<LabelList position="top" dataKey="account" fill="#000" fillOpacity={1} />
+					<LabelList position="top" dataKey="account" fill="var(--foreground)" fillOpacity={1} />
 					{filteredData.map((item, i) => (
-						<Cell key={i + item.account} fill={item.balance > 0 ? 'var(--chart-2)' : 'var(--chart-1)'} />
+						<Cell
+							key={i + item.account}
+							fill={item.balance > 0 ? `var(--chart-${(i % 5) + 1})` : 'var(--destructive)'}
+						/>
 					))}
 				</Bar>
 			</BarChart>

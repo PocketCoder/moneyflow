@@ -14,11 +14,19 @@ export default function BalanceSpark({
 	width: number;
 	height: number;
 }) {
-	const colour = type === 'Debt' ? '#b91c1c' : '#14b8a6';
+	const color = type === 'Debt' ? 'var(--destructive)' : 'var(--primary)';
 	return (
 		<ResponsiveContainer width={width} height={height}>
 			<AreaChart data={data}>
-				<Area type="monotone" dataKey="amount" stroke={colour} fill={colour} strokeWidth={1} dot={false} />
+				<Area
+					type="monotone"
+					dataKey="amount"
+					stroke={color}
+					fill={color}
+					strokeWidth={1}
+					dot={false}
+					fillOpacity={0.2}
+				/>
 			</AreaChart>
 		</ResponsiveContainer>
 	);

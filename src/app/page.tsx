@@ -28,7 +28,7 @@ export default async function Home() {
 				<h2 className="text-2xl font-bold">
 					{currencyFormatter(formattedBalances[formattedBalances.length - 1].amount)}
 				</h2>
-				<span className="text-sm text-gray-500">Current Net Worth</span>
+				<span className="text-muted-foreground text-sm">Current Net Worth</span>
 			</Card>
 			<StatCard
 				title="Change this FY"

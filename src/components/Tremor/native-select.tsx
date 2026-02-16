@@ -10,18 +10,18 @@ const selectNativeStyles = tv({
 		// base
 		'peer w-full cursor-pointer appearance-none truncate rounded-md border py-2 pl-3 pr-7 shadow-xs outline-hidden transition-all sm:text-sm',
 		// background color
-		'bg-white',
+		'bg-background',
 		// border color
-		'border-gray-300',
+		'border-input',
 		// text color
-		'text-gray-900',
+		'text-foreground',
 		// placeholder color
-		'placeholder-gray-400',
+		'placeholder-muted-foreground',
 		// hover
-		'hover:bg-gray-50',
+		'hover:bg-muted/50',
 		// disabled
 		'disabled:pointer-events-none',
-		'disabled:bg-gray-100 disabled:text-gray-400',
+		'disabled:bg-muted disabled:text-muted-foreground',
 		// focus
 		focusInput
 		// invalid (optional)
@@ -35,8 +35,7 @@ const selectNativeStyles = tv({
 });
 
 interface SelectNativeProps
-	extends React.InputHTMLAttributes<HTMLSelectElement>,
-		VariantProps<typeof selectNativeStyles> {}
+	extends React.InputHTMLAttributes<HTMLSelectElement>, VariantProps<typeof selectNativeStyles> {}
 
 const SelectNative = React.forwardRef<HTMLSelectElement, SelectNativeProps>(
 	({className, hasError, ...props}: SelectNativeProps, forwardedRef) => {

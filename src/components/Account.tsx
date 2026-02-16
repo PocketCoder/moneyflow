@@ -26,8 +26,8 @@ export default async function Account({account}: {account: AccountData}) {
 					'flex h-40 w-full items-center justify-between gap-4 p-4 transition-transform hover:scale-[101%] md:w-90',
 					{
 						'opacity-70': account.tags.includes('inactive'),
-						'border-t-4 border-red-500': account.type === 'Debt',
-						'border-t-4 border-purple-500': account.type === 'Pension'
+						'border-destructive border-t-4': account.type === 'Debt',
+						'border-chart-3 border-t-4': account.type === 'Pension'
 					}
 				)}>
 				<div className="flex h-full flex-col justify-evenly">
@@ -35,12 +35,12 @@ export default async function Account({account}: {account: AccountData}) {
 					{bankLogos[account.parent.toUpperCase()] ? (
 						<Image src={`${bankLogos[account.parent.toUpperCase()]}`} alt={account.parent} width={60} height={20} />
 					) : (
-						<span className="text-gray-800">{account.parent}</span>
+						<span className="text-foreground">{account.parent}</span>
 					)}
-					<span className="text-sm text-gray-500">{account.type}</span>
+					<span className="text-muted-foreground text-sm">{account.type}</span>
 					<div>
 						{account.tags.map((tag: string, i: number) => (
-							<span key={i} className="text-sm text-blue-500">
+							<span key={i} className="text-accent text-sm">
 								{i !== 0 ? ', ' : ''}
 								{'#' + tag}
 							</span>

@@ -19,19 +19,19 @@ export default async function AccountPage({params}: {params: Promise<{id: string
 		<>
 			<header className="flex gap-1">
 				<Link href={'/accounts/'}>
-					<Card className="flex h-full w-12 items-center gap-1 p-1 transition-all hover:bg-blue-600 hover:text-white">
+					<Card className="hover:bg-accent hover:text-accent-foreground flex h-full w-12 items-center gap-1 p-1 transition-all">
 						<ChevronLeftIcon className="mx-auto h-10" />
 					</Card>
 				</Link>
 				<Card className="flex items-center justify-between">
 					<div className="flex flex-col items-start">
 						<h1 className="text-2xl font-bold">{account.name}</h1>
-						<span className="text-gray-500">
+						<span className="text-muted-foreground">
 							{account.parent} &bull; {account.type}
 						</span>
 						<div>
 							{account.tags.map((tag: string, i: number) => (
-								<span key={i} className="text-sm text-blue-500">
+								<span key={i} className="text-accent text-sm">
 									{i !== 0 ? ', ' : ''}
 									{'#' + tag}
 								</span>

@@ -58,9 +58,9 @@ const DialogContent = React.forwardRef<
 						// base
 						'fixed top-1/2 left-1/2 z-50 w-[95vw] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-md border p-6 shadow-lg',
 						// border color
-						'border-gray-200',
+						'border-border',
 						// background color
-						'bg-white',
+						'bg-popover',
 						// transition
 						'data-[state=open]:animate-dialogContentShow',
 						focusRing,
@@ -92,7 +92,7 @@ const DialogTitle = React.forwardRef<
 			// base
 			'text-lg font-semibold',
 			// text color
-			'text-gray-900',
+			'text-foreground',
 			className
 		)}
 		{...props}
@@ -105,7 +105,9 @@ const DialogDescription = React.forwardRef<
 	React.ElementRef<typeof DialogPrimitives.Description>,
 	React.ComponentPropsWithoutRef<typeof DialogPrimitives.Description>
 >(({className, ...props}, forwardedRef) => {
-	return <DialogPrimitives.Description ref={forwardedRef} className={cx('text-gray-500', className)} {...props} />;
+	return (
+		<DialogPrimitives.Description ref={forwardedRef} className={cx('text-muted-foreground', className)} {...props} />
+	);
 });
 
 DialogDescription.displayName = 'DialogDescription';

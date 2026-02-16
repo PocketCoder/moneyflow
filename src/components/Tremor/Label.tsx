@@ -17,10 +17,10 @@ const Label = React.forwardRef<React.ElementRef<typeof LabelPrimitives.Root>, La
 				// base
 				'text-sm leading-none',
 				// text color
-				'text-gray-900',
+				'text-foreground',
 				// disabled
 				{
-					'text-gray-400': disabled
+					'text-muted-foreground': disabled
 				},
 				className
 			)}
