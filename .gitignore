@@ -43,3 +43,5 @@ next-env.d.ts
 # other
 db/
 moneysheets/
+EFFICIENCIES.md
+TODO.md

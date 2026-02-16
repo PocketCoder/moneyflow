@@ -61,7 +61,7 @@ export async function saveNewAccountAndBalance(data: FormData): Promise<{success
 		const accountRow = account[0] as Account;
 		const accountID = accountRow.id;
 		await saveBalance(accountID, date, balance);
-		await calculateNetWorth([{date}]);
+		await calculateNetWorth([date]);
 		revalidatePath('/accounts');
 		revalidatePath('/');
 		return {success: true, account_name};
@@ -82,7 +82,7 @@ export async function checkNetWorthRowExistsandCreate(session: Session): Promise
 			) AS row_exists;
 			`;
 
-		if (!result[0].row_exists) {
+		if (!result || result.length === 0 || !result[0].row_exists) {
 			await sql`
 		INSERT INTO bank_accounts (owner, name, type, parent, tags)
 		VALUES ((SELECT id FROM users WHERE email = ${session.user?.email}), 'Net Worth', 'Net Worth', 'Net Worth', ARRAY['nw'])
@@ -99,44 +99,32 @@ export async function recalculateNetWorthAction() {
 	redirect('/settings');
 }
 
-export async function calculateNetWorth(dates?: {date: string}[]): Promise<void> {
+export async function calculateNetWorth(dates?: string[]): Promise<void> {
 	const session = await auth();
 	if (!session) throw new Error('Not logged in');
 
+	// Ensure the Net Worth account exists first
+	await checkNetWorthRowExistsandCreate(session);
+
 	try {
-		if (!dates) {
-			dates = (await sql`
-				SELECT DISTINCT b.date
-				FROM balances b
-				JOIN bank_accounts a ON b.bank_account = a.id
-				WHERE a.owner = (SELECT id FROM users WHERE email = ${session.user?.email})
-			`) as {date: string}[];
-		}
-
-		if (dates.length === 0) return;
-
-		const netWorthAccount = await getNetWorthAccount();
-
-		for (const uniqueDate of dates) {
-			const balances = (await sql`
-			SELECT amount
-			FROM balances b
-			JOIN bank_accounts a ON b.bank_account = a.id
-			WHERE a.owner = (SELECT id FROM users WHERE email = ${session.user?.email}) AND b.date = ${uniqueDate.date} AND a.name <> 'Net Worth'
-			`) as {amount: string}[];
-
-			let total: number = 0;
-
-			for (const balance of balances) {
-				total += parseFloat(balance.amount);
-			}
-
-			await sql`
-			INSERT INTO balances (bank_account, date, amount)
-							VALUES (${netWorthAccount.id}, ${uniqueDate.date}, ${total})
-							ON CONFLICT (bank_account, date) DO UPDATE SET amount = ${total}
-						`;
-		}
+		await sql`
+		INSERT INTO balances (bank_account, date, amount)
+		SELECT
+			nw.id,
+			b.date,
+			SUM(b.amount)
+		FROM balances b
+		JOIN bank_accounts a ON b.bank_account = a.id
+		JOIN users u ON a.owner = u.id
+		JOIN bank_accounts nw ON nw.owner = u.id AND nw.name = 'Net Worth'
+		WHERE 
+			u.email = ${session.user?.email}
+			AND a.name <> 'Net Worth'
+			AND (${dates}::date[] IS NULL OR b.date = ANY(${dates}::date[]))
+		GROUP BY b.date, nw.id
+		ON CONFLICT (bank_account, date)
+		DO UPDATE SET amount = EXCLUDED.amount
+	`;
 		revalidatePath('/');
 		revalidatePath('/accounts');
 	} catch (e) {
@@ -303,31 +291,34 @@ export async function updateBalances(formData: FormData) {
 	const session = await auth();
 	if (!session) throw new Error('User not logged in');
 
-	const date = new Date(formData.get('date') as string);
+	const dateStr = formData.get('date') as string;
+	const date = new Date(dateStr);
+	const isoDate = date.toISOString().split('T')[0];
 
-	const balanceEntries: Partial<BalanceData>[] = Array.from(formData.entries())
+	const balanceEntries = Array.from(formData.entries())
 		.filter(([key]) => key.startsWith('amount-'))
 		.map(([key, value]) => ({
 			account: key.replace('amount-', ''),
-			amount: parseFloat(value.toString()),
-			date: date.toDateString()
+			amount: parseFloat(value.toString())
 		}))
-		.filter((balance) => balance.amount);
+		.filter((balance) => !isNaN(balance.amount));
 
 	if (balanceEntries.length === 0) {
 		throw new Error('No balance values provided');
 	}
 
 	try {
-		for (const b of balanceEntries) {
-			await sql`
-			INSERT INTO balances (bank_account, amount, date)
-			VALUES (${b.account}, ${b.amount}, ${b.date})
-			ON CONFLICT (bank_account, date) DO UPDATE SET amount = ${b.amount};
-		`;
-		}
+		const accounts = balanceEntries.map((b) => b.account);
+		const amounts = balanceEntries.map((b) => b.amount);
+		const dates = balanceEntries.map(() => isoDate);
 
-		await calculateNetWorth([{date: date.toDateString()}]);
+		await sql`
+			INSERT INTO balances (bank_account, amount, date)
+			SELECT * FROM UNNEST(${accounts}::uuid[], ${amounts}::numeric[], ${dates}::date[])
+			ON CONFLICT (bank_account, date) DO UPDATE SET amount = EXCLUDED.amount;
+		`;
+
+		await calculateNetWorth([isoDate]);
 	} catch (e) {
 		console.error(e);
 		throw new Error('Failed to update balances');
@@ -339,21 +330,27 @@ export async function updateBalances(formData: FormData) {
 export async function DistPieChartData(): Promise<{account: string; balance: number}[]> {
 	const session = await auth();
 	if (!session) throw new Error('Not logged in');
-	const allAccounts =
-		(await sql`SELECT * FROM bank_accounts WHERE owner = (SELECT id FROM users WHERE email = ${session!.user?.email})`) as Account[];
-	const data: {
-		account: string;
-		balance: number;
-	}[] = [];
 
-	for (const account of allAccounts) {
-		const balances = await getBalances(account.id);
-		const formattedBalances = formatBalances(balances);
-		if (formattedBalances.length > 0) {
-			data.push({account: account.name, balance: formattedBalances[formattedBalances.length - 1].amount});
-		}
+	try {
+		const result = await sql`
+			SELECT DISTINCT ON (a.id)
+				a.name as account,
+				b.amount as balance
+			FROM bank_accounts a
+			LEFT JOIN balances b ON a.id = b.bank_account
+			WHERE a.owner = (SELECT id FROM users WHERE email = ${session.user?.email})
+			AND a.name <> 'Net Worth'
+			ORDER BY a.id, b.date DESC
+		`;
+
+		return result.map((r) => ({
+			account: r.account,
+			balance: parseFloat(r.balance || 0)
+		}));
+	} catch (e) {
+		console.error(e);
+		throw new Error('Failed to fetch distribution data');
 	}
-	return data;
 }
 
 export async function MoM(): Promise<{percMoM: number; absMoM: number}> {
