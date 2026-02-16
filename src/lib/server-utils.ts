@@ -3,8 +3,7 @@
 import {auth} from '@/auth';
 import {sql} from '@/lib/db';
 import {Account, BalanceData} from './types';
-import {revalidatePath} from 'next/cache';
-import {Session} from 'next-auth';
+import {revalidateTag, unstable_cache} from 'next/cache';
 import {getFinancialYearRange} from './utils';
 import {redirect} from 'next/navigation';
 import {cache} from 'react';
@@ -29,7 +28,7 @@ export async function saveNewAccount(
 	const type = data.get('type') as string;
 
 	try {
-		const account = await sql`
+		await sql`
 			INSERT INTO bank_accounts (owner, name, type, parent)
 			VALUES (
 			${user.id},
@@ -37,8 +36,7 @@ export async function saveNewAccount(
 			${type},
 			${bank}
 			)`;
-		revalidatePath('/accounts');
-		revalidatePath('/');
+		revalidateTag('accounts');
 		return {success: true, account_name};
 	} catch (e) {
 		console.error(e);
@@ -71,8 +69,8 @@ export async function saveNewAccountAndBalance(data: FormData): Promise<{success
 		const accountID = accountRow.id;
 		await saveBalance(accountID, date, balance);
 		await calculateNetWorth([date]);
-		revalidatePath('/accounts');
-		revalidatePath('/');
+		revalidateTag('accounts');
+		revalidateTag('balances');
 		return {success: true, account_name};
 	} catch (e) {
 		console.error(e);
@@ -96,6 +94,7 @@ export async function checkNetWorthRowExistsandCreate(userID: string): Promise<v
 		INSERT INTO bank_accounts (owner, name, type, parent, tags)
 		VALUES (${userID}, 'Net Worth', 'Net Worth', 'Net Worth', ARRAY['nw'])
 		`;
+			revalidateTag('accounts');
 		}
 	} catch (e) {
 		console.log(e);
@@ -105,6 +104,7 @@ export async function checkNetWorthRowExistsandCreate(userID: string): Promise<v
 
 export async function recalculateNetWorthAction() {
 	await calculateNetWorth();
+	revalidateTag('balances');
 	redirect('/settings');
 }
 
@@ -134,8 +134,7 @@ export async function calculateNetWorth(dates?: string[]): Promise<void> {
 		ON CONFLICT (bank_account, date)
 		DO UPDATE SET amount = EXCLUDED.amount
 	`;
-		revalidatePath('/');
-		revalidatePath('/accounts');
+		revalidateTag('balances');
 	} catch (e) {
 		console.error(e);
 		throw new Error('Failed to calculate net worth');
@@ -154,6 +153,7 @@ export async function saveBalance(accountID: string, date: string, balance: stri
 			${date},
 			${balance}
 		)`;
+		revalidateTag('balances');
 		return {success: true};
 	} catch (e) {
 		console.error(e);
@@ -161,34 +161,39 @@ export async function saveBalance(accountID: string, date: string, balance: stri
 	}
 }
 
-export async function getNetWorthAccount(): Promise<Account> {
-	const user = await getCachedUser();
-	if (!user) throw new Error('Unauthorized');
+export const getNetWorthAccount = unstable_cache(
+	async (): Promise<Account> => {
+		const user = await getCachedUser();
+		if (!user) throw new Error('Unauthorized');
 
-	await checkNetWorthRowExistsandCreate(user.id);
+		await checkNetWorthRowExistsandCreate(user.id);
 
-	const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} AND name = 'Net Worth'`;
-	const account = accountResult[0] as Account;
-	return account;
-}
+		const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} AND name = 'Net Worth'`;
+		return accountResult[0] as Account;
+	},
+	['net-worth-account'],
+	{tags: ['accounts']}
+);
 
-export async function getAccount(accountID: string): Promise<Account> {
-	try {
+export const getAccount = unstable_cache(
+	async (accountID: string): Promise<Account> => {
 		const user = await getCachedUser();
 		if (!user) throw new Error('Unauthorized');
 		const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} AND id=${accountID}`;
-		const account = accountResult[0] as Account;
-		return account;
-	} catch (e) {
-		throw new Error(`Error: ${e}`);
-	}
-}
+		return accountResult[0] as Account;
+	},
+	['account-detail'],
+	{tags: ['accounts']}
+);
 
-export async function getBalances(accountID: string): Promise<BalanceData[]> {
-	const balancesResult = await sql`SELECT amount, date FROM balances WHERE bank_account = ${accountID}`;
-	const balances = balancesResult as BalanceData[];
-	return balances;
-}
+export const getBalances = unstable_cache(
+	async (accountID: string): Promise<BalanceData[]> => {
+		const balancesResult = await sql`SELECT amount, date FROM balances WHERE bank_account = ${accountID}`;
+		return balancesResult as BalanceData[];
+	},
+	['balances-list'],
+	{tags: ['balances']}
+);
 
 export async function isNewUser(): Promise<boolean> {
 	try {
@@ -201,8 +206,8 @@ export async function isNewUser(): Promise<boolean> {
 	}
 }
 
-export async function changeAllTime(): Promise<{percChangeAT: number; absChangeAT: number}> {
-	try {
+export const changeAllTime = unstable_cache(
+	async (): Promise<{percChangeAT: number; absChangeAT: number}> => {
 		const user = await getCachedUser();
 		if (!user) throw new Error('Unauthorized');
 		const result = await sql`
@@ -237,14 +242,14 @@ export async function changeAllTime(): Promise<{percChangeAT: number; absChangeA
 		const formatted = parseFloat(change.toPrecision(2));
 		const absChange = latest - earliest;
 		return {percChangeAT: formatted, absChangeAT: parseFloat(absChange.toFixed(2))};
-	} catch (e) {
-		throw new Error(`Error: ${e}`);
-	}
-}
+	},
+	['stats-all-time'],
+	{tags: ['balances']}
+);
 
-export async function percentChangeFY(): Promise<{percChangeFY: number; absChangeFY: number}> {
-	const {start, end} = getFinancialYearRange();
-	try {
+export const percentChangeFY = unstable_cache(
+	async (): Promise<{percChangeFY: number; absChangeFY: number}> => {
+		const {start, end} = getFinancialYearRange();
 		const user = await getCachedUser();
 		if (!user) throw new Error('Unauthorized');
 		const result = await sql`
@@ -281,10 +286,10 @@ export async function percentChangeFY(): Promise<{percChangeFY: number; absChang
 		const formatted = change.toPrecision(2);
 		const absChange = latest - earliest;
 		return {percChangeFY: parseFloat(formatted), absChangeFY: parseFloat(absChange.toFixed(2))};
-	} catch (e) {
-		throw new Error(`Error: ${e}`);
-	}
-}
+	},
+	['stats-fy'],
+	{tags: ['balances']}
+);
 
 export async function updateBalances(formData: FormData) {
 	const dateStr = formData.get('date') as string;
@@ -315,6 +320,7 @@ export async function updateBalances(formData: FormData) {
 		`;
 
 		await calculateNetWorth([isoDate]);
+		revalidateTag('balances');
 	} catch (e) {
 		console.error(e);
 		throw new Error('Failed to update balances');
@@ -323,11 +329,11 @@ export async function updateBalances(formData: FormData) {
 	redirect('/');
 }
 
-export async function DistPieChartData(): Promise<{account: string; balance: number}[]> {
-	const user = await getCachedUser();
-	if (!user) throw new Error('Unauthorized');
+export const DistPieChartData = unstable_cache(
+	async (): Promise<{account: string; balance: number}[]> => {
+		const user = await getCachedUser();
+		if (!user) throw new Error('Unauthorized');
 
-	try {
 		const result = await sql`
 			SELECT DISTINCT ON (a.id)
 				a.name as account,
@@ -343,15 +349,14 @@ export async function DistPieChartData(): Promise<{account: string; balance: num
 			account: r.account,
 			balance: parseFloat(r.balance || 0)
 		}));
-	} catch (e) {
-		console.error(e);
-		throw new Error('Failed to fetch distribution data');
-	}
-}
+	},
+	['pie-chart-data'],
+	{tags: ['balances', 'accounts']}
+);
 
-export async function MoM(): Promise<{percMoM: number; absMoM: number}> {
-	try {
-		const user = await getCachedUser(); // Uses cache if already called
+export const MoM = unstable_cache(
+	async (): Promise<{percMoM: number; absMoM: number}> => {
+		const user = await getCachedUser();
 		if (!user) throw new Error('Unauthorized');
 		const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} AND name = 'Net Worth'`;
 		const account = accountResult[0] as Account;
@@ -368,14 +373,14 @@ export async function MoM(): Promise<{percMoM: number; absMoM: number}> {
 		const formatted = change.toPrecision(2);
 		const absChange = latest - earliest;
 		return {percMoM: parseFloat(formatted), absMoM: parseFloat(absChange.toFixed(2))};
-	} catch (e) {
-		throw new Error(`Error: ${e}`);
-	}
-}
+	},
+	['stats-mom'],
+	{tags: ['balances']}
+);
 
-export async function YoY(): Promise<{percYoY: number; absYoY: number}> {
-	try {
-		const user = await getCachedUser(); // Uses cache if already called
+export const YoY = unstable_cache(
+	async (): Promise<{percYoY: number; absYoY: number}> => {
+		const user = await getCachedUser();
 		if (!user) throw new Error('Unauthorized');
 		const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} AND name = 'Net Worth'`;
 		const account = accountResult[0] as Account;
@@ -406,7 +411,7 @@ export async function YoY(): Promise<{percYoY: number; absYoY: number}> {
 		const formatted = change.toPrecision(2);
 		const absChange = latestAmount - earliestAmount;
 		return {percYoY: parseFloat(formatted), absYoY: parseFloat(absChange.toFixed(2))};
-	} catch (e) {
-		throw new Error(`Error: ${e}`);
-	}
-}
+	},
+	['stats-yoy'],
+	{tags: ['balances']}
+);
