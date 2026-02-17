@@ -13,7 +13,8 @@ export default async function AccountPage({params}: {params: Promise<{id: string
 	const account = await getAccount(id);
 	const balances = await getBalances(id);
 	const formattedBalances = formatBalances(balances);
-	const diff = formattedBalances[formattedBalances.length - 1].amount - formattedBalances[0].amount;
+	const hasBalances = formattedBalances.length > 0;
+	const diff = hasBalances ? formattedBalances[formattedBalances.length - 1].amount - formattedBalances[0].amount : 0;
 	const diffPercent = getDiffPercent(formattedBalances);
 	return (
 		<>
@@ -60,10 +61,10 @@ export default async function AccountPage({params}: {params: Promise<{id: string
 							</h2>
 							<div className="h-full">
 								<span className="text-3xl font-bold">
-									{formatter.format(formattedBalances[formattedBalances.length - 1].amount) || 'N/A'}
+									{hasBalances ? formatter.format(formattedBalances[formattedBalances.length - 1].amount) : 'N/A'}
 								</span>
 								<br />
-								<span>{formattedBalances[formattedBalances.length - 1].date || 'N/A'}</span>
+								<span>{hasBalances ? formattedBalances[formattedBalances.length - 1].date : 'N/A'}</span>
 							</div>
 						</Card>
 						<Card className="flex h-fit w-full items-center justify-between md:h-1/3">
@@ -75,9 +76,11 @@ export default async function AccountPage({params}: {params: Promise<{id: string
 						<Card className="flex h-fit w-full items-center justify-between md:h-1/3">
 							<h2 className="mb-2 text-xl font-bold">Starting Balance</h2>
 							<div className="h-full">
-								<span className="text-3xl font-bold">{formatter.format(formattedBalances[0].amount)}</span>
+								<span className="text-3xl font-bold">
+									{hasBalances ? formatter.format(formattedBalances[0].amount) : 'N/A'}
+								</span>
 								<br />
-								<span>{formattedBalances[0].date}</span>
+								<span>{hasBalances ? formattedBalances[0].date : 'N/A'}</span>
 							</div>
 						</Card>
 					</div>

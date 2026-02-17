@@ -32,7 +32,9 @@ export default async function Home() {
 		<main className="grid h-full min-h-full w-full grid-cols-6 gap-4">
 			<Card className="col-span-1 flex flex-col justify-evenly whitespace-nowrap lg:col-start-1 lg:row-start-1">
 				<h2 className="text-2xl font-bold">
-					{currencyFormatter(formattedBalances[formattedBalances.length - 1].amount)}
+					{formattedBalances.length > 0
+						? currencyFormatter(formattedBalances[formattedBalances.length - 1].amount)
+						: '£0'}
 				</h2>
 				<span className="text-muted-foreground text-sm">Current Net Worth</span>
 			</Card>
