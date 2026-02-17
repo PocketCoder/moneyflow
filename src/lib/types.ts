@@ -36,4 +36,5 @@ export interface BalanceData {
 	account: UUID; // AccountData.id
 	date: DateTime;
 	amount: number;
+	originalDate?: DateTime;
 }

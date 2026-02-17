@@ -7,18 +7,12 @@ import {sql} from '@/lib/db';
 import {Card} from '@/components/Tremor/Card';
 import BalanceSpark from '@/components/BalanceSpark';
 
+import {formatBalances} from '@/lib/utils';
+
 export default async function Account({account}: {account: AccountData}) {
-	const balances = (await sql`SELECT * FROM balances WHERE bank_account = ${account.id}`) as BalanceData[];
-	const formattedBalances: BalanceData[] = balances
-		.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-		.map((balance) => ({
-			...balance,
-			date: new Intl.DateTimeFormat('en-GB', {
-				month: 'short',
-				year: 'numeric'
-			}).format(new Date(balance.date)),
-			amount: parseFloat(balance.amount as any)
-		}));
+	const balances =
+		(await sql`SELECT * FROM balances WHERE bank_account = ${account.id} ORDER BY date ASC`) as BalanceData[];
+	const formattedBalances: BalanceData[] = formatBalances(balances);
 	return (
 		<Link href={`/accounts/${account.id}`}>
 			<Card

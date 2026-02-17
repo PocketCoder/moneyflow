@@ -46,11 +46,12 @@ export function currencyFormatter(value: number | string | undefined) {
 export function formatBalances(balances: BalanceData[]): BalanceData[] {
 	return balances.map((balance) => ({
 		...balance,
+		originalDate: balance.date,
 		date: new Intl.DateTimeFormat('en-GB', {
 			month: 'short',
 			year: 'numeric'
 		}).format(new Date(balance.date)),
-		amount: balance.amount || 0
+		amount: parseFloat(balance.amount as any) || 0
 	}));
 }
 
