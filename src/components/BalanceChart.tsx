@@ -4,7 +4,7 @@ import {ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip} from 'recha
 import {currencyFormatter} from '@/lib/utils';
 
 export default function BalanceChart({data, type}: {data: BalanceData[]; type: Partial<AccountData>['type']}) {
-	const color = type === 'Debt' ? 'var(--destructive)' : 'var(--primary)';
+	const color = type === 'Debt' ? 'var(--destructive)' : 'var(--chart-1)';
 	return (
 		<ResponsiveContainer width={'100%'} height={'100%'}>
 			<AreaChart data={data} margin={{top: 5, right: 20, bottom: 5, left: 0}}>

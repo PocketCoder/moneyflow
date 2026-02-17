@@ -14,7 +14,7 @@ export default function BalanceSpark({
 	width: number;
 	height: number;
 }) {
-	const color = type === 'Debt' ? 'var(--destructive)' : 'var(--primary)';
+	const color = type === 'Debt' ? 'var(--destructive)' : 'var(--chart-1)';
 	return (
 		<ResponsiveContainer width={width} height={height}>
 			<AreaChart data={data}>

@@ -15,14 +15,7 @@ export function StatCard({title, value, change, changeFormatted}: StatCardProps)
 	return (
 		<Card className="col-span-1 flex flex-col justify-evenly whitespace-nowrap">
 			<h2 className="text-2xl font-bold">{value}</h2>
-			<Badge
-				variant={'secondary'}
-				className={clsx({
-					'text-primary-foreground w-fit gap-1': true,
-					'bg-primary': change > 0,
-					'bg-destructive': change < 0,
-					'bg-foreground': change === 0
-				})}>
+			<Badge variant={change > 0 ? 'default' : change < 0 ? 'destructive' : 'secondary'} className="w-fit gap-1">
 				{changeFormatted}
 				{change > 0 ? <TrendingUpIcon /> : <TrendingDownIcon />}
 			</Badge>
