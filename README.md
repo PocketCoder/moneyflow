@@ -16,24 +16,23 @@
 
 **Vantage** is a minimalist financial tracker designed to help you ignore the minutiae of daily transactions and focus on the big picture.
 
-Unlike standard budgeting apps that shame you for buying coffee, Vantage focuses on **Net Worth**, **Asset Allocation**, and **Long-term Trends**. It features a "Natural Wealth" design language—using deep forest greens, warm stones, and slate greys—to create a calm, professional environment for managing your financial future.
+Unlike standard budgeting apps that shame you for buying coffee, Vantage focuses on **Net Worth**, **Asset Allocation**, and **Long-term Trends**.
 
 ## ✨ Features
 
 - **Macro Tracking:** Log balances periodically (monthly/weekly) rather than every transaction.
-- **Net Worth Visualisation:** Beautiful, interactive area charts showing your wealth trajectory.
+- **Net Worth Visualisation:** Charts showing your wealth trajectory.
 - **Trend Analysis:** Automatic calculation of Month-on-Month (MoM) and Year-on-Year (YoY) growth.
 - **Asset Allocation:** Breakdown of your portfolio (Cash, Pensions, Investments, Debt).
-- **Privacy First:** Self-hostable and owns your data.
-- **Responsive Design:** A premium mobile and desktop experience built with Tailwind CSS v4.
+- **Privacy First:** Self-hostable.
 
 ## 🛠 Tech Stack
 
-- **Framework:** [Next.js 15](https://nextjs.org/) (App Router)
+- **Framework:** [Next.js 16](https://nextjs.org/) (App Router)
 - **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) & [Tailwind Variants](https://www.tailwind-variants.org/)
 - **Database:** [Neon](https://neon.tech/) (Serverless Postgres)
 - **Auth:** [NextAuth.js v5](https://authjs.dev/)
-- **Charts:** [Recharts](https://recharts.org/) (customized for Tremor-like aesthetic)
+- **Charts:** [Recharts](https://recharts.org/)
 - **Icons:** [Heroicons](https://heroicons.com/) & [Lucide](https://lucide.dev/)
 
 ## 🚀 Getting Started
@@ -62,7 +61,7 @@ Unlike standard budgeting apps that shame you for buying coffee, Vantage focuses
 3. **Environment Setup** Create a `.env` file in the root directory:
 
    ```env
-   DATABASE_URL="postgres://user:pass@ep-xyz.region.aws.neon.tech/neondb?sslmode=require"
+   DATABASE_URL="your-db-url"
    AUTH_SECRET="your-generated-secret"
    GITHUB_ID="your-github-oauth-id"
    GITHUB_SECRET="your-github-oauth-secret"
@@ -99,7 +98,3 @@ We welcome contributions! Please check `TODO.md` for a list of architectural imp
 ## 📄 License
 
 Distributed under the MIT License.
-
-```
-
-```
