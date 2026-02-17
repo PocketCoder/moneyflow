@@ -97,16 +97,20 @@ export async function saveBalance(accountID: string, date: string, balance: stri
 	}
 }
 
-export const getAccount = unstable_cache(
-	async (accountID: string): Promise<Account> => {
-		const user = await getCachedUser();
-		if (!user) throw new Error('Unauthorized');
-		const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} AND id=${accountID}`;
+const getAccountInternal = unstable_cache(
+	async (userId: string, accountID: string): Promise<Account> => {
+		const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${userId} AND id=${accountID}`;
 		return accountResult[0] as Account;
 	},
 	['account-detail'],
 	{tags: ['accounts']}
 );
+
+export async function getAccount(accountID: string) {
+	const user = await getCachedUser();
+	if (!user) throw new Error('Unauthorized');
+	return getAccountInternal(user.id, accountID);
+}
 
 export const getBalances = unstable_cache(
 	async (accountID: string): Promise<BalanceData[]> => {
@@ -118,14 +122,12 @@ export const getBalances = unstable_cache(
 	{tags: ['balances']}
 );
 
-export const getNetWorthHistory = unstable_cache(
-	async (): Promise<BalanceData[]> => {
-		const user = await getCachedUser();
-		if (!user) throw new Error('Unauthorized');
+const getNetWorthHistoryInternal = unstable_cache(
+	async (userId: string): Promise<BalanceData[]> => {
 		const result = await sql`
 			SELECT total_net_worth as amount, date 
 			FROM net_worth_history 
-			WHERE owner = ${user.id} 
+			WHERE owner = ${userId} 
 			ORDER BY date ASC
 		`;
 		return result as BalanceData[];
@@ -133,6 +135,12 @@ export const getNetWorthHistory = unstable_cache(
 	['net-worth-history'],
 	{tags: ['balances']}
 );
+
+export async function getNetWorthHistory() {
+	const user = await getCachedUser();
+	if (!user) throw new Error('Unauthorized');
+	return getNetWorthHistoryInternal(user.id);
+}
 
 export async function isNewUser(): Promise<boolean> {
 	try {
@@ -145,19 +153,17 @@ export async function isNewUser(): Promise<boolean> {
 	}
 }
 
-export const changeAllTime = unstable_cache(
-	async (): Promise<{percChangeAT: number; absChangeAT: number}> => {
-		const user = await getCachedUser();
-		if (!user) throw new Error('Unauthorized');
+const changeAllTimeInternal = unstable_cache(
+	async (userId: string): Promise<{percChangeAT: number; absChangeAT: number}> => {
 		const result = await sql`
 			WITH dates AS (
                    SELECT MIN(date) as start_date, MAX(date) as end_date
                    FROM net_worth_history
-                   WHERE owner = ${user.id}
+                   WHERE owner = ${userId}
                )
                SELECT 
-                   (SELECT total_net_worth FROM net_worth_history WHERE owner = ${user.id} AND date = d.start_date) as earliest_balance,
-                   (SELECT total_net_worth FROM net_worth_history WHERE owner = ${user.id} AND date = d.end_date) as latest_balance
+                   (SELECT total_net_worth FROM net_worth_history WHERE owner = ${userId} AND date = d.start_date) as earliest_balance,
+                   (SELECT total_net_worth FROM net_worth_history WHERE owner = ${userId} AND date = d.end_date) as latest_balance
                FROM dates d
 		`;
 		if (!result[0] || result[0].earliest_balance === null) return {percChangeAT: 0, absChangeAT: 0};
@@ -170,16 +176,20 @@ export const changeAllTime = unstable_cache(
 	{tags: ['balances']}
 );
 
-export const percentChangeFY = unstable_cache(
-	async (): Promise<{percChangeFY: number; absChangeFY: number}> => {
+export async function changeAllTime() {
+	const user = await getCachedUser();
+	if (!user) throw new Error('Unauthorized');
+	return changeAllTimeInternal(user.id);
+}
+
+const percentChangeFYInternal = unstable_cache(
+	async (userId: string): Promise<{percChangeFY: number; absChangeFY: number}> => {
 		const {start, end} = getFinancialYearRange();
-		const user = await getCachedUser();
-		if (!user) throw new Error('Unauthorized');
 		const result = await sql`
 			WITH range_data AS (
 				SELECT total_net_worth as amount, date
 				FROM net_worth_history
-				WHERE owner = ${user.id} AND date BETWEEN ${start} AND ${end}
+				WHERE owner = ${userId} AND date BETWEEN ${start} AND ${end}
 			)
 			SELECT 
 				(SELECT amount FROM range_data ORDER BY date ASC LIMIT 1) as earliest_balance,
@@ -196,6 +206,12 @@ export const percentChangeFY = unstable_cache(
 	['stats-fy'],
 	{tags: ['balances']}
 );
+
+export async function percentChangeFY() {
+	const user = await getCachedUser();
+	if (!user) throw new Error('Unauthorized');
+	return percentChangeFYInternal(user.id);
+}
 
 export async function updateBalances(formData: FormData) {
 	const dateStr = formData.get('date') as string;
@@ -234,18 +250,15 @@ export async function updateBalances(formData: FormData) {
 	redirect('/');
 }
 
-export const DistPieChartData = unstable_cache(
-	async (): Promise<{account: string; balance: number}[]> => {
-		const user = await getCachedUser();
-		if (!user) throw new Error('Unauthorized');
-
+const DistPieChartDataInternal = unstable_cache(
+	async (userId: string): Promise<{account: string; balance: number}[]> => {
 		const result = await sql`
 			SELECT DISTINCT ON (a.id)
 				a.name as account,
 				b.amount as balance
 			FROM bank_accounts a
 			LEFT JOIN balances b ON a.id = b.bank_account
-			WHERE a.owner = ${user.id}
+			WHERE a.owner = ${userId}
 			AND a.name <> 'Net Worth'
 			ORDER BY a.id, b.date DESC
 		`;
@@ -259,15 +272,18 @@ export const DistPieChartData = unstable_cache(
 	{tags: ['balances', 'accounts']}
 );
 
-export const MoM = unstable_cache(
-	async (): Promise<{percMoM: number; absMoM: number}> => {
-		const user = await getCachedUser();
-		if (!user) throw new Error('Unauthorized');
+export async function DistPieChartData() {
+	const user = await getCachedUser();
+	if (!user) throw new Error('Unauthorized');
+	return DistPieChartDataInternal(user.id);
+}
 
+const MoMInternal = unstable_cache(
+	async (userId: string): Promise<{percMoM: number; absMoM: number}> => {
 		const balResult = await sql`
                SELECT total_net_worth as amount 
                FROM net_worth_history 
-               WHERE owner = ${user.id} 
+               WHERE owner = ${userId} 
                ORDER BY date DESC 
                LIMIT 2
            `;
@@ -283,15 +299,18 @@ export const MoM = unstable_cache(
 	{tags: ['balances']}
 );
 
-export const YoY = unstable_cache(
-	async (): Promise<{percYoY: number; absYoY: number}> => {
-		const user = await getCachedUser();
-		if (!user) throw new Error('Unauthorized');
+export async function MoM() {
+	const user = await getCachedUser();
+	if (!user) throw new Error('Unauthorized');
+	return MoMInternal(user.id);
+}
 
+const YoYInternal = unstable_cache(
+	async (userId: string): Promise<{percYoY: number; absYoY: number}> => {
 		const latestResult = await sql`
 			SELECT total_net_worth as amount, date 
 			FROM net_worth_history 
-			WHERE owner = ${user.id} 
+			WHERE owner = ${userId} 
 			ORDER BY date DESC 
 			LIMIT 1
 		`;
@@ -309,7 +328,7 @@ export const YoY = unstable_cache(
 		const earliestResult = await sql`
 			SELECT total_net_worth as amount 
 			FROM net_worth_history 
-			WHERE owner = ${user.id} 
+			WHERE owner = ${userId} 
 			AND date <= ${priorYearDate.toISOString().split('T')[0]} 
 			ORDER BY date DESC 
 			LIMIT 1
@@ -329,3 +348,9 @@ export const YoY = unstable_cache(
 	['stats-yoy'],
 	{tags: ['balances']}
 );
+
+export async function YoY() {
+	const user = await getCachedUser();
+	if (!user) throw new Error('Unauthorized');
+	return YoYInternal(user.id);
+}
