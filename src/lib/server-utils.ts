@@ -36,7 +36,7 @@ export async function saveNewAccount(
 			${type},
 			${bank}
 			)`;
-		revalidateTag('accounts');
+		revalidateTag('accounts', 'max');
 		return {success: true, account_name};
 	} catch (e) {
 		console.error(e);
@@ -68,8 +68,8 @@ export async function saveNewAccountAndBalance(data: FormData): Promise<{success
 		const accountRow = account[0] as Account;
 		const accountID = accountRow.id;
 		await saveBalance(accountID, date, balance);
-		revalidateTag('accounts');
-		revalidateTag('balances');
+		revalidateTag('accounts', 'max');
+		revalidateTag('balances', 'max');
 		return {success: true, account_name};
 	} catch (e) {
 		console.error(e);
@@ -89,7 +89,7 @@ export async function saveBalance(accountID: string, date: string, balance: stri
 			${date},
 			${balance}
 		)`;
-		revalidateTag('balances');
+		revalidateTag('balances', 'max');
 		return {success: true};
 	} catch (e) {
 		console.error(e);
@@ -234,7 +234,7 @@ export async function updateBalances(formData: FormData) {
 			ON CONFLICT (bank_account, date) DO UPDATE SET amount = EXCLUDED.amount;
 		`;
 
-		revalidateTag('balances');
+		revalidateTag('balances', 'max');
 	} catch (e) {
 		console.error(e);
 		throw new Error('Failed to update balances');
