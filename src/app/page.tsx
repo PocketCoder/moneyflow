@@ -1,19 +1,18 @@
 import {StatCard} from '@/components/StatCard';
-import type {BalanceData} from '@/lib/types';
+import {AccountType, type BalanceData} from '@/lib/types';
 import {Card} from '@/components/Tremor/Card';
 import BalanceChart from '@/components/BalanceChart';
 import {currencyFormatter, formatBalances} from '@/lib/utils';
 import {
 	DistPieChartData,
-	getBalances,
 	isNewUser,
 	changeAllTime,
 	percentChangeFY,
 	MoM,
 	YoY,
-	getCachedUser
+	getCachedUser,
+	getNetWorthHistory
 } from '@/lib/server-utils';
-import {getNetWorthAccount} from '@/lib/server-utils';
 import {redirect} from 'next/navigation';
 import {ChartBar} from '@/components/BarChart';
 
@@ -23,8 +22,7 @@ export default async function Home() {
 		redirect('/welcome');
 	}
 
-	const netWorthAccount = await getNetWorthAccount();
-	const balances = await getBalances(netWorthAccount.id);
+	const balances = await getNetWorthHistory();
 	const formattedBalances: BalanceData[] = formatBalances(balances);
 
 	const [{percChangeAT, absChangeAT}, {percChangeFY, absChangeFY}, {percMoM, absMoM}, {percYoY, absYoY}, PieData] =
@@ -63,7 +61,7 @@ export default async function Home() {
 				changeFormatted={currencyFormatter(absYoY)}
 			/>
 			<Card className="flex items-center justify-center md:col-span-2 lg:col-span-4 lg:col-start-1 lg:row-span-3 lg:row-start-2">
-				<BalanceChart data={formattedBalances} type={netWorthAccount.type} />
+				<BalanceChart data={formattedBalances} type={AccountType.NetWorth} />
 			</Card>
 			<Card className="flex items-center justify-center md:col-span-2 lg:col-span-2 lg:col-start-5 lg:row-span-3 lg:row-start-2">
 				<ChartBar data={PieData} />

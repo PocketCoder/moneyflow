@@ -36,7 +36,7 @@ export async function saveNewAccount(
 			${type},
 			${bank}
 			)`;
-		revalidateTag('accounts');
+		revalidateTag('accounts', 'max');
 		return {success: true, account_name};
 	} catch (e) {
 		console.error(e);
@@ -68,76 +68,12 @@ export async function saveNewAccountAndBalance(data: FormData): Promise<{success
 		const accountRow = account[0] as Account;
 		const accountID = accountRow.id;
 		await saveBalance(accountID, date, balance);
-		await calculateNetWorth([date]);
-		revalidateTag('accounts');
-		revalidateTag('balances');
+		revalidateTag('accounts', 'max');
+		revalidateTag('balances', 'max');
 		return {success: true, account_name};
 	} catch (e) {
 		console.error(e);
 		throw new Error('Failed to create account.');
-	}
-}
-
-export async function checkNetWorthRowExistsandCreate(userID: string): Promise<void> {
-	try {
-		const result = await sql`
-			SELECT EXISTS(
-				SELECT 1 
-				FROM bank_accounts 
-				WHERE owner = ${userID}
-				AND name = 'Net Worth'
-			) AS row_exists;
-			`;
-
-		if (!result || result.length === 0 || !result[0].row_exists) {
-			await sql`
-		INSERT INTO bank_accounts (owner, name, type, parent, tags)
-		VALUES (${userID}, 'Net Worth', 'Net Worth', 'Net Worth', ARRAY['nw'])
-		`;
-			revalidateTag('accounts');
-		}
-	} catch (e) {
-		console.log(e);
-		throw new Error(`Error: ${e}`);
-	}
-}
-
-export async function recalculateNetWorthAction() {
-	await calculateNetWorth();
-	revalidateTag('balances');
-	redirect('/settings');
-}
-
-export async function calculateNetWorth(dates?: string[]): Promise<void> {
-	const user = await getCachedUser();
-	if (!user) throw new Error('Unauthorized');
-
-	// Ensure the Net Worth account exists first
-	await checkNetWorthRowExistsandCreate(user.id);
-
-	try {
-		await sql`
-		INSERT INTO balances (bank_account, date, amount)
-		SELECT
-			nw.id,
-			b.date,
-			SUM(b.amount)
-		FROM balances b
-		JOIN bank_accounts a ON b.bank_account = a.id
-		JOIN users u ON a.owner = u.id
-		JOIN bank_accounts nw ON nw.owner = u.id AND nw.name = 'Net Worth'
-		WHERE 
-			u.id = ${user.id}
-			AND a.name <> 'Net Worth'
-			AND (${dates}::date[] IS NULL OR b.date = ANY(${dates}::date[]))
-		GROUP BY b.date, nw.id
-		ON CONFLICT (bank_account, date)
-		DO UPDATE SET amount = EXCLUDED.amount
-	`;
-		revalidateTag('balances');
-	} catch (e) {
-		console.error(e);
-		throw new Error('Failed to calculate net worth');
 	}
 }
 
@@ -153,27 +89,13 @@ export async function saveBalance(accountID: string, date: string, balance: stri
 			${date},
 			${balance}
 		)`;
-		revalidateTag('balances');
+		revalidateTag('balances', 'max');
 		return {success: true};
 	} catch (e) {
 		console.error(e);
 		throw new Error('Failed to save balance.');
 	}
 }
-
-export const getNetWorthAccount = unstable_cache(
-	async (): Promise<Account> => {
-		const user = await getCachedUser();
-		if (!user) throw new Error('Unauthorized');
-
-		await checkNetWorthRowExistsandCreate(user.id);
-
-		const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} AND name = 'Net Worth'`;
-		return accountResult[0] as Account;
-	},
-	['net-worth-account'],
-	{tags: ['accounts']}
-);
 
 export const getAccount = unstable_cache(
 	async (accountID: string): Promise<Account> => {
@@ -196,6 +118,22 @@ export const getBalances = unstable_cache(
 	{tags: ['balances']}
 );
 
+export const getNetWorthHistory = unstable_cache(
+	async (): Promise<BalanceData[]> => {
+		const user = await getCachedUser();
+		if (!user) throw new Error('Unauthorized');
+		const result = await sql`
+			SELECT total_net_worth as amount, date 
+			FROM net_worth_history 
+			WHERE owner = ${user.id} 
+			ORDER BY date ASC
+		`;
+		return result as BalanceData[];
+	},
+	['net-worth-history'],
+	{tags: ['balances']}
+);
+
 export async function isNewUser(): Promise<boolean> {
 	try {
 		const user = await getCachedUser();
@@ -212,37 +150,21 @@ export const changeAllTime = unstable_cache(
 		const user = await getCachedUser();
 		if (!user) throw new Error('Unauthorized');
 		const result = await sql`
-			SELECT 
-				b1.amount AS earliest_balance, 
-				b2.amount AS latest_balance
-			FROM balances b1
-			JOIN bank_accounts a 
-				ON b1.bank_account = a.id
-			JOIN (
-				SELECT bank_account, MAX(date) AS max_date
-				FROM balances
-				GROUP BY bank_account
-			) b_latest 
-				ON b1.bank_account = b_latest.bank_account
-			JOIN balances b2 
-				ON b2.bank_account = b_latest.bank_account 
-			AND b2.date = b_latest.max_date
-			WHERE a.name = 'Net Worth'
-			AND a.owner = ${user.id}
-			AND b1.date = (
-				SELECT MIN(date)
-				FROM balances
-				WHERE bank_account = a.id
-			)
+			WITH dates AS (
+                   SELECT MIN(date) as start_date, MAX(date) as end_date
+                   FROM net_worth_history
+                   WHERE owner = ${user.id}
+               )
+               SELECT 
+                   (SELECT total_net_worth FROM net_worth_history WHERE owner = ${user.id} AND date = d.start_date) as earliest_balance,
+                   (SELECT total_net_worth FROM net_worth_history WHERE owner = ${user.id} AND date = d.end_date) as latest_balance
+               FROM dates d
 		`;
-		if (!result[0]) return {percChangeAT: 0, absChangeAT: 0};
-		const balances = result[0] as {earliest_balance: string; latest_balance: string};
-		const earliest = parseFloat(balances.earliest_balance);
-		const latest = parseFloat(balances.latest_balance);
+		if (!result[0] || result[0].earliest_balance === null) return {percChangeAT: 0, absChangeAT: 0};
+		const earliest = parseFloat(result[0].earliest_balance);
+		const latest = parseFloat(result[0].latest_balance);
 		const change = ((latest - earliest) / Math.abs(earliest)) * 100;
-		const formatted = parseFloat(change.toPrecision(2));
-		const absChange = latest - earliest;
-		return {percChangeAT: formatted, absChangeAT: parseFloat(absChange.toFixed(2))};
+		return {percChangeAT: parseFloat(change.toPrecision(2)), absChangeAT: parseFloat((latest - earliest).toFixed(2))};
 	},
 	['stats-all-time'],
 	{tags: ['balances']}
@@ -254,35 +176,18 @@ export const percentChangeFY = unstable_cache(
 		const user = await getCachedUser();
 		if (!user) throw new Error('Unauthorized');
 		const result = await sql`
+			WITH range_data AS (
+				SELECT total_net_worth as amount, date
+				FROM net_worth_history
+				WHERE owner = ${user.id} AND date BETWEEN ${start} AND ${end}
+			)
 			SELECT 
-				b1.amount AS earliest_balance, 
-				b2.amount AS latest_balance
-			FROM balances b1
-			JOIN bank_accounts a 
-				ON b1.bank_account = a.id
-			JOIN (
-				SELECT bank_account, MAX(date) AS max_date
-				FROM balances
-				WHERE date BETWEEN ${start} AND ${end}
-				GROUP BY bank_account
-			) b_latest 
-				ON b1.bank_account = b_latest.bank_account
-			JOIN balances b2 
-				ON b2.bank_account = b_latest.bank_account 
-			AND b2.date = b_latest.max_date
-			WHERE a.name = 'Net Worth'
-			AND a.owner = ${user.id}
-			AND b1.date = (
-				SELECT MIN(date)
-				FROM balances
-				WHERE bank_account = a.id
-				AND date BETWEEN ${start} AND ${end}
-			);
+				(SELECT amount FROM range_data ORDER BY date ASC LIMIT 1) as earliest_balance,
+				(SELECT amount FROM range_data ORDER BY date DESC LIMIT 1) as latest_balance
 		`;
-		if (!result[0]) return {percChangeFY: 0, absChangeFY: 0};
-		const balances = result[0] as {earliest_balance: string; latest_balance: string};
-		const earliest = parseFloat(balances.earliest_balance);
-		const latest = parseFloat(balances.latest_balance);
+		if (!result[0] || result[0].earliest_balance === null) return {percChangeFY: 0, absChangeFY: 0};
+		const earliest = parseFloat(result[0].earliest_balance);
+		const latest = parseFloat(result[0].latest_balance);
 		const change = ((latest - earliest) / Math.abs(earliest)) * 100;
 		const formatted = change.toPrecision(2);
 		const absChange = latest - earliest;
@@ -320,8 +225,7 @@ export async function updateBalances(formData: FormData) {
 			ON CONFLICT (bank_account, date) DO UPDATE SET amount = EXCLUDED.amount;
 		`;
 
-		await calculateNetWorth([isoDate]);
-		revalidateTag('balances');
+		revalidateTag('balances', 'max');
 	} catch (e) {
 		console.error(e);
 		throw new Error('Failed to update balances');
@@ -359,21 +263,21 @@ export const MoM = unstable_cache(
 	async (): Promise<{percMoM: number; absMoM: number}> => {
 		const user = await getCachedUser();
 		if (!user) throw new Error('Unauthorized');
-		const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} AND name = 'Net Worth'`;
-		const account = accountResult[0] as Account;
-		const balResult =
-			await sql`SELECT amount FROM balances WHERE bank_account = ${account.id} ORDER BY date DESC LIMIT 2`;
 
-		if (balResult.length < 2) {
-			return {percMoM: 0, absMoM: 0};
-		}
+		const balResult = await sql`
+               SELECT total_net_worth as amount 
+               FROM net_worth_history 
+               WHERE owner = ${user.id} 
+               ORDER BY date DESC 
+               LIMIT 2
+           `;
+
+		if (balResult.length < 2) return {percMoM: 0, absMoM: 0};
 
 		const latest = parseFloat(balResult[0].amount);
 		const earliest = parseFloat(balResult[1].amount);
 		const change = ((latest - earliest) / Math.abs(earliest)) * 100;
-		const formatted = change.toPrecision(2);
-		const absChange = latest - earliest;
-		return {percMoM: parseFloat(formatted), absMoM: parseFloat(absChange.toFixed(2))};
+		return {percMoM: parseFloat(change.toPrecision(2)), absMoM: parseFloat((latest - earliest).toFixed(2))};
 	},
 	['stats-mom'],
 	{tags: ['balances']}
@@ -383,11 +287,14 @@ export const YoY = unstable_cache(
 	async (): Promise<{percYoY: number; absYoY: number}> => {
 		const user = await getCachedUser();
 		if (!user) throw new Error('Unauthorized');
-		const accountResult = await sql`SELECT * FROM bank_accounts WHERE owner = ${user.id} AND name = 'Net Worth'`;
-		const account = accountResult[0] as Account;
 
-		const latestResult =
-			await sql`SELECT amount, date FROM balances WHERE bank_account = ${account.id} ORDER BY date DESC LIMIT 1`;
+		const latestResult = await sql`
+			SELECT total_net_worth as amount, date 
+			FROM net_worth_history 
+			WHERE owner = ${user.id} 
+			ORDER BY date DESC 
+			LIMIT 1
+		`;
 
 		if (latestResult.length === 0) {
 			return {percYoY: 0, absYoY: 0};
@@ -399,8 +306,14 @@ export const YoY = unstable_cache(
 		const priorYearDate = new Date(latestDate);
 		priorYearDate.setFullYear(priorYearDate.getFullYear() - 1);
 
-		const earliestResult =
-			await sql`SELECT amount FROM balances WHERE bank_account = ${account.id} AND date <= ${priorYearDate.toISOString().split('T')[0]} ORDER BY date DESC LIMIT 1`;
+		const earliestResult = await sql`
+			SELECT total_net_worth as amount 
+			FROM net_worth_history 
+			WHERE owner = ${user.id} 
+			AND date <= ${priorYearDate.toISOString().split('T')[0]} 
+			ORDER BY date DESC 
+			LIMIT 1
+		`;
 
 		if (earliestResult.length === 0) {
 			return {percYoY: 0, absYoY: 0};
